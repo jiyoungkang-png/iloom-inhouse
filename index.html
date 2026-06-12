@@ -48,6 +48,8 @@ button,input,select{font:inherit}
 .input-table th{background:#f9fafb;border-bottom:1px solid var(--line);padding:10px;font-size:13px}
 .input-table td{border-bottom:1px solid var(--line);padding:7px}
 .input-table input,.input-table select{width:100%;border:1px solid #edf0f3;border-radius:8px;padding:8px}
+.input-table textarea{width:100%;border:1px solid #edf0f3;border-radius:8px;padding:8px;resize:vertical;font:inherit;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.input-table td:nth-child(4){min-width:200px;max-width:300px}
 .icon-btn{border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:8px;cursor:pointer}
 .detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .detail-section{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fafbfc}
@@ -1514,7 +1516,7 @@ function newReport(){
 function addTest(item){
   const tbody=$('testTable').querySelector('tbody'); const tr=document.createElement('tr');
   const detail = item.detail || {};
-  tr.innerHTML=`<td class="rowno"></td><td><input class="t-name" value="${esc(item.name)}"></td><td><input class="t-spec" value="${esc(item.spec)}"></td><td><input class="t-crit" value="${esc(item.crit||'')}"></td><td><select class="t-cat"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></td><td><button class="btn ghost t-detail-btn" style="font-size:11px;padding:4px 8px;white-space:nowrap">세부 입력</button></td><td><button class="icon-btn">삭제</button></td>`;
+  tr.innerHTML=`<td class="rowno"></td><td><input class="t-name" value="${esc(item.name)}"></td><td><input class="t-spec" value="${esc(item.spec)}"></td><td><textarea class="t-crit" rows="3" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;padding:4px 6px;font:inherit;font-size:12px;resize:vertical;min-height:32px">${esc(item.crit||'')}</textarea></td><td><select class="t-cat"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></td><td><button class="btn ghost t-detail-btn" style="font-size:11px;padding:4px 8px;white-space:nowrap">세부 입력</button></td><td><button class="icon-btn">삭제</button></td>`;
   tbody.appendChild(tr);
   tr.querySelector('.t-cat').value=item.category||'기타';
 
@@ -1837,7 +1839,7 @@ function renderPreview(){
       <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
       <div class="red-title">■ 의뢰 시험 항목</div>
       <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:25%">시험 규격</th><th style="width:22%">시험 기준</th></tr></thead>
-        <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td><td class="left" style="white-space:pre-wrap">'+esc(t.crit||'')+'</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
+        <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td><td class="left" style="vertical-align:top">'+esc(t.crit||'').replace(/\n/g,'<br>')+'</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
       </table>
       <table class="report-table" style="margin-top:0;border-top:none"><tbody><tr>
         <td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border-top:1px solid #ddd;white-space:nowrap">비고</td>
