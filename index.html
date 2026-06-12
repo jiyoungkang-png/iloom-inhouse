@@ -2345,12 +2345,22 @@ function initRequestTab(){
       updateReqDelBtn();
     });
     const delBtn = document.getElementById('reqDelSelectedBtn');
-    if(delBtn) delBtn.onclick = function(){
+    if(delBtn) delBtn.onclick = async function(){
       const nos = [...document.querySelectorAll('.req-chk:checked')].map(c=>c.dataset.no);
       if(!nos.length) return;
       if(!confirm(nos.length+'개 의뢰서를 삭제할까요?')) return;
+      // 로컬 삭제
       const list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]').filter(r=>!nos.includes(r.no));
       localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+      // Supabase 삭제
+      for(const no of nos){
+        try {
+          await fetch(SUPA_URL+'/rest/v1/requests?id=eq.'+encodeURIComponent(no), {
+            method:'DELETE',
+            headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+          });
+        } catch(e){ console.warn('의뢰서 Supabase 삭제 실패:', no, e); }
+      }
       renderReqList();
     };
   }
