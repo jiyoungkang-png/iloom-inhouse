@@ -1025,7 +1025,12 @@ function init(){
   try{
     const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
     const el = document.getElementById('sidebarUsername');
-    if(el && u.id) el.textContent = u.name ? u.name+' ('+u.id+')' : u.id;
+    if(el && u.id){
+      const isAdmin = u.role==='관리자' || u.id===ADMIN_ID;
+      const crown = isAdmin ? '<span title="관리자" style="margin-right:5px;font-size:15px">👑</span>' : '';
+      const nameText = u.name ? u.name+' ('+u.id+')' : u.id;
+      el.innerHTML = crown + nameText;
+    }
     const accBtn = document.getElementById('accountsNavBtn');
     if(accBtn && (u.role==='관리자' || u.id===ADMIN_ID)) accBtn.style.display='';
     const adminMemberBtn = document.getElementById('adminMemberBtn');
