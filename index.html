@@ -2260,13 +2260,13 @@ function deleteCurrent(){
 function saveStandard(){
   const name = ($('stdName')?.value||'').trim();
   const spec = ($('stdSpec')?.value||'').trim();
-  const cond = ($('stdCrit')?.value||'').trim();
+  const crit = ($('stdCrit')?.value||'').trim();
   const category = $('stdCategory')?.value || '물성시험';
   if(!name){ alert('시험 항목을 입력해주세요.'); return; }
   if(!spec){ alert('시험 규격을 입력해주세요.'); return; }
   const list = getStandards();
   if(list.find(s=>s.name===name)){ alert('이미 존재하는 시험 항목입니다.'); return; }
-  list.push({name, spec, cond, category});
+  list.push({name, spec, crit, category});
   setStandards(list);
   $('stdName').value='';
   $('stdSpec').value='';
