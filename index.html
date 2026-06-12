@@ -313,19 +313,19 @@ button,input,select{font:inherit}
             </label>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               회사명
-              <input id="req_company" value="㈜일룸" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+              <input id="req_company" value="" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
             </label>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               의뢰자
-              <input id="req_person" value="강지영" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+              <input id="req_person" value="" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
             </label>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               H.P
-              <input id="req_hp" value="010-9422-5518" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+              <input id="req_hp" value="" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
             </label>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               E-mail
-              <input id="req_email" value="Jiyoung_kang@fursys.com" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+              <input id="req_email" value="" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
             </label>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151;grid-column:1/-1">
               시료명
@@ -449,11 +449,11 @@ button,input,select{font:inherit}
               <select id="tester" style="border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit;cursor:pointer">
                 <option value="이용희">이용희</option>
                 <option value="양지운">양지운</option>
-                <option value="강지영">강지영</option>
+                <option value="">강지영</option>
                 <option value="장성진">장성진</option>
               </select>
             </label>
-            <input type="hidden" id="techManager" value="강지영">
+            <input type="hidden" id="techManager" value="">
             <input type="hidden" id="qualityManager" value="장성진">
             <!-- 비고 입력란 -->
             <div style="grid-column:1/-1;margin-top:4px">
@@ -470,7 +470,7 @@ button,input,select{font:inherit}
               <label>회사명<input id="companyName" value="일룸시험연구소" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
               <label class="wide">주소<input id="companyAddress" value="경기도 안성시 공도읍 서동대로 4279" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
               <label>전화<input id="companyTel" value="02-1577-5670" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
-              <label>기술책임자<input value="010-9422-5518" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <label>기술책임자<input value="" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
               <input type="hidden" id="companyFax" value="">
               <label>홈페이지<input id="companyWeb" value="www.iloom.com" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
               <label>보고서 제목<input id="reportTitle" value="In House Test Report" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
@@ -1194,6 +1194,25 @@ function applyRoleTabControl(user){
   // reqListSection 숨김 처리
   const reqListSec = document.getElementById('reqListSection');
   if(reqListSec) reqListSec.style.display = isRequester ? 'none' : '';
+
+  // 의뢰자는 기본 정보 빈칸으로
+  if(isRequester){
+    ['req_company','req_person','req_hp','req_email','req_dept'].forEach(function(id){
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+  } else {
+    // 관리자/시험원은 기본값 복원
+    const defaults = {
+      'req_company': '㈜일룸',
+      'req_person': '강지영',
+      'req_hp': '010-9422-5518',
+      'req_email': 'Jiyoung_kang@fursys.com'
+    };
+    Object.keys(defaults).forEach(function(id){
+      const el = document.getElementById(id);
+      if(el && !el.value) el.value = defaults[id];
+    });
+  }
 
   // 의뢰자는 로그인 후 의뢰서 작성 탭으로 강제 이동
   if(isRequester){
