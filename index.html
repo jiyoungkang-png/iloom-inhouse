@@ -2254,21 +2254,21 @@ function generateReqNo(){
 }
 
 async function renderReqListAsync(){
-  // Supabase에서 의뢰서 불러와 로컬에 병합
+  // Supabase에서 의뢰서 불러와 로컬에 병합 (최신 데이터로 업데이트)
   try {
     const supaReqs = await getRequestsAsync();
     if(supaReqs && supaReqs.length > 0){
       const localList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
       const merged = [...localList];
       supaReqs.forEach(function(sr){
-        if(!merged.find(function(lr){ return lr.no===sr.no; })) merged.push(sr);
+        const idx = merged.findIndex(function(lr){ return lr.no===sr.no; });
+        if(idx === -1) merged.push(sr);
+        else merged[idx] = sr; // 최신 데이터로 업데이트
       });
-      if(merged.length !== localList.length){
-        localStorage.setItem('iloom_requests_v1', JSON.stringify(merged));
-      }
+      localStorage.setItem('iloom_requests_v1', JSON.stringify(merged));
     }
-  } catch(e){}
-  renderReqListAsync();
+  } catch(e){ console.warn('의뢰서 Supabase 로드 실패:', e); }
+  renderReqList(); // renderReqListAsync 아닌 renderReqList 호출!
 }
 
 function renderReqList(){
