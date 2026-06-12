@@ -284,7 +284,7 @@ button,input,select{font:inherit}
       </section>
 
       <!-- 의뢰서 작성 탭 -->
-      <section class="tab-panel no-print" id="tab-request">
+      <section class="tab-panel no-print active" id="tab-request">
         <!-- 입력 폼 -->
         <div class="card no-print" style="max-width:860px;margin-bottom:16px">
           <h2>의뢰서 작성</h2>
@@ -2742,11 +2742,20 @@ function updateAdminDelBtn(){
   }
 }
 
-function deleteAccount(id){
+async function deleteAccount(id){
   if(id===ADMIN_ID){ alert('관리자 계정은 삭제할 수 없습니다.'); return; }
   if(!confirm('"'+id+'" 계정을 삭제할까요?')) return;
   const list = getAccounts().filter(a=>a.id!==id);
-  setAccounts(list); renderAccounts();
+  setAccounts(list);
+  // Supabase에서도 삭제
+  try {
+    await fetch(SUPA_URL+'/rest/v1/accounts?id=eq.'+encodeURIComponent(id), {
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    console.log('계정 Supabase 삭제 완료:', id);
+  } catch(e){ console.warn('계정 Supabase 삭제 실패:', e); }
+  renderAccounts(); renderSideMemberList();
 }
 
 function renderSideMemberList(){
@@ -2821,7 +2830,20 @@ function renderAccounts(){
       };})(acc);
       tdAct.appendChild(resetBtn);
 
-      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct);
+      // 삭제 버튼
+      const tdDel = document.createElement('td'); tdDel.style.cssText='padding:10px 12px;text-align:center';
+      if(acc.id===ADMIN_ID){
+        const noDelSpan = document.createElement('span');
+        noDelSpan.style.cssText='font-size:11px;color:#9ca3af'; noDelSpan.textContent='삭제 불가';
+        tdDel.appendChild(noDelSpan);
+      } else {
+        const delBtn2 = document.createElement('button');
+        delBtn2.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer';
+        delBtn2.textContent='삭제';
+        delBtn2.onclick=(function(a){ return function(){ deleteAccount(a.id); renderAccounts(); renderSideMemberList(); }; })(acc);
+        tdDel.appendChild(delBtn2);
+      }
+      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct); tr.appendChild(tdDel);
       tbody.appendChild(tr);
     });
   }
