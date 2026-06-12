@@ -322,10 +322,26 @@ button,input,select{font:inherit}
               E-mail
               <input id="req_email" value="Jiyoung_kang@fursys.com" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
             </label>
-            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;grid-column:1/-1">
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151;grid-column:1/-1">
               시료명
-              <input id="req_product" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="시료명 입력">
-            </label>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input id="req_product" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;flex:1;min-width:180px" placeholder="시료명 입력">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <label style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:#374151;cursor:pointer;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:6px 12px">
+                    <input type="checkbox" id="req_mat_fabric" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer"> 원단
+                  </label>
+                  <label style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:#374151;cursor:pointer;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:6px 12px">
+                    <input type="checkbox" id="req_mat_sponge" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer"> 스펀지
+                  </label>
+                  <label style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:#374151;cursor:pointer;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:6px 12px">
+                    <input type="checkbox" id="req_mat_antibac" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer"> 항균
+                  </label>
+                  <label style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:#374151;cursor:pointer;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:6px 12px">
+                    <input type="checkbox" id="req_mat_padding" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer"> 패딩
+                  </label>
+                </div>
+              </div>
+            </div>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               브랜드
               <input id="req_brand" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="브랜드">
@@ -1889,6 +1905,7 @@ async function saveAndPreviewRequest(){
   var v = function(id){ return (document.getElementById(id)||{}).value||''; };
   var data = {
     no:v('req_no'), date:v('req_date'), company:v('req_company'),
+    materials: ['fabric','sponge','antibac','padding'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
     person:v('req_person'), dept:v('req_dept'), hp:v('req_hp'), email:v('req_email'),
     product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
     style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
@@ -1958,7 +1975,7 @@ async function saveAndPreviewRequest(){
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
     +'<tr><th '+th+'>색 상</th><td '+td+'>'+data.color+'</td>'
     +'<th '+th+'>브 랜 드</th><td '+td+'>'+data.brand+'</td></tr>'
-    +'<tr><th '+th+'>시 료 명</th><td '+td+' colspan="3" style="font-weight:700">'+data.product+'</td></tr>'
+    +'<tr><th '+th+'>시 료 명</th><td '+td+' colspan="3" style="font-weight:700">'+data.product+(data.materials&&data.materials.length?' <span style="font-weight:400;color:#888;font-size:10px">['+data.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+']</span>':'')+'</td></tr>'
     
     +'</table>'
     +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px;letter-spacing:.3px">■ 의뢰 시험 항목</div>'
@@ -2026,6 +2043,7 @@ function clearRequest(){
   if(noEl) noEl.value=generateReqNo();
   const nameEl2=document.getElementById('req_items_custom_name'); if(nameEl2) nameEl2.value='';
   const specEl2=document.getElementById('req_items_custom_spec'); if(specEl2) specEl2.value='';
+  ['req_mat_fabric','req_mat_sponge','req_mat_antibac','req_mat_padding'].forEach(function(id){ const el=document.getElementById(id); if(el) el.checked=false; });
   // 체크박스 초기화
   document.querySelectorAll('.req-item-chk').forEach(c=>c.checked=false);
   // 커스텀 항목 제거
