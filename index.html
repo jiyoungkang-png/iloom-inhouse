@@ -232,9 +232,11 @@ button,input,select{font:inherit}
   <div class="app-shell">
     <aside class="sidebar no-print">
       <div class="brand">
-        <div class="brand-mark">il</div>
+        <div class="brand-mark" style="background:none;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center">
+          <img src="" id="sidebar-iloom-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px" alt="iloom">
+        </div>
         <div>
-          <strong>IN HOUSE REPORT</strong>
+          <strong>IN HOUSE LAB</strong>
           <span>품질보증팀 (일룸시험연구소)</span>
         </div>
       </div>
@@ -261,6 +263,7 @@ button,input,select{font:inherit}
           </div>
           <button id="logoutBtn" style="background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap">로그아웃</button>
         </div>
+        <button id="myPageBtn" onclick="openMyPage()" style="margin-top:8px;width:100%;background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;text-align:left">👤 내 정보 / 비밀번호 변경</button>
       </div>
 
       
@@ -1168,6 +1171,86 @@ function applyRoleTabControl(user){
   }
 }
 
+// ── 내 정보 / 비밀번호 변경 ──
+function openMyPage(){
+  const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+  if(!u.id){ alert('로그인이 필요합니다.'); return; }
+
+  // 기존 모달 제거
+  const existing = document.getElementById('myPageModal');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'myPageModal';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)';
+
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:32px 28px;width:420px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div style="font-size:18px;font-weight:900;color:#1f2937">👤 내 정보</div>
+        <button onclick="document.getElementById('myPageModal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af">✕</button>
+      </div>
+
+      <!-- 현재 정보 -->
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;font-size:13px">
+          <span style="color:#6b7280;font-weight:700">아이디</span><span style="font-weight:800;color:#1f2937">${u.id}</span>
+          <span style="color:#6b7280;font-weight:700">이름</span><span style="font-weight:800;color:#1f2937">${u.name||'-'}</span>
+          <span style="color:#6b7280;font-weight:700">역할</span><span style="font-weight:800;color:#e60012">${u.role||'시험원'}</span>
+        </div>
+      </div>
+
+      <!-- 비밀번호 변경 -->
+      <div style="font-size:14px;font-weight:900;color:#1f2937;margin-bottom:12px">🔒 비밀번호 변경</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:#374151">현재 비밀번호
+          <input type="password" id="myPageCurPw" style="border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:13px;outline:none" placeholder="현재 비밀번호 입력">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:#374151">새 비밀번호
+          <input type="password" id="myPageNewPw" style="border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:13px;outline:none" placeholder="새 비밀번호 입력 (4자 이상)">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:#374151">새 비밀번호 확인
+          <input type="password" id="myPageNewPw2" style="border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:13px;outline:none" placeholder="새 비밀번호 재입력">
+        </label>
+        <div id="myPageErr" style="font-size:12px;color:#e60012;min-height:16px"></div>
+        <button onclick="changeMyPassword()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">비밀번호 변경</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.getElementById('myPageCurPw').focus();
+}
+
+function changeMyPassword(){
+  const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+  const curPw  = document.getElementById('myPageCurPw')?.value||'';
+  const newPw  = document.getElementById('myPageNewPw')?.value||'';
+  const newPw2 = document.getElementById('myPageNewPw2')?.value||'';
+  const err    = document.getElementById('myPageErr');
+
+  if(!curPw){ err.textContent='현재 비밀번호를 입력해주세요.'; return; }
+  if(newPw.length < 4){ err.textContent='새 비밀번호는 4자 이상이어야 합니다.'; return; }
+  if(newPw !== newPw2){ err.textContent='새 비밀번호가 일치하지 않습니다.'; return; }
+
+  const accs = getAccounts();
+  const idx = accs.findIndex(function(a){ return a.id === u.id; });
+  if(idx === -1){ err.textContent='계정을 찾을 수 없습니다.'; return; }
+  if(accs[idx].pw !== curPw){ err.textContent='현재 비밀번호가 올바르지 않습니다.'; return; }
+
+  // 비밀번호 변경
+  accs[idx].pw = newPw;
+  setAccounts(accs);
+
+  // 세션 정보도 업데이트
+  const updated = Object.assign({}, u, {pw: newPw});
+  sessionStorage.setItem('iloom_user', JSON.stringify(updated));
+
+  document.getElementById('myPageModal').remove();
+  showToast('✅ 비밀번호가 변경되었습니다!');
+}
+
 function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
@@ -1184,6 +1267,10 @@ function init(){
       el.innerHTML = crown + nameText;
     }
     if(u.id) applyRoleTabControl(u);
+    // 사이드바 일룸 로고
+    const sideLogoEl = document.getElementById('sidebar-iloom-logo');
+    const iloomLogoSrc = document.getElementById('iloom-logo-src');
+    if(sideLogoEl && iloomLogoSrc) sideLogoEl.src = iloomLogoSrc.src;
     const accBtn = document.getElementById('accountsNavBtn');
     if(accBtn && (u.role==='관리자' || u.id===ADMIN_ID)) accBtn.style.display='';
     const adminMemberBtn = document.getElementById('adminMemberBtn');
