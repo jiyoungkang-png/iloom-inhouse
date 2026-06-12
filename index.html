@@ -754,7 +754,7 @@ function saveReqItemList(){
     items.push({label: chk.dataset.label||'', spec: chk.dataset.spec||''});
   });
   localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(items));
-  syncReqItemsToSupabase().catch(function(e){});
+  supaFetch('settings','POST',{id:'req_items',data:JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'[]'),updated_at:new Date().toISOString()}).catch(function(e){});
   // 저장 메시지 표시
   const msg = document.getElementById('reqItemSaveMsg');
   if(msg){ msg.style.display='block'; setTimeout(function(){ msg.style.display='none'; }, 2500); }
@@ -1096,6 +1096,21 @@ async function migrateLocalToSupabase(){
   console.log('Supabase 마이그레이션 시작...');
   let migrated = 0;
 
+  // 계정 Supabase 저장
+  try {
+    const accs = getAccounts();
+    for(const a of accs){ await supaFetch('accounts','POST',{id:a.id,data:a}); }
+  } catch(e){}
+  // 시험 규격 저장
+  try {
+    const stds = getStandards();
+    if(stds.length) await supaFetch('settings','POST',{id:'standards',data:stds,updated_at:new Date().toISOString()});
+  } catch(e){}
+  // 의뢰항목 저장
+  try {
+    const ri = JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'null');
+    if(ri) await supaFetch('settings','POST',{id:'req_items',data:ri,updated_at:new Date().toISOString()});
+  } catch(e){}
   // 성적서 마이그레이션 (여러 키 시도)
   const reportKeys = ['iloom_inhouse_reports_v1', 'iloom_reports_v2', storeKey];
   const allReports = {};
@@ -1269,74 +1284,84 @@ function changeMyPassword(){
   showToast('✅ 비밀번호가 변경되었습니다!');
 }
 
-// ── 시험 규격 Supabase 동기화 ──
-async function syncStandardsToSupabase(){
-  const list = getStandards();
+// ── Supabase 공유 데이터 저장/로드 ──
+async function saveSharedToSupabase(){
   try {
-    await supaFetch('settings', 'POST', {id: 'standards', data: list, updated_at: new Date().toISOString()});
-  } catch(e){ console.warn('규격 Supabase 저장 실패:', e); }
+    // 계정 저장
+    const accs = getAccounts();
+    for(const a of accs){
+      await supaFetch('accounts', 'POST', {id:a.id, data:a});
+    }
+    // 규격 저장
+    const stds = getStandards();
+    await supaFetch('settings', 'POST', {id:'standards', data:stds, updated_at:new Date().toISOString()});
+    // 의뢰항목 저장
+    const reqItems = JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'null');
+    if(reqItems) await supaFetch('settings', 'POST', {id:'req_items', data:reqItems, updated_at:new Date().toISOString()});
+    console.log('✅ Supabase 공유 데이터 저장 완료');
+  } catch(e){ console.warn('Supabase 저장 실패:', e); }
 }
-async function loadStandardsFromSupabase(){
+
+async function loadSharedFromSupabase(){
   try {
-    const localData = localStorage.getItem(standardsKey);
-    if(localData) return false; // 로컬 데이터 우선
-    const rows = await supaFetch('settings', 'GET');
-    if(rows && rows.length){
-      const stdRow = rows.find(function(r){ return r.id === 'standards'; });
+    // 계정 불러오기
+    const accRows = await supaFetch('accounts', 'GET');
+    if(accRows && accRows.length > 0){
+      const remoteAccs = accRows.map(function(r){ return r.data; });
+      const localAccs = getAccounts();
+      // 원격 계정을 로컬에 병합 (중복 제거)
+      const merged = [...localAccs];
+      remoteAccs.forEach(function(ra){
+        if(!merged.find(function(la){ return la.id === ra.id; })){
+          merged.push(ra);
+        }
+      });
+      if(merged.length !== localAccs.length){
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(merged));
+        renderAccounts(); renderSideMemberList();
+        console.log('✅ 계정 동기화:', merged.length+'개');
+      }
+    }
+    // 규격 불러오기
+    const settingRows = await supaFetch('settings', 'GET');
+    if(settingRows && settingRows.length){
+      const stdRow = settingRows.find(function(r){ return r.id==='standards'; });
       if(stdRow && Array.isArray(stdRow.data) && stdRow.data.length > 0){
-        localStorage.setItem(standardsKey, JSON.stringify(stdRow.data));
-        return true;
+        const localStds = getStandards();
+        // 원격 규격을 로컬에 병합
+        const mergedStds = [...localStds];
+        stdRow.data.forEach(function(rs){
+          if(!mergedStds.find(function(ls){ return ls.name===rs.name; })){
+            mergedStds.push(rs);
+          }
+        });
+        if(mergedStds.length !== localStds.length){
+          localStorage.setItem(standardsKey, JSON.stringify(mergedStds));
+          renderStandardSelect(); renderStandards();
+          console.log('✅ 규격 동기화:', mergedStds.length+'개');
+        }
+      }
+      // 의뢰항목 불러오기
+      const reqRow = settingRows.find(function(r){ return r.id==='req_items'; });
+      if(reqRow && Array.isArray(reqRow.data) && reqRow.data.length > 0){
+        const localReq = JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'null');
+        if(!localReq){
+          localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(reqRow.data));
+          console.log('✅ 의뢰항목 동기화:', reqRow.data.length+'개');
+        }
       }
     }
-  } catch(e){ console.warn('규격 Supabase 로드 실패:', e); }
-  return false;
-}
-
-// ── 시험 항목 목록 Supabase 동기화 ──
-async function syncReqItemsToSupabase(){
-  const list = JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'null');
-  if(!list) return;
-  try {
-    await supaFetch('settings', 'POST', {id: 'req_items', data: list, updated_at: new Date().toISOString()});
-  } catch(e){ console.warn('의뢰항목 Supabase 저장 실패:', e); }
-}
-async function loadReqItemsFromSupabase(){
-  try {
-    const localData = localStorage.getItem(REQ_ITEM_LIST_KEY);
-    if(localData) return false; // 로컬 데이터 우선
-    const rows = await supaFetch('settings', 'GET');
-    if(rows && rows.length){
-      const row = rows.find(function(r){ return r.id === 'req_items'; });
-      if(row && Array.isArray(row.data)){
-        localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(row.data));
-        return true;
-      }
-    }
-  } catch(e){ console.warn('의뢰항목 Supabase 로드 실패:', e); }
-  return false;
-}
-
-// ── 계정 Supabase 로드 ──
-async function loadAccountsFromSupabase(){
-  // 로컬 데이터 보호 - 로컬에 데이터 있으면 덮어쓰지 않음
-  try {
-    const localData = localStorage.getItem(ACCOUNTS_KEY);
-    if(localData) return false; // 로컬 데이터 우선
-    const rows = await getAccountsAsync();
-    if(rows && rows.length > 0){
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(rows));
-      return true;
-    }
-  } catch(e){ console.warn('계정 Supabase 로드 실패:', e); }
-  return false;
+  } catch(e){ console.warn('Supabase 로드 실패:', e); }
 }
 
 function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
   initAccounts(); initListActions();
-  // 로컬 데이터 먼저 렌더링 후 Supabase에 업로드 (덮어쓰기 없음)
+  // 먼저 로컬 데이터로 렌더링
   renderListAsync();
+  // Supabase에서 공유 데이터 불러오기 (병합)
+  loadSharedFromSupabase();
   // 로컬 데이터를 Supabase에 업로드
   migrateLocalToSupabase();
   // 로그인 사용자 표시 + 관리자 탭 제어
@@ -2607,8 +2632,11 @@ function getAccounts(){
 }
 function setAccounts(list){
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list));
-  // Supabase에도 저장
-  setAccountsAsync(list).catch(function(e){ console.warn('계정 Supabase 저장 실패:', e); });
+  // Supabase에 즉시 저장
+  list.forEach(function(a){
+    supaFetch('accounts', 'POST', {id:a.id, data:a})
+      .catch(function(e){ console.warn('계정 저장 실패:', e); });
+  });
 }
 
 
