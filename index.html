@@ -243,8 +243,8 @@ button,input,select{font:inherit}
         </div>
       </div>
       <nav>
-        <button class="nav-btn" data-tab="request">의뢰서 작성</button>
-        <button class="nav-btn active" data-tab="write">성적서 작성</button>
+        <button class="nav-btn active" data-tab="request">의뢰서 작성</button>
+        <button class="nav-btn" data-tab="write">성적서 작성</button>
         <button class="nav-btn" data-tab="list">성적서 조회</button>
         <button class="nav-btn" data-tab="standard">시험 규격 관리</button>
         <button class="nav-btn" data-tab="setting">회사/결재 설정</button>
@@ -415,7 +415,7 @@ button,input,select{font:inherit}
         </div>
       </section>
 
-      <section class="tab-panel active" id="tab-write">
+      <section class="tab-panel" id="tab-write">
         <div class="grid-layout no-print">
           <div class="card form-card">
             <h2>기본 정보</h2>
@@ -624,7 +624,7 @@ button,input,select{font:inherit}
                 <th style="padding:11px 13px;text-align:center;width:40px"><input type="checkbox" id="adminSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer"></th>
                 <th style="padding:11px 13px;text-align:left;font-weight:700">아이디</th>
                 <th style="padding:11px 13px;text-align:left;font-weight:700">이름</th>
-                <th style="padding:11px 13px;text-align:left;font-weight:700">그룹</th>
+                <th style="padding:11px 13px;text-align:left;font-weight:700">그룹</th><th style="padding:11px 13px;text-align:center;font-weight:700">비밀번호</th>
               </tr>
             </thead>
             <tbody id="adminRegTableBody"></tbody>
@@ -1209,10 +1209,10 @@ function applyRoleTabControl(user){
       if(reqBtn) reqBtn.click();
     }, 100);
   } else {
-    // 시험원/관리자는 성적서 작성 탭으로
+    // 시험원/관리자는 의뢰서 작성 탭으로
     setTimeout(function(){
-      const writeBtn = document.querySelector('.nav-btn[data-tab="write"]');
-      if(writeBtn && !writeBtn.classList.contains('active')) writeBtn.click();
+      const reqBtn = document.querySelector('.nav-btn[data-tab="request"]');
+      if(reqBtn && !reqBtn.classList.contains('active')) reqBtn.click();
     }, 100);
   }
 }
@@ -2376,6 +2376,10 @@ function initRequestTab(){
   if(noEl && !noEl.value) noEl.value = generateReqNo();
   const dateEl = document.getElementById('req_date');
   if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  // 의뢰서 정보 항상 빈칸으로
+  ['company','person','hp','email','dept','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
+    const el = document.getElementById('req_'+k); if(el) el.value = '';
+  });
   renderReqItemCheckboxes();
   renderReqListAsync(); // Supabase에서 불러오기
 
@@ -2798,7 +2802,26 @@ function renderAccounts(){
       span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(roleColors[acc.role]||'#f3f4f6')+';color:'+(roleTextColors[acc.role]||'#374151');
       span.textContent=acc.role||'-'; tdRole.appendChild(span);
 
-      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole);
+      // 비밀번호 초기화 버튼
+      const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
+      const resetBtn = document.createElement('button');
+      resetBtn.textContent = '🔑 비번 초기화';
+      resetBtn.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap';
+      resetBtn.onclick = (function(a){ return function(){
+        var newPw = prompt('"'+a.id+'" 계정의 새 비밀번호를 입력하세요 (4자 이상):', '1234');
+        if(!newPw) return;
+        if(newPw.length < 4){ alert('비밀번호는 4자 이상이어야 합니다.'); return; }
+        var list2 = getAccounts();
+        var idx = list2.findIndex(function(x){ return x.id===a.id; });
+        if(idx > -1){
+          list2[idx].pw = newPw;
+          setAccounts(list2);
+          alert('"'+a.id+'" 비밀번호가 초기화되었습니다.');
+        }
+      };})(acc);
+      tdAct.appendChild(resetBtn);
+
+      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct);
       tbody.appendChild(tr);
     });
   }
