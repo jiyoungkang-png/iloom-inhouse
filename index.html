@@ -233,9 +233,9 @@ button,input,select{font:inherit}
 
   <div class="app-shell">
     <aside class="sidebar no-print">
-      <div class="brand" style="cursor:pointer" onclick="document.querySelector('.nav-btn[data-tab=\"request\"]')?.click()">
+      <div class="brand" style="cursor:pointer" onclick="(function(){ var b=document.querySelector('.nav-btn[data-tab=request]'); if(b)b.click(); })()">
         <div class="brand-mark" style="background:none;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center">
-          <img src="" id="sidebar-iloom-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;cursor:pointer" alt="iloom" onclick="document.querySelector('.nav-btn[data-tab=\"request\"]')?.click()">
+          <img src="" id="sidebar-iloom-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;cursor:pointer" alt="iloom" onclick="(function(){ var b=document.querySelector('.nav-btn[data-tab=request]'); if(b)b.click(); })()">
         </div>
         <div>
           <strong>IN HOUSE LAB</strong>
@@ -1199,18 +1199,6 @@ function applyRoleTabControl(user){
   if(isRequester){
     ['req_company','req_person','req_hp','req_email','req_dept'].forEach(function(id){
       const el = document.getElementById(id); if(el) el.value = '';
-    });
-  } else {
-    // 관리자/시험원은 기본값 복원
-    const defaults = {
-      'req_company': '㈜일룸',
-      'req_person': '강지영',
-      'req_hp': '010-9422-5518',
-      'req_email': 'Jiyoung_kang@fursys.com'
-    };
-    Object.keys(defaults).forEach(function(id){
-      const el = document.getElementById(id);
-      if(el && !el.value) el.value = defaults[id];
     });
   }
 
