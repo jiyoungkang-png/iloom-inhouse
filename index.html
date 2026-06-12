@@ -2221,24 +2221,8 @@ function renderStandards(){
 }
 
 function previewRequestOnly(){
-  // 저장 없이 미리보기만 갱신
-  var v = function(id){ return (document.getElementById(id)||{}).value||''; };
-  var data = {
-    no:v('req_no'), date:v('req_date'), company:v('req_company'),
-    person:v('req_person'), dept:v('req_dept'), hp:v('req_hp'), email:v('req_email'),
-    product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
-    style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
-    items:getCheckedReqItems(), note:v('req_note'),
-    chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
-    chk_internal: document.getElementById('req_chk_internal')?.checked||false,
-    materials: ['fabric','sponge','antibac','padding'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; })
-  };
-  // 미리보기 렌더링만
-  var previewFn = document.getElementById('reqPreview');
-  if(previewFn) renderReqPreview(data);
-  // 의뢰서 작성 탭으로 이동
-  var reqTab = document.querySelector('.nav-btn[data-tab="request"]');
-  if(reqTab) reqTab.click();
+  // saveAndPreviewRequest 호출 (저장도 하지만 불러온 데이터 미리보기 갱신)
+  saveAndPreviewRequest();
 }
 
 function generateReqNo(){
