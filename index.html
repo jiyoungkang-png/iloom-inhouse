@@ -918,31 +918,31 @@ function getCheckedReqItems(){
 // ── 의뢰서 → 성적서 항목 불러오기 ──
 async function importFromRequest(){
   const no = (document.getElementById('receiptNo')?.value||'').trim();
-  if(!no){ alert('접수번호를 먼저 입력해주세요.'); return; }
 
-  // 저장된 의뢰서 목록에서 접수번호 검색 (의뢰번호 또는 접수번호 매핑)
-  // Supabase + 로컬 합쳐서 검색
+  // Supabase + 로컬 합쳐서 목록 로드
   let reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
   try {
     const supaReqs = await getRequestsAsync();
-    // 중복 제거하며 병합
-    supaReqs.forEach(function(r){ if(!reqList.find(function(x){return x.no===r.no;})) reqList.push(r); });
+    supaReqs.forEach(function(r){
+      const idx = reqList.findIndex(function(x){ return x.no===r.no; });
+      if(idx === -1) reqList.push(r);
+      else reqList[idx] = r; // 최신 데이터로 업데이트
+    });
     localStorage.setItem('iloom_requests_v1', JSON.stringify(reqList));
   } catch(e){ console.warn('의뢰서 Supabase 조회 실패:', e); }
 
-  // 의뢰번호 직접 매칭 (IM_2026001 형식)
-  let found = reqList.find(function(r){
-    return r.no === no || (r.no||'').toLowerCase() === no.toLowerCase();
-  });
-
-  if(!found){
-    // 접수번호가 없으면 목록 팝업으로 선택
-    showRequestPickerModal(function(selected){
-      if(selected) applyRequestToReport(selected);
+  // 의뢰번호 입력된 경우 직접 매칭
+  if(no){
+    let found = reqList.find(function(r){
+      return r.no === no || (r.no||'').toLowerCase() === no.toLowerCase();
     });
-    return;
+    if(found){ applyRequestToReport(found); return; }
   }
-  applyRequestToReport(found);
+
+  // 의뢰번호 없거나 매칭 안되면 목록 팝업
+  showRequestPickerModal(function(selected){
+    if(selected) applyRequestToReport(selected);
+  }, reqList);
 }
 
 function applyRequestToReport(req){
