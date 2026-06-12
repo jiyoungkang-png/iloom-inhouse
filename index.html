@@ -430,7 +430,12 @@ button,input,select{font:inherit}
               <label>접수일자<input id="receivedDate" type="date"></label>
               <label>발급예정일<input id="issuedDate" type="date"></label>
               <label>의뢰자<input id="requestDept" placeholder=""></label>
-              <label>시료명<input id="sampleName" placeholder=""></label>
+              <label>시료명
+                <div style="display:flex;align-items:center;gap:8px">
+                  <input id="sampleName" placeholder="" style="flex:1">
+                  <span id="sampleMaterials" style="font-size:11px;font-weight:900;color:#e60012;white-space:nowrap"></span>
+                </div>
+              </label>
               <label>브랜드<input id="brand" placeholder=""></label>
               <label class="wide">색상<input id="colorInfo" placeholder=""></label>
             </div>
@@ -908,6 +913,27 @@ function applyRequestToReport(req){
   setVal('sampleName',   req.product || '');
   setVal('brand',        req.brand   || '');
   setVal('colorInfo',    req.color   || '');
+  // 재질 체크박스 복원 (의뢰서 탭)
+  ['fabric','sponge','antibac','padding'].forEach(function(m){
+    const el = document.getElementById('req_mat_'+m);
+    if(el) el.checked = false;
+  });
+  if(Array.isArray(req.materials)){
+    req.materials.forEach(function(m){
+      const el = document.getElementById('req_mat_'+m);
+      if(el) el.checked = true;
+    });
+  }
+  // 성적서 탭 시료명 옆 재질 표시
+  const matEl = document.getElementById('sampleMaterials');
+  if(matEl){
+    const matMap = {fabric:'원단', sponge:'스펀지', antibac:'항균', padding:'패딩'};
+    const matText = Array.isArray(req.materials) && req.materials.length
+      ? '[' + req.materials.map(function(m){ return matMap[m]||m; }).join(', ') + ']'
+      : '';
+    matEl.textContent = matText;
+    matEl.dataset.materials = JSON.stringify(req.materials||[]);
+  }
 
   markUnsaved();
   renderPreview();
@@ -1257,7 +1283,7 @@ function collectTests(){
     };
   });
 }
-function collectReport(){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); return data;}
+function collectReport(){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); const me=document.getElementById('sampleMaterials'); data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[]; return data;}
 
 function renderImage(){const el=$('imagePreview'); if(!el) return; el.innerHTML=sampleImageData?`<img src="${sampleImageData}" style="max-width:100%;max-height:200px">`:'<span style="color:#aaa">이미지 없음</span>';}
 
@@ -1502,7 +1528,7 @@ function renderPreview(){
     $('reportPreview').innerHTML=`
     <section class="page page-1">
       <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
-      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>제품명</th><td>${esc(r.sampleName)}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
+      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
       <div class="red-title">■ 의뢰 시험 항목</div>
       <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:25%">시험 규격</th><th style="width:22%">시험 기준</th></tr></thead>
         <tbody>${tests.length ? tests.map((t,i)=>'<tr style="height:28px"><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td><td class="left">'+esc(t.crit||'')+'</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
@@ -1849,15 +1875,39 @@ function renderReqList(){
     loadBtn.style.cssText = 'font-size:12px;padding:6px 14px;flex-shrink:0';
     loadBtn.onclick = function(e){
       e.stopPropagation();
-      ['no','date','company','person','hp','email','product','brand','color','style','fiber','buyer','items','note'].forEach(function(k){
+      // 기본 텍스트 필드 복원
+      ['no','date','company','person','dept','hp','email','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
         var el = document.getElementById('req_'+k); if(el) el.value = r[k]||'';
       });
+      // KOLAS/내부 체크박스
       if(r.chk_kolas !== undefined){
         var kEl = document.getElementById('req_chk_kolas'); if(kEl) kEl.checked = r.chk_kolas;
       }
       if(r.chk_internal !== undefined){
         var iEl = document.getElementById('req_chk_internal'); if(iEl) iEl.checked = r.chk_internal;
       }
+      // 재질 체크박스 복원
+      ['fabric','sponge','antibac','padding'].forEach(function(m){
+        var el = document.getElementById('req_mat_'+m); if(el) el.checked = false;
+      });
+      if(Array.isArray(r.materials)){
+        r.materials.forEach(function(m){
+          var el = document.getElementById('req_mat_'+m); if(el) el.checked = true;
+        });
+      }
+      // 시험 항목 체크박스 복원
+      renderReqItemCheckboxes();
+      if(Array.isArray(r.items)){
+        // items가 객체 배열인 경우
+        r.items.forEach(function(item){
+          var label = typeof item === 'object' ? (item.label||'') : String(item).split(' - ')[0].trim();
+          document.querySelectorAll('.req-item-chk').forEach(function(chk){
+            if(chk.dataset.label === label) chk.checked = true;
+          });
+        });
+      }
+      // 미리보기 갱신
+      saveAndPreviewRequest();
     };
     d.appendChild(chk); d.appendChild(info); d.appendChild(loadBtn);
     box.appendChild(d);
@@ -1950,7 +2000,7 @@ async function saveAndPreviewRequest(){
     '<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #e60012;padding-bottom:6px;margin-bottom:10px">'
     +'<img src="'+iloomSrc+'" style="height:26px">'
     +'<div style="text-align:right">'
-    +'<div style="font-size:11px;color:#888;letter-spacing:2px;margin-bottom:3px">IN HOUSE TEST REQUEST</div>'
+    +'<div style="font-size:11px;color:#444;font-weight:700;letter-spacing:2px;margin-bottom:3px">IN HOUSE TEST REQUEST</div>'
     +'<div style="font-size:22px;font-weight:900;color:#e60012;letter-spacing:3px">시험 의뢰서</div>'
     +'</div>'
     +'</div>'
@@ -1963,7 +2013,7 @@ async function saveAndPreviewRequest(){
     +'<input type="checkbox"'+(data.chk_internal?' checked':'')+' style="width:14px;height:14px;accent-color:#e60012"> 내부 품질용'
     +'</label>'
     +'</div>'
-    +'<div style="font-size:14px;color:#1f2937;font-weight:900">신청일: '+data.date+' &nbsp;&nbsp; 의뢰번호: '+data.no+'</div>'
+    +'<div style="font-size:14px;color:#111;font-weight:900;letter-spacing:0.3px">신청일: '+data.date+' &nbsp;&nbsp; 의뢰번호: '+data.no+'</div>'
     +'</div>'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
     +'<tr><th '+th+' rowspan="2" style="background:#f4f5f7;border:1px solid #bbb;padding:8px 10px;text-align:center;width:8%;font-size:12px">신청자</th>'
@@ -2100,7 +2150,8 @@ function clearAll(){
   init();
 }
 
-function loadReport(r){currentId=r.id; fields.forEach(id=>setVal(id,r[id]||'')); sampleImageData=r.image||''; $('testTable').querySelector('tbody').innerHTML=''; (r.tests||[]).forEach(addTest); renderImage(); renderPreview(); renderDetailSection(); restoreDetailData(r.detailData); document.querySelector('[data-tab="write"]').click();}
+function loadReport(r){currentId=r.id; fields.forEach(id=>setVal(id,r[id]||'')); sampleImageData=r.image||'';
+  const matEl3=document.getElementById('sampleMaterials'); if(matEl3){ const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'}; matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':''; matEl3.dataset.materials=JSON.stringify(r.materials||[]); } $('testTable').querySelector('tbody').innerHTML=''; (r.tests||[]).forEach(addTest); renderImage(); renderPreview(); renderDetailSection(); restoreDetailData(r.detailData); document.querySelector('[data-tab="write"]').click();}
 async function saveReport(silent=false){
   try {
     const r=collectReport();
