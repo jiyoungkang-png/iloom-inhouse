@@ -2560,33 +2560,39 @@ function renderSideMemberList(){
 
 function renderAccounts(){
   const list = getAccounts();
-  const tbody = document.getElementById('accTableBody');
-  if(!tbody) return;
-  tbody.innerHTML = '';
-  list.forEach(function(acc){
-    const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid #f3f4f6';
-    const tdId = document.createElement('td'); tdId.style.cssText='padding:10px 12px;font-weight:700'; tdId.textContent=acc.id;
-    const tdName = document.createElement('td'); tdName.style.padding='10px 12px'; tdName.textContent=acc.name||'-';
-    const tdRole = document.createElement('td'); tdRole.style.padding='10px 12px';
-    const span = document.createElement('span');
-    var roleColors = {'관리자':'#fef2f2','시험원':'#eff6ff','의뢰자':'#f0fdf4'};
-    var roleTextColors = {'관리자':'#e60012','시험원':'#2563eb','의뢰자':'#16a34a'};
-    span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(roleColors[acc.role]||'#f3f4f6')+';color:'+(roleTextColors[acc.role]||'#374151');
-    span.textContent=acc.role; tdRole.appendChild(span);
-    const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
-    if(acc.id===ADMIN_ID){
-      const s2=document.createElement('span'); s2.style.cssText='font-size:11px;color:#9ca3af'; s2.textContent='삭제 불가'; tdAct.appendChild(s2);
-    } else {
-      const btn=document.createElement('button');
-      btn.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer';
-      btn.textContent='삭제';
-      btn.onclick=function(){ deleteAccount(acc.id); renderAccounts(); renderSideMemberList(); };
-      tdAct.appendChild(btn);
-    }
-    tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct);
-    tbody.appendChild(tr);
-  });
+  const roleColors = {'관리자':'#fef2f2','시험원':'#eff6ff','의뢰자':'#f0fdf4'};
+  const roleTextColors = {'관리자':'#e60012','시험원':'#2563eb','의뢰자':'#16a34a'};
+
+  function buildRows(tbody){
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(function(acc){
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #f3f4f6';
+      const tdId = document.createElement('td'); tdId.style.cssText='padding:10px 12px;font-weight:700'; tdId.textContent=acc.id;
+      const tdName = document.createElement('td'); tdName.style.padding='10px 12px'; tdName.textContent=acc.name||'-';
+      const tdRole = document.createElement('td'); tdRole.style.padding='10px 12px';
+      const span = document.createElement('span');
+      span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(roleColors[acc.role]||'#f3f4f6')+';color:'+(roleTextColors[acc.role]||'#374151');
+      span.textContent=acc.role||'-'; tdRole.appendChild(span);
+      const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
+      if(acc.id===ADMIN_ID){
+        const s2=document.createElement('span'); s2.style.cssText='font-size:11px;color:#9ca3af'; s2.textContent='삭제 불가'; tdAct.appendChild(s2);
+      } else {
+        const btn=document.createElement('button');
+        btn.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer';
+        btn.textContent='삭제';
+        btn.onclick=function(){ deleteAccount(acc.id); renderAccounts(); renderSideMemberList(); };
+        tdAct.appendChild(btn);
+      }
+      tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct);
+      tbody.appendChild(tr);
+    });
+  }
+
+  // 두 테이블 모두 업데이트
+  buildRows(document.getElementById('accTableBody'));
+  buildRows(document.getElementById('adminRegTableBody'));
 }
 
 function initAccounts(){
