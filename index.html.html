@@ -1,0 +1,2406 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>품질보증팀 (일룸시험연구소) · IN HOUSE TEST REPORT</title>
+  <style>
+/* 시험 항목 체크박스 체크 시 빨간 강조 */
+.req-item-chk:checked + span span:first-child{color:#e60012!important;font-weight:900!important}
+.req-item-row:has(.req-item-chk:checked){background:#fff5f5!important;border-left:3px solid #e60012!important;padding-left:7px!important}
+:root{--red:#e60012;--dark:#1f2937;--muted:#6b7280;--line:#e5e7eb;--bg:#f3f5f8;--card:#fff;--green:#008a3d;--blue:#2563eb;--soft-red:#fff5f5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);color:var(--dark)}
+button,input,select{font:inherit}
+.app-shell{display:flex;min-height:100vh}
+.sidebar{width:270px;background:#101827;color:white;padding:22px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}
+.brand-mark{width:42px;height:42px;border-radius:12px;background:#fff;color:var(--red);display:grid;place-items:center;font-weight:900;font-size:20px}
+.brand span{display:block;color:#aab2c0;font-size:12px;margin-top:4px}
+.nav-btn{width:100%;background:transparent;border:0;color:#d1d5db;text-align:left;padding:13px 14px;border-radius:10px;margin:4px 0;cursor:pointer}
+.nav-btn.active,.nav-btn:hover{background:var(--red);color:#fff}
+.side-card{margin-top:28px;padding:16px;border:1px solid #2b3648;border-radius:14px;background:#182235}
+.side-card p{color:#c7ced9;font-size:13px;line-height:1.6}
+.workspace{flex:1;padding:24px;max-width:1600px;margin:auto}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
+.topbar h1{margin:0;font-size:26px}
+.topbar p{margin:7px 0 0;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.danger{background:#fff;color:var(--red);border-color:#ffc9c9}
+.btn.ghost{background:#f9fafb}
+.small-actions .btn{padding:8px 10px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.grid-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
+.card h2{font-size:18px;margin:0 0 14px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form-grid label,.detail-grid label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px;color:#374151}
+.form-grid input,.form-grid select,.detail-grid input,.search,.section-title select{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
+.wide{grid-column:1/-1}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.section-title h2{margin:0}
+.table-wrap{overflow:auto}
+.input-table{width:100%;border-collapse:collapse;min-width:900px}
+.input-table th{background:#f9fafb;border-bottom:1px solid var(--line);padding:10px;font-size:13px}
+.input-table td{border-bottom:1px solid var(--line);padding:7px}
+.input-table input,.input-table select{width:100%;border:1px solid #edf0f3;border-radius:8px;padding:8px}
+.icon-btn{border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:8px;cursor:pointer}
+.detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.detail-section{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fafbfc}
+.detail-section-title{font-size:13px;font-weight:800;color:var(--red);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0d0d0;letter-spacing:.3px}
+.detail-row{display:flex;gap:12px;flex-wrap:wrap}
+.detail-row label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px;color:#374151;flex:1;min-width:120px}
+.detail-row input{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit}
+.detail-row label.wide-input{flex:3}
+.detail-calc{flex:0 0 auto;min-width:80px!important}
+.pct-badge{display:inline-block;background:#1f2937;color:#fff;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:900;text-align:center;margin-top:2px;letter-spacing:.5px}
+.image-row{display:flex;gap:16px;margin-top:14px;align-items:center}
+.upload-box{width:220px;height:90px;border:2px dashed #cbd5e1;border-radius:14px;display:grid!important;place-items:center;cursor:pointer;background:#f8fafc}
+.upload-box input,.file-btn input{display:none}
+.thumb{width:160px;height:110px;border:1px solid var(--line);border-radius:12px;background:#f9fafb;display:grid;place-items:center;color:var(--muted);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.preview-header{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px}
+.preview-header h2{margin:0}
+.preview-header span{color:var(--muted);font-size:13px}
+.report-preview{display:flex;flex-direction:column;gap:18px;align-items:center}
+.page{width:210mm;min-height:297mm;background:#fff;padding:16mm 10mm 46mm;box-shadow:0 8px 28px rgba(0,0,0,.12);position:relative;color:#111;font-size:11px}
+.report-head{display:flex;flex-direction:column;border-bottom:2px solid var(--red);padding-bottom:0;gap:0;margin-bottom:0}
+.report-head-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.logo-block{display:flex;gap:14px;align-items:center}
+.report-head-row{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:8px}
+.logo{height:26px;display:block;object-fit:contain}
+.kolas-mark{height:30px;display:block;object-fit:contain}
+.company-text{font-size:10px;color:#555;line-height:1.5}
+.report-title{color:var(--red);font-size:24px;font-weight:900;letter-spacing:1px;text-align:left;padding-bottom:0;margin-top:0;border-bottom:none}
+.meta-table{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}
+.meta-table th,.meta-table td{border:1px solid #e5e7eb;padding:10px 11px;word-break:break-all;vertical-align:middle}
+
+.meta-table td{font-weight:600;font-size:11px}
+
+
+
+.request-box{margin-top:32px;background:#fafafa;border-left:4px solid var(--red);padding:20px 24px;font-size:14px;line-height:2}
+.red-title{color:var(--red);font-weight:900;font-size:15px;margin:30px 0 10px}
+.report-table{width:100%;border-collapse:collapse;font-size:11px}
+.result-block{margin-bottom:14px}
+.result-block-title{display:flex;align-items:center;gap:6px;font-weight:900;font-size:11px;margin-bottom:4px}
+.result-block-title::before{content:"";display:inline-block;width:4px;height:32px;background:var(--red);border-radius:2px;flex-shrink:0}
+.result-block-title-text{display:flex;flex-direction:column;gap:1px}
+.result-table{width:100%;border-collapse:collapse;font-size:11px}
+.result-table th{background:#f4f5f7;border:1px solid #ddd;padding:7px 10px;text-align:center;font-weight:700}
+.result-table td{border:1px solid #ddd;padding:7px 10px;text-align:center}
+.result-table td.left{text-align:left}
+.result-table .result-val{font-weight:900}
+.result-end{text-align:center;font-size:11px;font-weight:700;margin-top:16px;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
+.report-table th{background:#f7f8fa;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:10px}
+.report-table td{border-bottom:1px solid #e5e5e5;padding:10px;text-align:center}
+.report-table td.left{text-align:left}
+.report-table .bold{font-weight:900}
+.report-table .red{color:var(--red);font-weight:900}
+.report-table .green{color:var(--green);font-weight:900}
+.page1-footer{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}
+.p1f-sign-row{display:flex;border:1px solid #bbb;margin-bottom:0}
+.p1f-confirm{display:flex;align-items:center;justify-content:center;background:#f5f5f5;padding:8px 12px;font-weight:900;font-size:11px;border-right:1px solid #bbb;min-width:32px;writing-mode:vertical-lr;letter-spacing:2px}
+.p1f-signer{flex:1;border-right:1px solid #bbb;padding:8px 10px;font-size:10px;min-height:54px}
+.p1f-signer:last-child{border-right:none}
+.p1f-signer-label{color:#555;font-size:9px;margin-bottom:3px}
+.p1f-signer-name{font-weight:700}
+.p1f-stamp-row{display:flex;border:1px solid #bbb;border-top:none;background:#fff5f5;align-items:center;padding:5px 10px;gap:6px;font-size:8px;color:#c00;font-weight:700}
+.p1f-contact-bar{background:var(--red);color:#fff;text-align:center;padding:5px 8px;font-size:9.5px;margin-bottom:3px;margin-top:3px}
+.p1f-addr-row{display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:#333;margin-bottom:3px}
+.p1f-notes{font-size:8.5px;color:#444;line-height:1.7;border-top:1px solid #ddd;padding-top:4px;margin-top:2px}
+.p1f-notes li{list-style:none;padding-left:12px;text-indent:-12px}
+.notice-box{position:absolute;left:10mm;right:10mm;bottom:18mm;border:1px solid #ffcaca;border-radius:4px;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.sign-table{border-collapse:collapse;min-width:250px}
+.sign-table th,.sign-table td{border:1px solid #ddd;padding:8px;text-align:center}
+.sign-table th{background:#f7f7f7;color:#666}
+.company-footer{font-size:7.5pt;color:#555;text-align:center;border-top:1px solid #ddd;padding-top:3px;margin-top:4px;margin-bottom:2px;}
+.page-no{position:absolute;right:10mm;bottom:7mm;color:#777}
+.sub-head{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:10px;font-weight:700}
+.section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:16px;margin:28px 0 24px}
+.note{color:#555;font-size:10px;margin-top:10px}
+.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:106mm;display:grid;place-items:center;margin-top:10px;background:#fcfcfc}
+.photo-card{width:80mm;height:70mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
+.photo-card img{width:100%;height:100%;object-fit:contain}
+.caption{text-align:center;font-weight:800;margin-top:10px}
+.list-item,.standard-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;margin:8px 0;background:#fff}
+.list-item b,.standard-item b{display:block}
+.list-item span,.standard-item span{color:var(--muted);font-size:13px}
+.info-box{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.setting-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:1100px){
+  .app-shell{display:block}
+  .sidebar{position:relative;width:auto;height:auto}
+  .grid-layout,.detail-grid{grid-template-columns:1fr}
+  .topbar{display:block}
+  .page{transform:scale(.55);transform-origin:top center;margin-bottom:-130mm}
+  .report-preview{overflow:hidden}
+}
+@page{size:A4;margin:0}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{margin:0!important;padding:0!important;background:#fff!important}
+  .no-print,.sidebar,.topbar,.card,.preview-header{display:none!important}
+  .app-shell{display:block!important}
+  .workspace{padding:0!important;margin:0!important;max-width:none!important}
+  .report-preview{display:block!important;padding:0!important;margin:0!important}
+  .preview-wrap{padding:0!important;margin:0!important}
+  .page{
+    box-shadow:none!important;
+    width:210mm!important;
+    min-height:297mm!important;
+    height:auto!important;
+    margin:0!important;
+    padding:16mm 10mm 20mm!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    position:relative!important;
+    overflow:visible!important;
+    font-size:11px!important;
+    transform:none!important;
+  }
+  .page:last-child{page-break-after:auto!important;break-after:auto!important}
+  /* 1페이지: 고정 높이 유지해서 footer absolute 정상 작동 */
+  .page-1{min-height:297mm!important;height:297mm!important;padding:16mm 10mm 52mm!important}
+  /* 2페이지 이후: 내용 따라 늘어남 */
+  .page-2{min-height:297mm!important;height:auto!important;padding:16mm 10mm 20mm!important}
+  /* 결과 블록은 중간에서 잘리지 않도록 */
+  .result-block{break-inside:avoid!important;page-break-inside:avoid!important}
+  .photo-box{break-inside:avoid!important;page-break-inside:avoid!important}
+  .result-end{break-inside:avoid!important;page-break-inside:avoid!important}
+  /* page-no는 마지막 페이지 하단에 */
+  .page-no{position:static!important;text-align:right;margin-top:10mm}
+  /* 1페이지 footer는 그대로 absolute */
+  .page1-footer{position:absolute!important;left:10mm!important;right:10mm!important;bottom:4mm!important}
+}
+  /* ── 로그인 화면 ── */
+#loginScreen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a0305 0%,#3a0008 40%,#1f2937 100%)}
+#loginScreen[data-hide="1"]{display:none!important;visibility:hidden!important}
+#loginScreen.hidden{display:none}
+.login-card{background:#fff;border-radius:20px;padding:44px 40px;width:360px;box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:center}
+.login-logo{color:var(--red);font-size:28px;font-weight:900;letter-spacing:2px;margin-bottom:4px}
+.login-sub{font-size:12px;color:#6b7280;margin-bottom:28px;letter-spacing:.5px}
+.login-label{display:block;text-align:left;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;margin-top:14px}
+.login-input{width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 14px;font-size:14px;outline:none;transition:border .2s;box-sizing:border-box}
+.login-input:focus{border-color:var(--red)}
+.login-btn{width:100%;margin-top:22px;padding:13px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:filter .2s}
+.login-btn:hover{filter:brightness(.9)}
+.login-err{color:var(--red);font-size:12px;margin-top:10px;min-height:18px;font-weight:600}
+.login-badge{display:inline-block;background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:8px;font-size:11px;padding:4px 10px;margin-bottom:20px;font-weight:700}
+/* 체크박스 항목 체크 시 빨간 강조 */
+.req-item-chk:checked + span { color: #e60012 !important; font-weight: 900 !important; }
+.req-item-chk:checked + span span:first-child { color: #e60012 !important; font-weight: 900 !important; }
+.req-item-row:has(.req-item-chk:checked) {
+  background: #fff5f5 !important;
+  border-left: 3px solid #e60012 !important;
+  padding-left: 7px !important;
+}
+
+</style>
+</head>
+<body>
+<!-- 로고 이미지 저장소 -->
+<div id="logo-store" style="display:none">
+  <img id="iloom-logo-src" class="logo-src" data-type="logo" src="data:image/jpeg;base64,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" alt="iloom">
+  <img id="kolas-logo-src" class="kolas-src" data-type="kolas" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCAExAzcDASIAAhEBAxEB/8QAGwABAAIDAQEAAAAAAAAAAAAAAAQFAQMGAgf/xABHEAABBAEBBQQGBwYFBAIBBQABAAIDBBEFEiExQVEGE2FxFCIygZHRI0JSobHB4RUzYnKCkhYkQ0RUNDVTc4Pw8WOToqPC/8QAGQEBAQEBAQEAAAAAAAAAAAAAAAECAwQF/8QAKREAAgIBAwQCAgMBAQEAAAAAAAECESEDEjETMkFRImEEUiNCcaEzgf/aAAwDAQACEQMRAD8A6xERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEReJpWQxOkkdssaMk9EB7Raq9mKzEJYXbTCcZwo8OpRzX5KgY8PjzknGNytMlomoqzVNWOnyxsEPebbc52sKfJMIoHSu4NbtFNr5G5XRsRRdPvR34TLGxzQHbPrL265A2yKxkAlO8N6pT4Frk3oiKFCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCKNduMpVzLI1zhnADRzWIJo9Ro7bSQ2RpBAO9p5q06slq6JAc12dkg43blXx6m52rOpPiDAM4dneTx/BQdDldVvTUJeJJI8SPmFnXI3QX61yJpJyAcDiR+i6KCUqZzc242j12kEjGwTMc4AEggHdniFYvIuaUTx72LP3L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" alt="KOLAS">
+</div>
+
+<!-- ══════════════════ 로그인 화면 ══════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">iloom</div>
+    <div class="login-sub">품질보증팀 (일룸시험연구소)</div>
+    <div class="login-badge">🔒 관리자 전용</div>
+    <label class="login-label">아이디</label>
+    <input id="loginId" class="login-input" type="text" placeholder="아이디를 입력하세요" autocomplete="username">
+    <label class="login-label">비밀번호</label>
+    <input id="loginPw" class="login-input" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+    <div class="login-err" id="loginErr"></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:14px;text-align:left">
+      <input type="checkbox" id="saveIdCheck" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer">
+      <label for="saveIdCheck" style="font-size:12px;color:#6b7280;cursor:pointer;font-weight:600">아이디 저장</label>
+    </div>
+    <button class="login-btn" id="loginBtn">로그인</button>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════ -->
+
+  <div class="app-shell">
+    <aside class="sidebar no-print">
+      <div class="brand">
+        <div class="brand-mark">il</div>
+        <div>
+          <strong>IN HOUSE REPORT</strong>
+          <span>품질보증팀 (일룸시험연구소)</span>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-btn" data-tab="request">의뢰서 작성</button>
+        <button class="nav-btn active" data-tab="write">성적서 작성</button>
+        <button class="nav-btn" data-tab="list">성적서 조회</button>
+        <button class="nav-btn" data-tab="standard">시험 규격 관리</button>
+        <button class="nav-btn" data-tab="setting">회사/결재 설정</button>
+        <button class="nav-btn" data-tab="admin" id="adminNavBtn">관리자 등록</button>
+      </nav>
+
+      <div class="side-card">
+        <b>운영 흐름</b>
+        <p>접수 → 시험 입력 → 판정 → 출력/PDF → 이력 저장</p>
+      </div>
+
+      <!-- 로그인 계정 + 로그아웃 -->
+      <div class="side-card" style="margin-top:12px;padding:12px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div style="font-size:11px;color:#aab2c0;margin-bottom:2px">로그인 계정</div>
+            <div style="font-size:13px;font-weight:700;color:#fff" id="sidebarUsername">jiyoung_kang</div>
+          </div>
+          <button id="logoutBtn" style="background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap">로그아웃</button>
+        </div>
+      </div>
+
+      
+    </aside>
+
+    <main class="workspace">
+      <section class="topbar no-print">
+        <div><span id="topbarTitle" style="font-size:18px;font-weight:800;color:#1f2937"></span></div>
+        <div class="actions">
+          <button class="btn ghost" id="newBtn">신규</button>
+          <button class="btn" id="saveBtn">💾 저장</button>
+          <span id="autoSaveStatus" style="font-size:11px;color:#e60012;font-weight:700;align-self:center;margin-left:4px;display:none">● 미저장 변경사항 있음</span>
+          <button class="btn danger" id="deleteBtn">삭제</button>
+          <button class="btn primary" id="printBtn" style="background:var(--red);border-color:var(--red);font-size:14px;padding:10px 20px">📄 PDF 출력</button>
+        </div>
+      </section>
+
+      <!-- 의뢰서 작성 탭 -->
+      <section class="tab-panel no-print" id="tab-request">
+        <!-- 입력 폼 -->
+        <div class="card no-print" style="max-width:860px;margin-bottom:16px">
+          <h2>의뢰서 작성</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              의뢰 번호 (자동생성)
+              <div style="display:flex;gap:6px">
+                <input id="req_no" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;flex:1">
+                <button type="button" onclick="document.getElementById('req_no').value=generateReqNo();" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#374151;cursor:pointer;white-space:nowrap">자동생성</button>
+              </div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              신청일
+              <input id="req_date" type="date" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;color:#374151">
+              성적서 구분
+              <div style="display:flex;gap:20px;align-items:center;padding:10px 0">
+                <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;cursor:pointer">
+                  <input type="checkbox" id="req_chk_kolas" style="width:16px;height:16px;accent-color:#e60012"> KOLAS 성적서
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;cursor:pointer">
+                  <input type="checkbox" id="req_chk_internal" style="width:16px;height:16px;accent-color:#e60012"> 내부 품질용
+                </label>
+              </div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              회사명
+              <input id="req_company" value="㈜일룸" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              의뢰자
+              <input id="req_person" value="강지영" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              H.P
+              <input id="req_hp" value="010-9422-5518" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              E-mail
+              <input id="req_email" value="Jiyoung_kang@fursys.com" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;grid-column:1/-1">
+              시료명
+              <input id="req_product" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="시료명 입력">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              브랜드
+              <input id="req_brand" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="브랜드">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
+              색상
+              <input id="req_color" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="색상">
+            </label>
+            
+            
+            
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+              <span>의뢰 시험 항목 (시험방법 포함)</span>
+              <div style="display:flex;gap:6px">
+                <button type="button" onclick="saveReqItemList()" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">💾 목록 저장</button>
+                <button type="button" onclick="resetReqItemList()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">↺ 기본값 복원</button>
+              </div>
+            </div>
+            <div id="req_items_checkboxes" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 14px;background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:0">
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px">
+              <input id="req_items_custom_name" style="border:1px solid #d1d5db;border-radius:8px;padding:7px 10px;font-size:12px;flex:1;outline:none" placeholder="항목명 (예: 내마모성)"
+                onkeydown="if(event.key==='Enter')document.getElementById('req_items_custom_spec').focus()">
+              <input id="req_items_custom_spec" style="border:1px solid #d1d5db;border-radius:8px;padding:7px 10px;font-size:12px;flex:1.4;outline:none" placeholder="시험 규격 (예: KS K ISO 12947-2)"
+                onkeydown="if(event.key==='Enter')addCustomReqItem()">
+              <button type="button" onclick="addCustomReqItem()" style="background:#1f2937;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">+ 추가</button>
+            </div>
+            <div id="reqItemSaveMsg" style="display:none;font-size:11px;color:#008a3d;font-weight:700;padding:4px 0">✅ 항목 목록이 저장되었습니다.</div>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;margin-bottom:16px">
+            비고
+            <textarea id="req_note" rows="2" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;resize:vertical" placeholder="기타 요청사항"></textarea>
+          </label>
+          <div style="display:flex;gap:10px">
+            <button onclick="saveAndPreviewRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">💾 저장 &amp; 미리보기</button>
+            <button onclick="clearRequest()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer">초기화</button>
+          </div>
+        </div>
+
+        <!-- 의뢰서 목록 -->
+        <div class="card no-print" style="max-width:860px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h2 style="margin:0">저장된 의뢰서</h2>
+            <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">🗑 선택 삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb">
+            <input type="checkbox" id="reqSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer">
+            <label for="reqSelectAll" style="font-size:13px;font-weight:700;color:#374151;cursor:pointer">전체 선택</label>
+          </div>
+          <div id="reqList"></div>
+        </div>
+
+        <!-- A4 미리보기 -->
+        <div style="background:#e5e7eb;padding:20px;border-radius:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div style="font-size:14px;font-weight:800;color:#1f2937">📄 의뢰서 미리보기 (A4)</div>
+            <button onclick="printReqPreview()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">🖨️ PDF 출력</button>
+          </div>
+          <div style="display:flex;justify-content:center">
+            <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box">
+              <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">저장 &amp; 미리보기 버튼을 눌러주세요</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel active" id="tab-write">
+        <div class="grid-layout no-print">
+          <div class="card form-card">
+            <h2>기본 정보</h2>
+            <div class="form-grid">
+              <label>의뢰번호
+                <div style="display:flex;gap:6px;align-items:center">
+                  <input id="receiptNo" placeholder="의뢰번호 입력 (예: IM_2026001)" style="flex:1">
+                  <button type="button" onclick="importFromRequest()" style="background:#e60012;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap">📋 의뢰서 불러오기</button>
+                </div>
+              </label>
+              <label>용도
+                <select id="purpose" style="border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit;cursor:pointer">
+                  <option value="내부 품질 관리용">내부 품질 관리용</option>
+                  <option value="KOLAS용">KOLAS용</option>
+                </select>
+              </label>
+              <label>접수일자<input id="receivedDate" type="date"></label>
+              <label>발급예정일<input id="issuedDate" type="date"></label>
+              <label>의뢰자<input id="requestDept" placeholder=""></label>
+              <label>시료명<input id="sampleName" placeholder=""></label>
+              <label>브랜드<input id="brand" placeholder=""></label>
+              <label class="wide">색상<input id="colorInfo" placeholder=""></label>
+            </div>
+            <!-- 성적서 서명란용 hidden 필드 -->
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px;color:#374151">작성자
+              <select id="tester" style="border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit;cursor:pointer">
+                <option value="이용희">이용희</option>
+                <option value="양지운">양지운</option>
+                <option value="강지영">강지영</option>
+                <option value="장성진">장성진</option>
+              </select>
+            </label>
+            <input type="hidden" id="techManager" value="강지영">
+            <input type="hidden" id="qualityManager" value="장성진">
+            <!-- 비고 입력란 -->
+            <div style="grid-column:1/-1;margin-top:4px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13px;color:#374151">
+                비고
+                <textarea id="remarkNote" rows="3" style="border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical;min-height:60px" placeholder="비고 내용을 입력하세요"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="card form-card">
+            <h2>회사 정보</h2>
+            <div class="form-grid">
+              <label>회사명<input id="companyName" value="일룸시험연구소" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <label class="wide">주소<input id="companyAddress" value="경기도 안성시 공도읍 서동대로 4279" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <label>전화<input id="companyTel" value="02-1577-5670" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <label>기술책임자<input value="010-9422-5518" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <input type="hidden" id="companyFax" value="">
+              <label>홈페이지<input id="companyWeb" value="www.iloom.com" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+              <label>보고서 제목<input id="reportTitle" value="In House Test Report" readonly style="background:#f5f5f5;color:#555;cursor:default"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card no-print">
+          <div class="section-title">
+            <h2>시험 항목</h2>
+            <div class="actions small-actions">
+              <select id="standardSelect"></select>
+              <button class="btn" id="addStandardBtn">규격 추가</button>
+              <button class="btn ghost" id="addCustomBtn">직접 추가</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="input-table" id="testTable">
+              <thead>
+                <tr>
+                  <th>No.</th><th>시험 항목</th><th>시험 규격</th><th>시험 기준</th><th>구분</th><th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card no-print" id="detailDataCard" style="display:none">
+          <h2>세부 데이터 / 이미지</h2>
+          <div id="detailDataSection">
+          </div>
+          <div class="image-row">
+            <label class="upload-box">
+              <input id="sampleImage" type="file" accept="image/*">
+              <span>시료 이미지 업로드</span>
+            </label>
+            <div class="thumb" id="imagePreview">이미지 없음</div>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="preview-header no-print">
+            <h2>출력 미리보기</h2>
+            <span>A4 기준 / 인쇄 시 좌측 입력 패널은 제외됩니다.</span>
+          </div>
+          <div id="reportPreview" class="report-preview"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-list">
+        <div class="card no-print">
+          <div class="section-title">
+            <h2>저장된 성적서</h2>
+            <input id="searchReport" class="search" placeholder="접수번호, 시료명, 의뢰부서 검색">
+          </div>
+          <!-- 전체선택 + 버튼 바 -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:10px 14px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb">
+            <input type="checkbox" id="listSelectAll" style="width:17px;height:17px;accent-color:#e60012;cursor:pointer"
+              onclick="var c=this.checked;document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=c;});updateListActionBar();">
+            <label for="listSelectAll" style="font-size:13px;font-weight:700;color:#374151;cursor:pointer">전체 선택</label>
+            <span id="listSelectedCount" style="font-size:12px;color:#e60012;font-weight:700;display:none"></span>
+            <div style="flex:1"></div>
+            <button id="listPdfBtn" class="btn primary" style="background:var(--red);border-color:var(--red);font-size:12px;padding:7px 16px;opacity:0.4;cursor:not-allowed"
+              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listPrintSelected();">📄 PDF 출력</button>
+            <button id="listDeleteBtn" class="btn danger" style="font-size:12px;padding:7px 16px;opacity:0.4;cursor:not-allowed"
+              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listDeleteSelected();">🗑 삭제하기</button>
+            <button id="listCancelBtn" class="btn ghost" style="font-size:12px;padding:7px 16px;display:none"
+              onclick="document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=false;});document.getElementById('listSelectAll').checked=false;updateListActionBar();">✕ 선택 해제</button>
+          </div>
+          <div id="reportList" class="list"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-standard">
+        <div class="card no-print">
+          <div class="section-title">
+            <h2>시험 규격 라이브러리</h2>
+            <button class="btn" id="resetStandardsBtn">기본값 복원</button>
+          </div>
+          <div class="form-grid">
+            <label>시험 항목<input id="stdName" placeholder="예: 내마모성"></label>
+            <label class="wide">시험 규격<input id="stdSpec" placeholder="예: KS K ISO 105-C06"></label>
+            <label class="wide">시험 기준<input id="stdCrit" placeholder="예: 4급 이상"></label>
+            <label>기본 판정<select id="stdDefault" style="border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit;cursor:pointer"><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></label>
+            <label>분류<select id="stdCategory" style="border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font:inherit;cursor:pointer"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></label>
+          </div>
+          <button class="btn primary" id="saveStandardBtn">규격 저장</button>
+          <div id="standardList" class="standard-list"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-setting">
+        <div class="card no-print">
+          <h2>운영 설정</h2>
+          <div class="info-box">
+            <b>저장 방식</b>
+            <p>현재 버전은 서버 없이 PC 브라우저 LocalStorage에 저장됩니다. 여러 사용자가 중앙 관리하려면 Firebase 또는 사내 서버 연동 단계로 확장하십시오.</p>
+          </div>
+          <div class="setting-actions">
+            <button class="btn" id="exportBtn">전체 데이터 백업(JSON)</button>
+            <label class="btn ghost file-btn">백업 불러오기<input type="file" id="importFile" accept="application/json"></label>
+            <button class="btn danger" id="clearAllBtn">전체 데이터 초기화</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 관리자 등록 탭 -->
+      <section class="tab-panel no-print" id="tab-admin">
+        <div class="card">
+          <h2>관리자 등록</h2>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:20px">새 계정을 등록하고 관리합니다. 관리자(jiyoung_kang) 계정은 삭제할 수 없습니다.</p>
+
+          <!-- 등록 폼 -->
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:20px 22px;margin-bottom:24px">
+            <div style="font-size:14px;font-weight:800;color:#1f2937;margin-bottom:16px">➕ 새 계정 등록</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
+                아이디
+                <input id="adminRegId" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;outline:none" placeholder="아이디 입력">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
+                비밀번호
+                <input id="adminRegPw" type="password" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;outline:none" placeholder="비밀번호 입력 (4자 이상)">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
+                이름
+                <input id="adminRegName" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;outline:none" placeholder="이름 입력">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
+                그룹
+                <input value="일반" readonly style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;background:#f5f5f5;color:#555;cursor:default">
+                <input type="hidden" id="adminRegRole" value="일반">
+              </label>
+            </div>
+            <div id="adminRegErr" style="color:#e60012;font-size:12px;margin-top:10px;min-height:16px"></div>
+            <button id="adminRegBtn" style="margin-top:14px;background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 30px;font-size:14px;font-weight:800;cursor:pointer">등록하기</button>
+          </div>
+
+          <!-- 계정 목록 + 선택 삭제 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:14px;font-weight:800;color:#1f2937">👥 등록된 계정</div>
+            <button id="adminDelSelectedBtn" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;display:none">🗑 선택 삭제</button>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="background:#f3f4f6;border-bottom:2px solid #e5e7eb">
+                <th style="padding:11px 13px;text-align:center;width:40px"><input type="checkbox" id="adminSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer"></th>
+                <th style="padding:11px 13px;text-align:left;font-weight:700">아이디</th>
+                <th style="padding:11px 13px;text-align:left;font-weight:700">이름</th>
+                <th style="padding:11px 13px;text-align:left;font-weight:700">그룹</th>
+              </tr>
+            </thead>
+            <tbody id="adminRegTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 계정 관리 탭 -->
+      <section class="tab-panel no-print" id="tab-accounts">
+        <div class="card">
+          <h2>계정 관리</h2>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:16px">계정을 추가하거나 삭제할 수 있습니다. 관리자 계정(jiyoung_kang)은 삭제할 수 없습니다.</p>
+
+          <!-- 계정 추가 폼 -->
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:#1f2937">➕ 새 계정 추가</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;flex:1;min-width:140px">
+                아이디
+                <input id="newAccId" style="border:1px solid #d1d5db;border-radius:8px;padding:9px 12px;font-size:13px;outline:none" placeholder="아이디 입력">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;flex:1;min-width:140px">
+                비밀번호
+                <input id="newAccPw" type="password" style="border:1px solid #d1d5db;border-radius:8px;padding:9px 12px;font-size:13px;outline:none" placeholder="비밀번호 입력">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;flex:1;min-width:140px">
+                이름
+                <input id="newAccName" style="border:1px solid #d1d5db;border-radius:8px;padding:9px 12px;font-size:13px;outline:none" placeholder="이름 입력">
+              </label>
+              <button id="addAccBtn" class="btn primary" style="background:var(--red);border-color:var(--red);height:38px;padding:0 20px">추가</button>
+            </div>
+            <div id="accAddErr" style="color:var(--red);font-size:12px;margin-top:8px;min-height:16px"></div>
+          </div>
+
+          <!-- 계정 목록 -->
+          <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:#1f2937">👥 등록된 계정</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="background:#f3f4f6;border-bottom:2px solid #e5e7eb">
+                <th style="padding:10px 12px;text-align:left;font-weight:700">아이디</th>
+                <th style="padding:10px 12px;text-align:left;font-weight:700">이름</th>
+                <th style="padding:10px 12px;text-align:left;font-weight:700">권한</th>
+                <th style="padding:10px 12px;text-align:center;font-weight:700">관리</th>
+              </tr>
+            </thead>
+            <tbody id="accTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+const $ = (id) => document.getElementById(id);
+const storeKey = 'iloom_inhouse_reports_v1';
+const standardsKey = 'iloom_test_standards_v1';
+let currentId = null;
+let sampleImageData = '';
+
+const defaultStandards = [
+  {name:'염색견뢰도 (변퇴색 및 자체이염)', spec:'KS K ISO 105-A01:2010', result:'4 / 4-5 (급)', category:'물성시험'},
+  {name:'치수변화율 (세탁 반복 시험)', spec:'KS K ISO 5077:2007 준용 (*10회 세탁)', result:'자동 계산', category:'물성시험'},
+  {name:'필링(Pilling) 및 외관 평가', spec:'KS K ISO 12945-1:2000 준용', result:'4-5 (급)', category:'치수/외관'},
+  {name:'세탁 후 외관 상태 관찰', spec:'코팅/봉제/프린트/부자재 육안 검사', result:'육안상 변화없음', category:'치수/외관'}
+];
+
+const fields = ['receiptNo','purpose','receivedDate','issuedDate','requestDept','sampleName','colorInfo','brand','tester','techManager','qualityManager','companyName','companyAddress','companyTel','companyFax','companyWeb','reportTitle','colorChange','staining','lengthBefore','lengthAfter','widthBefore','widthAfter','pillingResult','appearanceResult','remarkNote'];
+const today = () => new Date().toISOString().slice(0,10);
+const fmt = (d) => d ? d.replaceAll('-','.') : '';
+const num = (v) => Number.parseFloat(v || 0);
+const pct = (before, after) => before ? (((after-before)/before)*100).toFixed(1) + ' %' : '-';
+
+function getStandards(){return JSON.parse(localStorage.getItem(standardsKey) || JSON.stringify(defaultStandards));}
+function setStandards(v){localStorage.setItem(standardsKey, JSON.stringify(v));}
+function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
+function generateReceiptNo(){
+  // 성적서 접수번호는 의뢰번호와 동일한 형식 (RQ_YYYY_NNN)
+  const reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  const year = new Date().getFullYear();
+  const prefix = 'RQ_' + year + '_';
+  let max = 0;
+  reqList.forEach(r=>{
+    const m = (r.no||'').match(/^RQ_\d{4}_(\d+)$/);
+    if(m) max = Math.max(max, parseInt(m[1]));
+  });
+  // 저장된 성적서 번호도 함께 확인
+  getReports().forEach(r=>{
+    const m = (r.receiptNo||'').match(/^RQ_\d{4}_(\d+)$/);
+    if(m) max = Math.max(max, parseInt(m[1]));
+  });
+  return prefix + String(max + 1).padStart(3, '0');
+}
+function setReports(v){localStorage.setItem(storeKey, JSON.stringify(v));}
+function val(id){const el=$(id); return el ? el.value.trim() : '';}
+function setVal(id,v){const el=$(id); if(el) el.value = v || '';}
+
+// ── 의뢰서 시험 항목 체크박스 ──
+const REQ_ITEM_LIST_DEFAULT = [
+  {label:'염색견뢰도 (세탁)', spec:'KS K ISO 105-C06'},
+  {label:'염색견뢰도 (마찰)', spec:'KS K ISO 105-X12'},
+  {label:'염색견뢰도 (땀)', spec:'KS K ISO 105-E04'},
+  {label:'염색견뢰도 (물)', spec:'KS K ISO 105-E01'},
+  {label:'염색견뢰도 (일광)', spec:'KS K ISO 105-B02'},
+  {label:'치수변화율', spec:'KS K ISO 5077'},
+  {label:'인장강도', spec:'KS K ISO 13934-1'},
+  {label:'인열강도', spec:'KS K ISO 13937-2'},
+  {label:'필링', spec:'KS K ISO 12945-1'},
+  {label:'내마모성', spec:'KS K ISO 12947-2'},
+  {label:'봉목강도', spec:'KS K ISO 13935-2'},
+  {label:'pH', spec:'KS K ISO 3071'},
+  {label:'중금속', spec:'KS K 0150'},
+  {label:'포름알데히드', spec:'KS K 0168'},
+  {label:'겉보기 밀도', spec:'KS K ISO 9073-6'},
+];
+const REQ_ITEM_LIST_KEY = 'iloom_req_item_list_v1';
+
+function getReqItemList(){
+  try {
+    const saved = localStorage.getItem(REQ_ITEM_LIST_KEY);
+    if(saved) return JSON.parse(saved);
+  } catch(e){}
+  return REQ_ITEM_LIST_DEFAULT.map(function(i){ return Object.assign({}, i); });
+}
+
+function saveReqItemList(){
+  // 현재 화면에 보이는 항목 전부 수집해서 저장
+  const items = [];
+  document.querySelectorAll('#req_items_checkboxes .req-item-chk').forEach(function(chk){
+    items.push({label: chk.dataset.label||'', spec: chk.dataset.spec||''});
+  });
+  localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(items));
+  // 저장 메시지 표시
+  const msg = document.getElementById('reqItemSaveMsg');
+  if(msg){ msg.style.display='block'; setTimeout(function(){ msg.style.display='none'; }, 2500); }
+}
+
+function resetReqItemList(){
+  if(!confirm('기본 항목 목록으로 복원할까요?\n현재 저장된 목록이 초기화됩니다.')) return;
+  localStorage.removeItem(REQ_ITEM_LIST_KEY);
+  renderReqItemCheckboxes();
+}
+
+function makeReqItemRow(item, isCustom){
+  // div 컨테이너 (label 대신 사용 - button 클릭 충돌 방지)
+  const row = document.createElement('div');
+  row.className = 'req-item-row' + (isCustom ? ' req-item-custom' : '');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;transition:background .15s;font-size:12px;color:#374151;cursor:default'
+    + (isCustom ? ';grid-column:1/-1;background:#fff9f9;border:1px dashed #fca5a5;margin-top:4px' : '');
+
+  // 체크박스 클릭 영역 (label로 감싸기)
+  const lbl = document.createElement('label');
+  lbl.style.cssText = 'display:flex;align-items:center;gap:8px;flex:1;cursor:pointer;min-width:0';
+
+  const chk = document.createElement('input');
+  chk.type = 'checkbox';
+  chk.className = 'req-item-chk';
+  chk.checked = isCustom ? true : false;
+  chk.dataset.label = item.label;
+  chk.dataset.spec  = item.spec||'';
+  chk.style.cssText = 'width:16px;height:16px;accent-color:#e60012;cursor:pointer;flex-shrink:0';
+
+  const txt = document.createElement('span');
+  txt.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap';
+  txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">✚</span> ' : '')
+    + '<span style="font-weight:700;color:#1f2937">'+item.label+'</span>'
+    + (item.spec ? '<span style="color:#9ca3af;font-size:10px;margin-left:2px">'+item.spec+'</span>' : '');
+
+  lbl.appendChild(chk);
+  lbl.appendChild(txt);
+
+  // 삭제 버튼 - 항상 보임
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.textContent = '삭제';
+  delBtn.title = '항목 삭제';
+  delBtn.style.cssText = 'margin-left:auto;background:#fee2e2;border:1px solid #fecaca;border-radius:6px;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:3px 10px;flex-shrink:0;white-space:nowrap';
+  delBtn.onmouseover = function(){ this.style.background='#fecaca'; };
+  delBtn.onmouseout  = function(){ this.style.background='#fee2e2'; };
+  delBtn.onclick = function(e){ e.stopPropagation(); row.remove(); };
+
+  row.appendChild(lbl);
+  row.appendChild(delBtn);
+  return row;
+}
+
+function renderReqItemCheckboxes(){
+  const container = document.getElementById('req_items_checkboxes');
+  if(!container) return;
+  container.innerHTML = '';
+  getReqItemList().forEach(function(item){
+    container.appendChild(makeReqItemRow(item, false));
+  });
+}
+
+function addCustomReqItem(){
+  const nameEl = document.getElementById('req_items_custom_name');
+  const specEl = document.getElementById('req_items_custom_spec');
+  const name = (nameEl?.value||'').trim();
+  const spec = (specEl?.value||'').trim();
+  if(!name){ alert('항목명을 입력해주세요.'); nameEl?.focus(); return; }
+  const container = document.getElementById('req_items_checkboxes');
+  if(!container) return;
+  const row = makeReqItemRow({label:name, spec:spec}, true);
+  container.appendChild(row);
+  nameEl.value = '';
+  specEl.value = '';
+  nameEl.focus();
+}
+
+function getCheckedReqItems(){
+  const result = [];
+  document.querySelectorAll('.req-item-chk:checked').forEach(function(chk){
+    result.push({
+      label: chk.dataset.label||'',
+      spec:  chk.dataset.spec||''
+    });
+  });
+  return result;
+}
+
+// ── 의뢰서 → 성적서 항목 불러오기 ──
+async function importFromRequest(){
+  const no = (document.getElementById('receiptNo')?.value||'').trim();
+  if(!no){ alert('접수번호를 먼저 입력해주세요.'); return; }
+
+  // 저장된 의뢰서 목록에서 접수번호 검색 (의뢰번호 또는 접수번호 매핑)
+  // Supabase + 로컬 합쳐서 검색
+  let reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  try {
+    const supaReqs = await getRequestsAsync();
+    // 중복 제거하며 병합
+    supaReqs.forEach(function(r){ if(!reqList.find(function(x){return x.no===r.no;})) reqList.push(r); });
+    localStorage.setItem('iloom_requests_v1', JSON.stringify(reqList));
+  } catch(e){ console.warn('의뢰서 Supabase 조회 실패:', e); }
+
+  // 의뢰번호 직접 매칭 (IM_2026001 형식)
+  let found = reqList.find(function(r){
+    return r.no === no || (r.no||'').toLowerCase() === no.toLowerCase();
+  });
+
+  if(!found){
+    // 접수번호가 없으면 목록 팝업으로 선택
+    showRequestPickerModal(function(selected){
+      if(selected) applyRequestToReport(selected);
+    });
+    return;
+  }
+  applyRequestToReport(found);
+}
+
+function applyRequestToReport(req){
+  // items가 객체 배열이면 그대로, 문자열 배열이면 파싱, 문자열이면 줄 분리
+  let itemList = [];
+  if(Array.isArray(req.items)){
+    itemList = req.items;
+  } else if(typeof req.items === 'string'){
+    itemList = req.items.split('\n').filter(function(l){return l.trim();});
+  }
+
+  // 시험 항목 채우기 (없어도 기본 정보는 채움)
+  if(itemList.length > 0){
+    const tbody = document.querySelector('#testTable tbody');
+    if(tbody && tbody.children.length > 0){
+      if(!confirm('기존 시험 항목을 모두 지우고 의뢰서 항목으로 교체할까요?')) return;
+    }
+    if(tbody) tbody.innerHTML = '';
+
+    const stdLib = getStandards();
+    itemList.forEach(function(item){
+      var name, specFromItem;
+      // 객체인 경우 (신규 형식)
+      if(typeof item === 'object' && item !== null){
+        name = item.label || '';
+        specFromItem = item.spec || '';
+      } else {
+        // 문자열인 경우 (구형식: "항목명 - 규격")
+        const parts = String(item).split(' - ');
+        name = parts[0].trim();
+        specFromItem = parts.slice(1).join(' - ').trim();
+      }
+      const stdMatch = stdLib.find(function(s){ return s.name === name; }) || {};
+      const spec = specFromItem || stdMatch.spec || '';
+      const crit = stdMatch.crit || '';
+      const category = stdMatch.category || '물성시험';
+      addTest({name:name, spec:spec, crit:crit, result:'', category:category});
+    });
+  }
+  const items = itemList; // alert용
+
+  // 기본 정보 전부 덮어쓰기 (항목 없어도 무조건 채움)
+  setVal('receiptNo',    req.no      || '');
+  setVal('receivedDate', req.date    || '');
+  setVal('requestDept',  req.person  || req.dept || '');
+  setVal('sampleName',   req.product || '');
+  setVal('brand',        req.brand   || '');
+  setVal('colorInfo',    req.color   || '');
+
+  markUnsaved();
+  renderPreview();
+  renderDetailSection();
+  var msg = '✅ 의뢰서 정보를 불러왔습니다!\n\n' +
+    '· 의뢰번호: ' + (req.no||'-') + '\n' +
+    '· 접수일자: ' + (req.date||'-') + '\n' +
+    '· 의뢰자: '  + (req.person||'-') + '\n' +
+    '· 시료명: '  + (req.product||'-') + '\n' +
+    '· 브랜드: '  + (req.brand||'-') + '\n' +
+    '· 색상: '    + (req.color||'-') + '\n' +
+    '· 시험항목: ' + items.length + '개';
+  alert(msg);
+}
+
+async function showRequestPickerModal(callback){
+  // Supabase + 로컬 합쳐서 검색
+  let reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  try {
+    const supaReqs = await getRequestsAsync();
+    // 중복 제거하며 병합
+    supaReqs.forEach(function(r){ if(!reqList.find(function(x){return x.no===r.no;})) reqList.push(r); });
+    localStorage.setItem('iloom_requests_v1', JSON.stringify(reqList));
+  } catch(e){ console.warn('의뢰서 Supabase 조회 실패:', e); }
+  if(!reqList.length){ alert('저장된 의뢰서가 없습니다.'); return; }
+
+  // 모달 오버레이
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:16px;padding:28px 24px;width:480px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.3)';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:17px;font-weight:900;color:#1f2937;margin-bottom:6px';
+  title.textContent = '📋 의뢰서 선택';
+
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:16px';
+  sub.textContent = '불러올 의뢰서를 선택해주세요.';
+
+  const list = document.createElement('div');
+  list.style.cssText = 'overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px';
+
+  reqList.forEach(function(req){
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:background .15s';
+    item.onmouseover = function(){ this.style.background='#fff5f5';this.style.borderColor='#e60012'; };
+    item.onmouseout  = function(){ this.style.background='';this.style.borderColor='#e5e7eb'; };
+
+    const itemCount = Array.isArray(req.items) ? req.items.length
+      : (req.items||'').split('\n').filter(function(l){return l.trim();}).length;
+
+    item.innerHTML = '<div>'
+      + '<div style="font-weight:800;font-size:13px;color:#1f2937">'+esc(req.no||'번호없음')+'</div>'
+      + '<div style="font-size:11px;color:#6b7280;margin-top:2px">'+esc(req.product||'-')+' · '+esc(req.person||'-')+' · 항목 '+itemCount+'개</div>'
+      + '</div>'
+      + '<button style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer">선택</button>';
+
+    item.querySelector('button').onclick = function(){
+      overlay.remove();
+      callback(req);
+    };
+    list.appendChild(item);
+  });
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = '취소';
+  cancelBtn.style.cssText = 'margin-top:14px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%';
+  cancelBtn.onclick = function(){ overlay.remove(); };
+
+  box.appendChild(title);
+  box.appendChild(sub);
+  box.appendChild(list);
+  box.appendChild(cancelBtn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+
+async function migrateLocalToSupabase(){
+  const migKey = 'iloom_migrated_to_supabase_v1';
+  if(localStorage.getItem(migKey)) return; // 이미 마이그레이션 완료
+
+  console.log('Supabase 마이그레이션 시작...');
+  let migrated = 0;
+
+  // 성적서 마이그레이션 (여러 키 시도)
+  const reportKeys = ['iloom_inhouse_reports_v1', 'iloom_reports_v2', storeKey];
+  const allReports = {};
+  reportKeys.forEach(function(key){
+    try {
+      const data = JSON.parse(localStorage.getItem(key)||'[]');
+      data.forEach(function(r){ if(r && r.id) allReports[r.id] = r; });
+    } catch(e){}
+  });
+  const reports = Object.values(allReports);
+  for(const r of reports){
+    try { await setReportAsync(r); migrated++; } catch(e){ console.warn('성적서 마이그레이션 실패:', r.id, e); }
+  }
+
+  // 의뢰서 마이그레이션
+  try {
+    const reqs = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+    for(const r of reqs){
+      try { await setRequestAsync(r); migrated++; } catch(e){ console.warn('의뢰서 마이그레이션 실패:', r.no, e); }
+    }
+  } catch(e){}
+
+  if(migrated > 0){
+    console.log('마이그레이션 완료:', migrated + '개');
+    showToast('기존 데이터 ' + migrated + '개를 서버에 동기화했습니다!');
+  }
+  localStorage.setItem(migKey, '1');
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .5s'; setTimeout(function(){ t.remove(); }, 500); }, 3000);
+}
+
+function init(){
+  if(!localStorage.getItem(standardsKey)) setStandards(defaultStandards);
+  navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
+  initAccounts(); initListActions();
+  migrateLocalToSupabase().then(function(){ renderListAsync(); });
+  // 로그인 사용자 표시 + 관리자 탭 제어
+  try{
+    const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    const el = document.getElementById('sidebarUsername');
+    if(el && u.id) el.textContent = u.name ? u.name+' ('+u.id+')' : u.id;
+    const accBtn = document.getElementById('accountsNavBtn');
+    if(accBtn && (u.role==='관리자' || u.id===ADMIN_ID)) accBtn.style.display='';
+    const adminMemberBtn = document.getElementById('adminMemberBtn');
+    if(adminMemberBtn) adminMemberBtn.style.display='none';
+    const adminNavBtn = document.getElementById('adminNavBtn');
+    if(adminNavBtn && (u.role==='관리자' || u.id===ADMIN_ID)){
+      adminNavBtn.style.display='';
+    }
+  }catch(e){}
+}
+function navInit(){
+  document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active'); $('tab-'+btn.dataset.tab).classList.add('active');
+    renderList(); renderStandards();
+    updateTopbar(btn.dataset.tab);
+    if(btn.dataset.tab === 'accounts') renderAccounts();
+    if(btn.dataset.tab === 'admin'){ renderAdminRegTable && renderAdminRegTable(); initAdminRegTab(); }
+    if(btn.dataset.tab === 'request') initRequestTab();
+    if(btn.dataset.tab === 'list') renderListAsync();
+    if(btn.dataset.tab === 'write') renderStandardSelect();
+  }));
+}
+
+function updateTopbar(tab){
+  const actions = document.querySelector('.actions');
+  const titleEl = document.getElementById('topbarTitle');
+  const newBtn  = document.getElementById('newBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const printBtn  = document.getElementById('printBtn');
+  const autoSaveStatus = document.getElementById('autoSaveStatus');
+
+  // 탭별 제목
+  const titles = {request:'의뢰서 작성', write:'', list:'성적서 조회', standard:'시험 규격 관리', setting:'회사/결재 설정', accounts:'계정 관리', admin:'관리자 등록'};
+  if(titleEl) titleEl.textContent = titles[tab] || '';
+
+  // 항상 actions 표시
+  actions.style.display = '';
+
+  if(tab === 'write'){
+    if(newBtn) newBtn.style.display = '';
+    if(saveBtn) saveBtn.style.display = '';
+    if(deleteBtn) deleteBtn.style.display = '';
+    if(printBtn) printBtn.style.display = '';
+    if(autoSaveStatus) autoSaveStatus.style.display = '';
+  } else if(tab === 'list'){
+    if(newBtn) newBtn.style.display = 'none';
+    if(saveBtn) saveBtn.style.display = 'none';
+    if(deleteBtn) deleteBtn.style.display = 'none';
+    if(printBtn) printBtn.style.display = '';
+    if(autoSaveStatus) autoSaveStatus.style.display = 'none';
+  } else {
+    // request / standard / setting / accounts / admin
+    if(newBtn) newBtn.style.display = 'none';
+    if(saveBtn) saveBtn.style.display = 'none';
+    if(deleteBtn) deleteBtn.style.display = 'none';
+    if(printBtn) printBtn.style.display = 'none';
+    if(autoSaveStatus) autoSaveStatus.style.display = 'none';
+  }
+}
+function markUnsaved(){
+  const btn = document.getElementById('saveBtn');
+  const status = document.getElementById('autoSaveStatus');
+  if(btn){ btn.style.background='#e60012'; btn.style.color='#fff'; btn.style.borderColor='#e60012'; }
+  if(status) status.style.display='';
+}
+function clearUnsaved(){
+  const btn = document.getElementById('saveBtn');
+  const status = document.getElementById('autoSaveStatus');
+  if(btn){ btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
+  if(status) status.style.display='none';
+}
+
+function bindInputs(){
+  function onInput(){renderPreview(); markUnsaved();}
+  fields.forEach(id=>$(id) && $(id).addEventListener('input', onInput));
+  fields.forEach(id=>{ const el=$(id); if(el && el.tagName==='SELECT') el.addEventListener('change', onInput); });
+  $('sampleImage').addEventListener('change', e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader(); reader.onload=()=>{sampleImageData=reader.result; renderImage(); renderPreview();}; reader.readAsDataURL(file);
+  });
+  $('addStandardBtn').onclick=()=>addTest(getStandards()[$('standardSelect').value]);
+  $('addCustomBtn').onclick=()=>addTest({name:'',spec:'',result:'',category:'물성시험'});
+  $('newBtn').onclick=newReport; $('saveBtn').onclick=()=>saveReport(false); $('deleteBtn').onclick=deleteCurrent;
+  $('printBtn').onclick=()=>{
+  // 인쇄 전 배율 안내 모달
+  let pm = document.getElementById('printModal');
+  if(!pm){
+    pm = document.createElement('div');
+    pm.id = 'printModal';
+    pm.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4)';
+    pm.innerHTML = `<div style="background:#fff;border-radius:16px;padding:30px 36px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:340px">
+      <div style="font-size:36px;margin-bottom:10px">🖨️</div>
+      <div style="font-size:17px;font-weight:900;color:#1f2937;margin-bottom:8px">PDF 출력 안내</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;margin-bottom:20px;text-align:left;background:#f9fafb;border-radius:8px;padding:12px 14px">
+        인쇄 창이 열리면 아래와 같이 설정해주세요:<br>
+        <b>• 용지 크기:</b> A4<br>
+        <b>• 여백:</b> 없음<br>
+        <b>• 배율:</b> 100% (맞춤 해제)<br>
+        <b>• 배경 그래픽:</b> 체크 ✓
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button id="printCancel" style="background:#f3f4f6;color:#374151;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">취소</button>
+        <button id="printGo" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:800;cursor:pointer">인쇄 시작</button>
+      </div>
+    </div>`;
+    document.body.appendChild(pm);
+  }
+  pm.style.display = 'flex';
+  document.getElementById('printCancel').onclick = ()=>{ pm.style.display='none'; };
+  document.getElementById('printGo').onclick = ()=>{ pm.style.display='none'; setTimeout(()=>window.print(),200); };
+}; $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{setStandards(defaultStandards);renderStandardSelect();renderStandards();};
+  $('searchReport').addEventListener('input',renderList);
+  $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
+}
+function newReport(){
+  currentId = null; sampleImageData='';
+  // 회사정보는 현재 입력값 유지
+  const companyFields=['companyName','companyAddress','companyTel','companyFax','companyWeb'];
+  const savedCompany={};
+  companyFields.forEach(id=>{ savedCompany[id]=val(id); });
+  const base={receiptNo:'',purpose:'내부 품질 관리용',receivedDate:'',issuedDate:'',requestDept:'',sampleName:'',colorInfo:'',brand:'',tester:'이용희',techManager:'강지영',qualityManager:'장성진',reportTitle:'In House Test Report',colorChange:'',staining:'',lengthBefore:'',lengthAfter:'',widthBefore:'',widthAfter:'',pillingResult:'',appearanceResult:'',remarkNote:''};
+  fields.forEach(id=>{
+    if(companyFields.includes(id)) setVal(id, savedCompany[id]);
+    else setVal(id, base[id]||'');
+  });
+  const tbody=$('testTable').querySelector('tbody'); tbody.innerHTML='';
+  // 시험 항목은 의뢰서에서 불러오거나 직접 추가
+  renderImage(); renderPreview();
+}
+function addTest(item){
+  const tbody=$('testTable').querySelector('tbody'); const tr=document.createElement('tr');
+  const detail = item.detail || {};
+  tr.innerHTML=`<td class="rowno"></td><td><input class="t-name" value="${esc(item.name)}"></td><td><input class="t-spec" value="${esc(item.spec)}"></td><td><input class="t-crit" value="${esc(item.crit||'')}"></td><td><select class="t-cat"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></td><td><button class="btn ghost t-detail-btn" style="font-size:11px;padding:4px 8px;white-space:nowrap">세부 입력</button></td><td><button class="icon-btn">삭제</button></td>`;
+  tbody.appendChild(tr);
+  tr.querySelector('.t-cat').value=item.category||'기타';
+
+  // 세부 데이터 패널 행
+  const detailTr = document.createElement('tr');
+  detailTr.className = 't-detail-row';
+  detailTr.style.display = 'none';
+  detailTr.innerHTML = `<td colspan="6" style="padding:0;background:#fafbfc">
+    <div style="padding:12px 16px;border:1px solid #f0d0d0;border-top:none;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">변퇴색 (급)<input class="d-colorChange" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" value="${esc(detail.colorChange||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">이염 (급)<input class="d-staining" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" value="${esc(detail.staining||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">필링 (급)<input class="d-pilling" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" value="${esc(detail.pilling||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">길이 세탁전 (cm)<input class="d-lenBefore" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" type="number" step="0.1" value="${esc(detail.lenBefore||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">길이 세탁후 (cm)<input class="d-lenAfter" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" type="number" step="0.1" value="${esc(detail.lenAfter||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">길이 변화율<span class="d-lenPct" style="background:#1f2937;color:#fff;border-radius:6px;padding:6px 10px;font-weight:900;text-align:center">—</span></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">폭 세탁전 (cm)<input class="d-widBefore" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" type="number" step="0.1" value="${esc(detail.widBefore||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">폭 세탁후 (cm)<input class="d-widAfter" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" type="number" step="0.1" value="${esc(detail.widAfter||'')}"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151">폭 변화율<span class="d-widPct" style="background:#1f2937;color:#fff;border-radius:6px;padding:6px 10px;font-weight:900;text-align:center">—</span></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#374151;grid-column:1/-1">외관 평가<input class="d-appearance" style="border:1px solid #ddd;border-radius:7px;padding:7px;font-size:12px" value="${esc(detail.appearance||'')}"></label>
+    </div>
+  </td>`;
+  tbody.appendChild(detailTr);
+
+  // 세부 버튼 토글
+  tr.querySelector('.t-detail-btn').onclick = ()=>{
+    const isOpen = detailTr.style.display !== 'none';
+    detailTr.style.display = isOpen ? 'none' : '';
+    tr.querySelector('.t-detail-btn').textContent = isOpen ? '세부 입력' : '세부 닫기';
+  };
+
+  // 변화율 자동 계산
+  function calcPct(before, after, pctEl){
+    const b=parseFloat(before), a=parseFloat(after);
+    pctEl.textContent = (!isNaN(b)&&!isNaN(a)&&b!==0) ? ((a-b)/b*100).toFixed(1)+'%' : '—';
+  }
+  detailTr.querySelector('.d-lenBefore').addEventListener('input', function(){ calcPct(this.value, detailTr.querySelector('.d-lenAfter').value, detailTr.querySelector('.d-lenPct')); renderPreview(); });
+  detailTr.querySelector('.d-lenAfter').addEventListener('input', function(){ calcPct(detailTr.querySelector('.d-lenBefore').value, this.value, detailTr.querySelector('.d-lenPct')); renderPreview(); });
+  detailTr.querySelector('.d-widBefore').addEventListener('input', function(){ calcPct(this.value, detailTr.querySelector('.d-widAfter').value, detailTr.querySelector('.d-widPct')); renderPreview(); });
+  detailTr.querySelector('.d-widAfter').addEventListener('input', function(){ calcPct(detailTr.querySelector('.d-widBefore').value, this.value, detailTr.querySelector('.d-widPct')); renderPreview(); });
+
+  // 초기 변화율 계산
+  if(detail.lenBefore) calcPct(detail.lenBefore, detail.lenAfter||'', detailTr.querySelector('.d-lenPct'));
+  if(detail.widBefore) calcPct(detail.widBefore, detail.widAfter||'', detailTr.querySelector('.d-widPct'));
+
+  tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',renderPreview));
+  detailTr.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderPreview));
+  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderPreview(); markUnsaved();}; renumber(); renderPreview(); renderDetailSection(); markUnsaved();
+}
+function renumber(){let n=0; document.querySelectorAll('#testTable tbody tr').forEach(tr=>{ if(!tr.classList.contains('t-detail-row')){ n++; const el=tr.querySelector('.rowno'); if(el) el.textContent=n; } });}
+function collectTests(){
+  const rows = [...document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)')];
+  return rows.map((tr,i)=>{
+    const nextTr = tr.nextElementSibling;
+    const hasDetail = nextTr && nextTr.classList.contains('t-detail-row');
+    const detail = hasDetail ? {
+      colorChange: nextTr.querySelector('.d-colorChange')?.value||'',
+      staining:    nextTr.querySelector('.d-staining')?.value||'',
+      pilling:     nextTr.querySelector('.d-pilling')?.value||'',
+      lenBefore:   nextTr.querySelector('.d-lenBefore')?.value||'',
+      lenAfter:    nextTr.querySelector('.d-lenAfter')?.value||'',
+      widBefore:   nextTr.querySelector('.d-widBefore')?.value||'',
+      widAfter:    nextTr.querySelector('.d-widAfter')?.value||'',
+      appearance:  nextTr.querySelector('.d-appearance')?.value||''
+    } : {};
+    return {
+      no: i+1,
+      name: tr.querySelector('.t-name').value,
+      spec: tr.querySelector('.t-spec').value,
+      crit: tr.querySelector('.t-crit')?.value||'',
+      category: tr.querySelector('.t-cat').value,
+      detail
+    };
+  });
+}
+function collectReport(){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); return data;}
+
+function renderImage(){const el=$('imagePreview'); if(!el) return; el.innerHTML=sampleImageData?`<img src="${sampleImageData}" style="max-width:100%;max-height:200px">`:'<span style="color:#aaa">이미지 없음</span>';}
+
+function renderDetailSection(){
+  const box = document.getElementById('detailDataSection');
+  if(!box) return;
+  const tests = collectTests();
+
+  // 세부데이터 카드 자체를 숨김/표시
+  const card = document.getElementById('detailDataCard');
+  if(card){
+    card.style.display = (!tests || tests.length === 0) ? 'none' : '';
+  }
+
+  if(!tests || tests.length === 0){
+    box.innerHTML = '';
+    return;
+  }
+
+  // 기존 입력값 보존
+  const saved = {};
+  box.querySelectorAll('[data-key]').forEach(el=>{ saved[el.dataset.key] = el.value; });
+  box.innerHTML = '';
+
+  tests.forEach(function(t, i){
+    const sec = document.createElement('div');
+    sec.className = 'detail-section';
+    sec.style.marginBottom = '12px';
+
+    const title = document.createElement('div');
+    title.className = 'detail-section-title';
+    title.textContent = (i+1) + '. ' + (t.name||'항목 '+(i+1));
+    if(t.spec) title.textContent += '  (' + t.spec + ')';
+    sec.appendChild(title);
+
+    const name = (t.name||'').toLowerCase();
+    const cat  = (t.category||'').toLowerCase();
+
+    // ── 내구성시험 ──
+    if(name.includes('내구성')){
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
+      ['d1','d2','d3','d4'].forEach(function(d){
+        const lbl = document.createElement('label');
+        lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151';
+        lbl.textContent = d.toUpperCase() + ' (mm)';
+        const inp = document.createElement('input');
+        inp.type = 'number'; inp.step = '0.01';
+        inp.dataset.key = d+'_'+i;
+        inp.placeholder = '0.00';
+        inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+        inp.value = saved[d+'_'+i]||'';
+        inp.addEventListener('input', renderPreview);
+        lbl.appendChild(inp); grid.appendChild(lbl);
+      });
+      sec.appendChild(grid);
+
+      const judgeWrap = document.createElement('div');
+      judgeWrap.style.cssText = 'display:flex;align-items:center;gap:12px;margin-top:4px';
+      const jlbl = document.createElement('label');
+      jlbl.style.cssText = 'display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151';
+      jlbl.textContent = '판정';
+      const jSel = document.createElement('select');
+      jSel.dataset.key = 'judge_'+i;
+      jSel.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      ['','합격','불합격'].forEach(function(v){
+        const o = document.createElement('option'); o.value=v; o.textContent=v||'선택';
+        if((saved['judge_'+i]||'')=== v) o.selected=true;
+        jSel.appendChild(o);
+      });
+      jSel.addEventListener('change', renderPreview);
+      jlbl.appendChild(jSel); judgeWrap.appendChild(jlbl);
+      sec.appendChild(judgeWrap);
+
+    // ── 수직하중시험 ──
+    } else if(name.includes('수직하중') || name.includes('하중')){
+      const cycles = ['0회','200회','10000회','80000회','480000회'];
+      cycles.forEach(function(cycle){
+        const ckey = cycle.replace('회','');
+        const cycleDiv = document.createElement('div');
+        cycleDiv.style.cssText = 'margin-bottom:8px;padding:8px 10px;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb';
+        const ctitle = document.createElement('div');
+        ctitle.style.cssText = 'font-weight:800;font-size:12px;color:#e60012;margin-bottom:6px';
+        ctitle.textContent = cycle;
+        cycleDiv.appendChild(ctitle);
+        const cgrid = document.createElement('div');
+        cgrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px';
+        ['D1','D2'].forEach(function(d){
+          const lbl = document.createElement('label');
+          lbl.style.cssText = 'display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:12px;color:#374151';
+          lbl.textContent = d + ' (mm)';
+          const inp = document.createElement('input');
+          inp.type = 'number'; inp.step = '0.01';
+          inp.dataset.key = 'load_'+ckey+'_'+d.toLowerCase()+'_'+i;
+          inp.placeholder = '0.00';
+          inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:7px;font:inherit';
+          inp.value = saved['load_'+ckey+'_'+d.toLowerCase()+'_'+i]||'';
+          inp.addEventListener('input', renderPreview);
+          lbl.appendChild(inp); cgrid.appendChild(lbl);
+        });
+        cycleDiv.appendChild(cgrid);
+        sec.appendChild(cycleDiv);
+      });
+      const judgeWrap2 = document.createElement('div');
+      judgeWrap2.style.cssText = 'display:flex;align-items:center;gap:12px;margin-top:4px';
+      const jlbl2 = document.createElement('label');
+      jlbl2.style.cssText = 'display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151';
+      jlbl2.textContent = '판정';
+      const jSel2 = document.createElement('select');
+      jSel2.dataset.key = 'judge_'+i;
+      jSel2.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      ['','합격','불합격'].forEach(function(v){
+        const o = document.createElement('option'); o.value=v; o.textContent=v||'선택';
+        if((saved['judge_'+i]||'')=== v) o.selected=true;
+        jSel2.appendChild(o);
+      });
+      jSel2.addEventListener('change', renderPreview);
+      jlbl2.appendChild(jSel2); judgeWrap2.appendChild(jlbl2);
+      sec.appendChild(judgeWrap2);
+
+    // ── 치수변화율 ──
+    } else if(name.includes('치수') || name.includes('수축') || name.includes('변화율')){
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:10px';
+      const dimFields = [
+        {label:'길이 세탁 전(cm)', key:'lenBefore_'+i, type:'number'},
+        {label:'길이 세탁 후(cm)', key:'lenAfter_'+i, type:'number'},
+        {label:'길이 변화율(%)',   key:'lenPct_'+i,    readonly:true},
+        {label:'폭 세탁 전(cm)',  key:'widBefore_'+i, type:'number'},
+        {label:'폭 세탁 후(cm)',  key:'widAfter_'+i,  type:'number'},
+        {label:'폭 변화율(%)',    key:'widPct_'+i,    readonly:true},
+      ];
+      dimFields.forEach(function(f){
+        const lbl = document.createElement('label');
+        lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151';
+        lbl.textContent = f.label;
+        const inp = document.createElement('input');
+        if(f.type) inp.type = f.type; inp.step='0.1';
+        inp.dataset.key = f.key; inp.placeholder = '0.0';
+        if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#e60012'; inp.style.fontWeight='900'; }
+        inp.style.cssText += ';border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+        inp.value = saved[f.key]||'';
+        inp.addEventListener('input', function(){
+          const idx2 = i;
+          const b1=parseFloat(document.querySelector('[data-key="lenBefore_'+idx2+'"]')?.value||'');
+          const a1=parseFloat(document.querySelector('[data-key="lenAfter_'+idx2+'"]')?.value||'');
+          const lp=document.querySelector('[data-key="lenPct_'+idx2+'"]');
+          if(lp&&!isNaN(b1)&&!isNaN(a1)&&b1!==0) lp.value=((a1-b1)/b1*100).toFixed(2)+'%';
+          const b2=parseFloat(document.querySelector('[data-key="widBefore_'+idx2+'"]')?.value||'');
+          const a2=parseFloat(document.querySelector('[data-key="widAfter_'+idx2+'"]')?.value||'');
+          const wp=document.querySelector('[data-key="widPct_'+idx2+'"]');
+          if(wp&&!isNaN(b2)&&!isNaN(a2)&&b2!==0) wp.value=((a2-b2)/b2*100).toFixed(2)+'%';
+          renderPreview();
+        });
+        lbl.appendChild(inp); grid.appendChild(lbl);
+      });
+      sec.appendChild(grid);
+      // 판정
+      const jw = document.createElement('div'); jw.style.cssText='display:flex;align-items:center;gap:8px;margin-top:8px';
+      const jl = document.createElement('label'); jl.style.cssText='display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151'; jl.textContent='판정';
+      const js = document.createElement('select'); js.dataset.key='judge_'+i;
+      js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      ['','PASS','FAIL'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); jw.appendChild(jl); sec.appendChild(jw);
+
+    // ── 염색견뢰도 ──
+    } else if(name.includes('염색') || name.includes('견뢰도') || cat.includes('견뢰도')){
+      const row = document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+      [{label:'변퇴색 (급)',key:'colorChange_'+i,ph:'예: 4-5'},{label:'이염 (급)',key:'staining_'+i,ph:'예: 4-5'}].forEach(function(f){
+        const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:120px'; lbl.textContent=f.label;
+        const inp=document.createElement('input'); inp.dataset.key=f.key; inp.placeholder=f.ph; inp.value=saved[f.key]||'';
+        inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+        inp.addEventListener('input',renderPreview); lbl.appendChild(inp); row.appendChild(lbl);
+      });
+      const jl=document.createElement('label'); jl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:100px'; jl.textContent='판정';
+      const js=document.createElement('select'); js.dataset.key='judge_'+i; js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;cursor:pointer';
+      ['','PASS','FAIL'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); row.appendChild(jl); sec.appendChild(row);
+
+    // ── 필링 ──
+    } else if(name.includes('필링') || name.includes('pilling')){
+      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+      const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:120px'; lbl.textContent='필링 등급 (급)';
+      const inp=document.createElement('input'); inp.dataset.key='pilling_'+i; inp.placeholder='예: 4'; inp.value=saved['pilling_'+i]||'';
+      inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+      inp.addEventListener('input',renderPreview); lbl.appendChild(inp); row.appendChild(lbl);
+      const jl=document.createElement('label'); jl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:100px'; jl.textContent='판정';
+      const js=document.createElement('select'); js.dataset.key='judge_'+i; js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;cursor:pointer';
+      ['','PASS','FAIL'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); row.appendChild(jl); sec.appendChild(row);
+
+    // ── 기타 (인장/인열/강도/pH/유해/외관 등) ──
+    } else {
+      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+      const resultLabel = name.includes('외관') ? '외관 평가' : '시험 결과';
+      const resultPh = name.includes('외관') ? '예: 이상 없음' : '결과 입력';
+      [{label:resultLabel,key:'result_'+i,ph:resultPh},{label:'기준값',key:'crit_val_'+i,ph:'예: ≥ 300 N'}].forEach(function(f){
+        const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:120px'; lbl.textContent=f.label;
+        const inp=document.createElement('input'); inp.dataset.key=f.key; inp.placeholder=f.ph; inp.value=saved[f.key]||'';
+        inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+        inp.addEventListener('input',renderPreview); lbl.appendChild(inp); row.appendChild(lbl);
+      });
+      const jl=document.createElement('label'); jl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:100px'; jl.textContent='판정';
+      const js=document.createElement('select'); js.dataset.key='judge_'+i; js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;cursor:pointer';
+      ['','PASS','FAIL'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); row.appendChild(jl); sec.appendChild(row);
+    }
+
+    box.appendChild(sec);
+  });
+}
+
+function getDetailData(){
+  const result = {};
+  const box = document.getElementById('detailDataSection');
+  if(box) box.querySelectorAll('[data-key]').forEach(el=>{ result[el.dataset.key] = el.value; });
+  return result;
+}
+
+function restoreDetailData(data){
+  if(!data) return;
+  const box = document.getElementById('detailDataSection');
+  if(!box) return;
+  Object.keys(data).forEach(function(key){
+    const el = box.querySelector('[data-key="'+key+'"]');
+    if(el) el.value = data[key]||'';
+  });
+}
+
+function renderPreview(){
+  if(!$('reportPreview')) return;
+  try{
+    const r=collectReport();
+
+    const tests=r.tests;
+    const lenPct=pct(num(r.lengthBefore),num(r.lengthAfter));
+    const widPct=pct(num(r.widthBefore),num(r.widthAfter));
+    const lpEl=$('lengthPctDisplay'); if(lpEl) lpEl.textContent=lenPct||'—';
+    const wpEl=$('widthPctDisplay'); if(wpEl) wpEl.textContent=widPct||'—';
+    const logoSrc = document.getElementById('iloom-logo-src') ? document.getElementById('iloom-logo-src').src : '';
+    const kolasSrc = document.getElementById('kolas-logo-src') ? document.getElementById('kolas-logo-src').src : '';
+    $('reportPreview').innerHTML=`
+    <section class="page page-1">
+      <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
+      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>제품명</th><td>${esc(r.sampleName)}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
+      <div class="red-title">■ 의뢰 시험 항목</div>
+      <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:25%">시험 규격</th><th style="width:22%">시험 기준</th></tr></thead>
+        <tbody>${tests.length ? tests.map((t,i)=>'<tr style="height:28px"><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td><td class="left">'+esc(t.crit||'')+'</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
+      </table>
+      <table class="report-table" style="margin-top:0;border-top:none"><tbody><tr>
+        <td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border-top:1px solid #ddd;white-space:nowrap">비고</td>
+        <td class="left" colspan="2" style="height:70px;border:1px solid #e5e7eb;vertical-align:top;padding:8px 10px">${esc(r.remarkNote||'')}</td>
+      </tr></tbody></table>
+      <div class="page1-footer">
+        <div class="p1f-sign-row">
+          <div class="p1f-confirm">확&nbsp;인</div>
+          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc(r.tester)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.techManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+        </div>
+        <div class="p1f-contact-bar">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
+        <div class="p1f-addr-row"><span><b>${esc(r.companyName)}</b> &nbsp; ${esc(r.companyAddress)}</span><span>T ${esc(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${esc(r.companyWeb)}</span></div>
+        <div class="p1f-notes"><ul style="margin:0;padding:0">
+          <li>1. 본 성적서는 의뢰자가 제시한 시료 및 시료명으로 시험한 평가 결과로서, 전체 제품에 대한 품질 및 성능을 보증하지 않습니다.</li>
+          <li>2. 본 성적서는 당 연구원의 사전 서면 동의 없이 광고, 선전 등 홍보 목적 및 소송용으로 사용할 수 없으며, 용도 외 사용을 금합니다.</li>
+        </ul></div>
+        <div style="text-align:right;font-size:7px;color:#999;margin-top:2px">PAGE(S) : 1 / 2</div>
+      </div>
+    </section>
+    <section class="page page-2">
+      <div class="sub-head"><span>접수번호 : ${esc(r.receiptNo)}</span><span>PAGE(S) : 2 / 2</span></div>
+      <h3 class="section-line-title">세부 시험 결과 데이터</h3>
+      ${(function(){
+        const detail = r.detailData || {};
+        const testItems = r.tests || [];
+        let blocks = '';
+
+        testItems.forEach(function(t, i){
+          const name = (t.name||'').toLowerCase();
+          const title = t.name || ('항목 '+(i+1));
+          const spec  = t.spec || '';
+          const crit  = t.crit || '';
+          const judge = detail['judge_'+i] || '';
+          const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td><td></td></tr>' : '';
+
+          // 내구성시험
+          if(name.includes('내구성')){
+            const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
+            const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td><td>'+(crit||'40mm 이하')+'</td></tr>'
+              +'<tr><td class="left">d2 (mm)</td><td class="result-val">'+d2+'</td><td></td></tr>'
+              +'<tr><td class="left">d3 (mm)</td><td class="result-val">'+d3+'</td><td></td></tr>'
+              +'<tr><td class="left">d4 (mm)</td><td class="result-val">'+d4+'</td><td></td></tr>'
+              +judgeCell
+              +'</table></div>';
+
+          // 수직하중시험
+          } else if(name.includes('수직하중')||name.includes('하중')){
+            const cycles = [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']];
+            let rows = '';
+            cycles.forEach(function(c){
+              const d1=detail['load_'+c[1]+'_d1_'+i]||'';
+              const d2=detail['load_'+c[1]+'_d2_'+i]||'';
+              rows += '<tr><td class="left" style="font-weight:800">'+c[0]+'</td><td class="result-val">D1: '+d1+' / D2: '+d2+'</td><td></td></tr>';
+            });
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +rows+judgeCell+'</table></div>';
+
+          // 염색견뢰도
+          } else if(name.includes('염색')||name.includes('견뢰도')){
+            const chg=detail['colorChange_'+i]||''; const sta=detail['staining_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">변퇴색 (급)</td><td class="result-val">'+chg+'</td><td>'+(crit||'')+'</td></tr>'
+              +'<tr><td class="left">이염 (급)</td><td class="result-val">'+sta+'</td><td></td></tr>'
+              +judgeCell+'</table></div>';
+
+          // 치수변화율
+          } else if(name.includes('치수')||name.includes('변화율')||name.includes('수축')){
+            const lb=detail['lenBefore_'+i]||''; const la=detail['lenAfter_'+i]||'';
+            const lp=detail['lenPct_'+i]||'-';
+            const wb=detail['widBefore_'+i]||''; const wa=detail['widAfter_'+i]||'';
+            const wp=detail['widPct_'+i]||'-';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">길이 세탁 전 (cm)</td><td class="result-val">'+lb+'</td><td></td></tr>'
+              +'<tr><td class="left">길이 세탁 후 (cm)</td><td class="result-val">'+la+'</td><td></td></tr>'
+              +'<tr><td class="left">길이 치수변화율 (%)</td><td class="result-val" style="color:var(--red)">'+lp+'</td><td>'+(crit||'')+'</td></tr>'
+              +'<tr><td class="left">폭 세탁 전 (cm)</td><td class="result-val">'+wb+'</td><td></td></tr>'
+              +'<tr><td class="left">폭 세탁 후 (cm)</td><td class="result-val">'+wa+'</td><td></td></tr>'
+              +'<tr><td class="left">폭 치수변화율 (%)</td><td class="result-val" style="color:var(--red)">'+wp+'</td><td></td></tr>'
+              +judgeCell+'</table><div class="note" style="margin-top:3px">※ (-) 수축, (+) 신장</div></div>';
+
+          // 필링
+          } else if(name.includes('필링')||name.includes('pilling')){
+            const pil=detail['pilling_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">필링 등급 (급)</td><td class="result-val">'+pil+'</td><td>'+(crit||'')+'</td></tr>'
+              +judgeCell+'</table></div>';
+
+          // 기타
+          } else {
+            const res=detail['result_'+i]||''; const critVal=detail['crit_val_'+i]||''; const app=detail['appearance_'+i]||'';
+            const val = res || app;
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">시험 결과</td><td class="result-val">'+val+'</td><td>'+(crit||critVal||'')+'</td></tr>'
+              +judgeCell+'</table></div>';
+          }
+        });
+
+        // 사진 블록
+        blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
+          +'<div class="photo-box" style="margin-top:6px"><div>'
+          +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
+          +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
+          +'</div></div></div>';
+
+        return blocks;
+      })()}
+      <div class="result-end">- 시험결과 기록 완료 -</div>
+      <div class="page-no" id="lastPageNo">PAGE(S) : 2 / 2</div>
+    </section>`;
+  // 페이지 수 업데이트 (미리보기 렌더 후)
+  setTimeout(function(){
+    const pages = document.querySelectorAll('#reportPreview .page');
+    const total = pages.length;
+    pages.forEach(function(p, i){
+      // sub-head PAGE 업데이트
+      const subHead = p.querySelector('.sub-head span:last-child');
+      if(subHead && subHead.textContent.includes('PAGE')) subHead.textContent = 'PAGE(S) : '+(i+1)+' / '+total;
+      // page-no 업데이트
+      const pno = p.querySelector('.page-no');
+      if(pno) pno.textContent = 'PAGE(S) : '+(i+1)+' / '+total;
+      // 1페이지 footer PAGE
+      const footerPno = p.querySelector('.p1f-notes')?.closest('.page1-footer')?.querySelector('.page-no-footer');
+      if(footerPno) footerPno.textContent = 'PAGE(S) : 1 / '+total;
+    });
+  }, 50);
+  }catch(ex){ console.error('renderPreview error:',ex); }
+}
+
+let _listPage = 1;
+const LIST_PAGE_SIZE = 10;
+
+async function renderListAsync(page){
+  // Supabase에서 최신 목록 가져와서 로컬 캐시 갱신
+  try {
+    const rows = await getReportsAsync();
+    setReports(rows);
+  } catch(e){ console.warn('Supabase 조회 실패, 로컬 사용:', e); }
+  renderList(page);
+}
+
+function renderList(page){
+  if(page) _listPage = page;
+  const q=($('searchReport')?.value||'').toLowerCase();
+  const box=$('reportList'); if(!box) return;
+  const all=getReports().filter(r=>[r.receiptNo,r.sampleName,r.requestDept].join(' ').toLowerCase().includes(q));
+  const totalPages = Math.max(1, Math.ceil(all.length / LIST_PAGE_SIZE));
+  if(_listPage > totalPages) _listPage = totalPages;
+  const list = all.slice((_listPage-1)*LIST_PAGE_SIZE, _listPage*LIST_PAGE_SIZE);
+
+  box.innerHTML = all.length ? '' : '<p class="note">저장된 성적서가 없습니다.</p>';
+  list.forEach(r=>{
+    const d=document.createElement('div'); d.className='list-item';
+    d.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.className='list-chk'; chk.dataset.id=r.id;
+    chk.style.cssText='width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0';
+    chk.onclick = updateListActionBar;
+    const info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
+    info.innerHTML='<div style="font-weight:800;font-size:14px">'+esc(r.receiptNo||'접수번호 없음')+'</div><div style="font-size:12px;color:#6b7280;margin-top:2px">'+esc(r.sampleName||'')+' · '+fmt(r.issuedDate)+'</div>';
+    const btn=document.createElement('button'); btn.className='btn ghost'; btn.textContent='불러오기';
+    btn.style.cssText='font-size:12px;padding:6px 14px;flex-shrink:0';
+    btn.onclick=(e)=>{e.stopPropagation();loadReport(r);document.querySelector('.nav-btn[data-tab="write"]').click();};
+    d.onclick=(e)=>{if(e.target.tagName!=='BUTTON'&&e.target.tagName!=='INPUT'){chk.checked=!chk.checked;updateListActionBar();}};
+    d.appendChild(chk); d.appendChild(info); d.appendChild(btn); box.appendChild(d);
+  });
+
+  // 페이지네이션 렌더
+  let pager = document.getElementById('listPager');
+  if(!pager){
+    pager = document.createElement('div');
+    pager.id = 'listPager';
+    box.parentNode.appendChild(pager);
+  }
+  pager.innerHTML = '';
+  if(totalPages <= 1){ updateListActionBar(); return; }
+
+  pager.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:4px 0';
+
+  // 이전 버튼
+  const prev = document.createElement('button');
+  prev.textContent = '‹';
+  prev.style.cssText = 'border:1px solid #e5e7eb;background:#fff;border-radius:8px;padding:6px 12px;font-size:15px;font-weight:700;cursor:pointer;color:'+ (_listPage===1?'#d1d5db':'#374151');
+  prev.disabled = _listPage === 1;
+  prev.onclick = ()=>{ if(_listPage>1){ document.getElementById('listSelectAll').checked=false; renderList(_listPage-1); }};
+  pager.appendChild(prev);
+
+  // 페이지 번호
+  for(let i=1; i<=totalPages; i++){
+    const pb = document.createElement('button');
+    pb.textContent = i;
+    const isActive = i === _listPage;
+    pb.style.cssText = 'border:1px solid '+(isActive?'#e60012':'#e5e7eb')+';background:'+(isActive?'#e60012':'#fff')+';color:'+(isActive?'#fff':'#374151')+';border-radius:8px;padding:6px 12px;font-size:13px;font-weight:'+(isActive?'900':'600')+';cursor:pointer;min-width:36px';
+    pb.onclick = (()=>{ const p=i; return ()=>{ document.getElementById('listSelectAll').checked=false; renderList(p); }; })();
+    pager.appendChild(pb);
+  }
+
+  // 다음 버튼
+  const next = document.createElement('button');
+  next.textContent = '›';
+  next.style.cssText = 'border:1px solid #e5e7eb;background:#fff;border-radius:8px;padding:6px 12px;font-size:15px;font-weight:700;cursor:pointer;color:'+(_listPage===totalPages?'#d1d5db':'#374151');
+  next.disabled = _listPage === totalPages;
+  next.onclick = ()=>{ if(_listPage<totalPages){ document.getElementById('listSelectAll').checked=false; renderList(_listPage+1); }};
+  pager.appendChild(next);
+
+  // 페이지 정보
+  const info = document.createElement('span');
+  info.style.cssText = 'font-size:12px;color:#6b7280;margin-left:6px';
+  info.textContent = all.length+'개 중 '+( (_listPage-1)*LIST_PAGE_SIZE+1 )+'–'+Math.min(_listPage*LIST_PAGE_SIZE, all.length);
+  pager.appendChild(info);
+
+  updateListActionBar();
+}
+
+async function listDeleteSelected(){
+  var ids = [...document.querySelectorAll('#reportList .list-chk:checked')].map(function(c){ return c.dataset.id; });
+  if(!ids.length){ return; }
+  if(!confirm(ids.length+'개 성적서를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+  await deleteReportsAsync(ids);
+  setReports(getReports().filter(function(r){ return !ids.includes(r.id); }));
+  document.getElementById('listSelectAll').checked = false;
+  renderList();
+  updateListActionBar();
+}
+
+function listPrintSelected(){
+  var ids = [...document.querySelectorAll('#reportList .list-chk:checked')].map(function(c){ return c.dataset.id; });
+  if(!ids.length){ return; }
+  var reports = getReports().filter(function(r){ return ids.includes(r.id); });
+  // 선택한 성적서들을 순서대로 미리보기 탭에서 출력
+  if(reports.length === 1){
+    loadReport(reports[0]);
+    setTimeout(function(){ document.getElementById('printBtn').click(); }, 400);
+  } else {
+    alert(reports.length+'개 성적서를 순서대로 출력합니다.');
+    var idx = 0;
+    function printNext(){
+      if(idx >= reports.length) return;
+      loadReport(reports[idx]);
+      idx++;
+      setTimeout(function(){
+        document.getElementById('printBtn').click();
+        setTimeout(printNext, 800);
+      }, 400);
+    }
+    printNext();
+  }
+}
+
+function updateListActionBar(){
+  var checked = document.querySelectorAll('#reportList .list-chk:checked').length;
+  var all = document.querySelectorAll('#reportList .list-chk').length;
+
+  var delBtn = document.getElementById('listDeleteBtn');
+  var pdfBtn = document.getElementById('listPdfBtn');
+  var cancelBtn = document.getElementById('listCancelBtn');
+  var countEl = document.getElementById('listSelectedCount');
+  var sa = document.getElementById('listSelectAll');
+
+  // 삭제/PDF 버튼 활성·비활성 스타일
+  if(checked > 0){
+    delBtn.style.opacity='1'; delBtn.style.cursor='pointer';
+    pdfBtn.style.opacity='1'; pdfBtn.style.cursor='pointer';
+    cancelBtn.style.display='';
+    if(countEl){ countEl.style.display=''; countEl.textContent=checked+'개 선택됨'; }
+  } else {
+    delBtn.style.opacity='0.4'; delBtn.style.cursor='not-allowed';
+    pdfBtn.style.opacity='0.4'; pdfBtn.style.cursor='not-allowed';
+    cancelBtn.style.display='none';
+    if(countEl) countEl.style.display='none';
+  }
+
+  if(sa && all > 0) sa.checked = (checked === all);
+  else if(sa) sa.checked = false;
+}
+
+function initListActions(){
+  // 검색
+  document.getElementById('searchReport').oninput = function(){
+    _listPage = 1;
+    renderList();
+    document.getElementById('listSelectAll').checked = false;
+    updateListActionBar();
+  };
+}
+
+function renderStandardSelect(){
+  const sel=$('standardSelect'); if(!sel) return;
+  sel.innerHTML='<option value="">규격 선택...</option>';
+  getStandards().forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;sel.appendChild(o);});
+}
+
+function renderStandards(){
+  const box=$('standardList'); if(!box) return; box.innerHTML='';
+  getStandards().forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='list-item';
+    d.innerHTML='<div><b>'+esc(s.name)+'</b><span>'+esc(s.spec)+(s.crit?'<span style="color:#6b7280;font-size:11px;margin-left:6px">('+esc(s.crit)+')</span>':'')+'</span></div><div class="actions"><button class="btn ghost">삭제</button></div>';
+    d.querySelector('button').onclick=()=>{const list=getStandards();list.splice(i,1);setStandards(list);renderStandards();renderStandardSelect();};
+    box.appendChild(d);
+  });
+}
+
+function generateReqNo(){
+  const list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  const year = new Date().getFullYear();
+  const prefix = 'IM_' + year;
+  let max = 0;
+  list.forEach(r=>{
+    const m=(r.no||'').match(/^IM_\d{4}(\d+)$/);
+    if(m) max=Math.max(max,parseInt(m[1]));
+  });
+  return prefix + String(max + 1).padStart(3, '0');
+}
+
+function renderReqList(){
+  const list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  const box = document.getElementById('reqList');
+  if(!box) return;
+  box.innerHTML = list.length ? '' : '<p class="note">저장된 의뢰서가 없습니다.</p>';
+  list.forEach(function(r){
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.className = 'req-chk'; chk.dataset.no = r.no;
+    chk.style.cssText = 'width:15px;height:15px;accent-color:#e60012;cursor:pointer;flex-shrink:0';
+    chk.onchange = updateReqDelBtn;
+    const info = document.createElement('div'); info.style.cssText = 'flex:1;min-width:0';
+    info.innerHTML = '<div style="font-weight:800;font-size:14px">'+r.no+'</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-top:2px">'+(r.product||'')+(r.date?' · '+r.date:'')+'</div>';
+    const loadBtn = document.createElement('button');
+    loadBtn.className = 'btn ghost'; loadBtn.textContent = '불러오기';
+    loadBtn.style.cssText = 'font-size:12px;padding:6px 14px;flex-shrink:0';
+    loadBtn.onclick = function(e){
+      e.stopPropagation();
+      ['no','date','company','person','hp','email','product','brand','color','style','fiber','buyer','items','note'].forEach(function(k){
+        var el = document.getElementById('req_'+k); if(el) el.value = r[k]||'';
+      });
+      if(r.chk_kolas !== undefined){
+        var kEl = document.getElementById('req_chk_kolas'); if(kEl) kEl.checked = r.chk_kolas;
+      }
+      if(r.chk_internal !== undefined){
+        var iEl = document.getElementById('req_chk_internal'); if(iEl) iEl.checked = r.chk_internal;
+      }
+    };
+    d.appendChild(chk); d.appendChild(info); d.appendChild(loadBtn);
+    box.appendChild(d);
+  });
+  updateReqDelBtn();
+}
+
+function updateReqDelBtn(){
+  const checked = document.querySelectorAll('.req-chk:checked');
+  const btn = document.getElementById('reqDelSelectedBtn');
+  const all = document.querySelectorAll('.req-chk');
+  const selectAll = document.getElementById('reqSelectAll');
+  if(btn) btn.style.display = checked.length > 0 ? '' : 'none';
+  if(selectAll && all.length > 0) selectAll.checked = checked.length === all.length;
+}
+
+function initRequestTab(){
+  const noEl = document.getElementById('req_no');
+  if(noEl && !noEl.value) noEl.value = generateReqNo();
+  const dateEl = document.getElementById('req_date');
+  if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  renderReqItemCheckboxes();
+  renderReqList();
+
+  const selectAll = document.getElementById('reqSelectAll');
+  if(selectAll && !selectAll._init){
+    selectAll._init = true;
+    selectAll.addEventListener('change', function(){
+      document.querySelectorAll('.req-chk').forEach(c=>c.checked=this.checked);
+      updateReqDelBtn();
+    });
+    const delBtn = document.getElementById('reqDelSelectedBtn');
+    if(delBtn) delBtn.onclick = function(){
+      const nos = [...document.querySelectorAll('.req-chk:checked')].map(c=>c.dataset.no);
+      if(!nos.length) return;
+      if(!confirm(nos.length+'개 의뢰서를 삭제할까요?')) return;
+      const list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]').filter(r=>!nos.includes(r.no));
+      localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+      renderReqList();
+    };
+  }
+}
+
+async function saveAndPreviewRequest(){
+  var v = function(id){ return (document.getElementById(id)||{}).value||''; };
+  var data = {
+    no:v('req_no'), date:v('req_date'), company:v('req_company'),
+    person:v('req_person'), dept:v('req_dept'), hp:v('req_hp'), email:v('req_email'),
+    product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
+    style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
+    items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
+    chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
+    chk_internal: document.getElementById('req_chk_internal')?.checked||false
+  };
+  // Supabase에 저장
+  try { await setRequestAsync(data); } catch(e){ console.warn('의뢰서 Supabase 저장 실패:', e); }
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var fi = list.findIndex(function(r){return r.no===data.no;});
+  if(fi>=0) list[fi]=data; else list.unshift(data);
+  localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+
+  var preview = document.getElementById('reqPreview');
+  if(!preview) return;
+
+  var iloomEl = document.getElementById('iloom-logo-src');
+  var kolasEl = document.getElementById('kolas-logo-src');
+  var iloomSrc = iloomEl ? iloomEl.src : '';
+  var kolasSrc = kolasEl ? kolasEl.src : '';
+
+  // 저장된 items는 이미 체크된 항목만 들어있음
+  var rawItems = Array.isArray(data.items) ? data.items : (data.items||'').split('\n').filter(function(l){return l.trim();});
+  var itemList = rawItems.map(function(it){ return typeof it==='object' ? it : {label:String(it).split(' - ')[0], spec:String(it).split(' - ').slice(1).join(' - ')}; });
+  var itemRows = itemList.map(function(item, idx){
+    var name = item.label||'';
+    var spec = item.spec||'';
+    return '<tr>'
+      +'<td style="border:1px solid #ddd;padding:8px 11px;text-align:center;font-size:12px;color:#555;font-weight:700">'+(idx+1)+'</td>'
+      +'<td style="border:1px solid #ddd;padding:8px 12px;font-size:12px;font-weight:700;color:#1f2937">'+name+'</td>'
+      +'<td style="border:1px solid #ddd;padding:8px 11px;font-size:11px;color:#444">'+spec+'</td>'
+      +'<td style="border:1px solid #ddd;padding:7px 10px"></td>'
+      +'</tr>';
+  }).join('');
+  if(!itemRows) itemRows = '<tr><td colspan="4" style="border:1px solid #ddd;padding:20px;text-align:center;color:#aaa;font-size:12px">시험 항목을 선택해주세요</td></tr>';
+
+  var th = 'style="background:#f4f5f7;border:1px solid #bbb;padding:8px 11px;text-align:center;white-space:nowrap;width:16%;font-size:12px"';
+  var td = 'style="border:1px solid #bbb;padding:8px 11px;width:34%;font-size:12px"';
+
+  preview.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #e60012;padding-bottom:6px;margin-bottom:10px">'
+    +'<img src="'+iloomSrc+'" style="height:26px">'
+    +'<div style="text-align:right">'
+    +'<div style="font-size:11px;color:#888;letter-spacing:2px;margin-bottom:3px">IN HOUSE TEST REQUEST</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#e60012;letter-spacing:3px">시험 의뢰서</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<div style="display:flex;gap:16px;align-items:center">'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer">'
+    +'<input type="checkbox"'+(data.chk_kolas?' checked':'')+' style="width:14px;height:14px;accent-color:#e60012"> KOLAS 성적서'
+    +'</label>'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer">'
+    +'<input type="checkbox"'+(data.chk_internal?' checked':'')+' style="width:14px;height:14px;accent-color:#e60012"> 내부 품질용'
+    +'</label>'
+    +'</div>'
+    +'<div style="font-size:14px;color:#1f2937;font-weight:900">신청일: '+data.date+' &nbsp;&nbsp; 의뢰번호: '+data.no+'</div>'
+    +'</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
+    +'<tr><th '+th+' rowspan="2" style="background:#f4f5f7;border:1px solid #bbb;padding:8px 10px;text-align:center;width:8%;font-size:12px">신청자</th>'
+    +'<th '+th+' style="width:10%">회 사 명</th><td style="border:1px solid #bbb;padding:8px 11px;font-size:12px;width:22%;font-weight:700">'+data.company+'</td>'
+    +'<th '+th+' style="width:10%">담 당 자</th><td style="border:1px solid #bbb;padding:8px 11px;font-size:12px;font-weight:700">'+data.person+'</td></tr>'
+    +'<tr><th '+th+'>H.P</th><td style="border:1px solid #bbb;padding:8px 11px;font-size:12px;width:22%">'+data.hp+'</td>'
+    +'<th '+th+'>E-mail</th><td style="border:1px solid #bbb;padding:8px 11px;font-size:12px">'+data.email+'</td></tr>'
+    +'</table>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
+    +'<tr><th '+th+'>색 상</th><td '+td+'>'+data.color+'</td>'
+    +'<th '+th+'>브 랜 드</th><td '+td+'>'+data.brand+'</td></tr>'
+    +'<tr><th '+th+'>시 료 명</th><td '+td+' colspan="3" style="font-weight:700">'+data.product+'</td></tr>'
+    
+    +'</table>'
+    +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px;letter-spacing:.3px">■ 의뢰 시험 항목</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
+    +'<thead><tr>'
+    +'<th style="background:#e60012;color:#fff;border:1px solid #c00;padding:8px 11px;text-align:center;width:6%;font-size:12px">No.</th>'
+    +'<th style="background:#e60012;color:#fff;border:1px solid #c00;padding:8px 11px;text-align:center;font-size:12px">시험 항목</th>'
+    +'<th style="background:#e60012;color:#fff;border:1px solid #c00;padding:8px 11px;text-align:center;width:38%;font-size:12px">시험 규격 / 시험 방법</th>'
+    +'<th style="background:#e60012;color:#fff;border:1px solid #c00;padding:8px 11px;text-align:center;width:14%;font-size:12px">비고</th>'
+    +'</tr></thead>'
+    +itemRows+'</table>'
+    +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px">■ 비고</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
+    +'<tr><td style="border:1px solid #bbb;padding:14px 12px;height:70px;vertical-align:top;white-space:pre-wrap;font-size:12px">'+data.note+'</td></tr></table>'
+    +'<div style="position:absolute;bottom:0;left:10mm;right:10mm">'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px">'
+    +'<tr><th style="background:#f4f5f7;border:1px solid #bbb;padding:7px;text-align:center;font-size:12px" colspan="2">확인 (서명)</th></tr>'
+    +'<tr><td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px">의 뢰 자</td>'
+    +'<td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px">담 당 자</td></tr>'
+    +'</table>'
+    +'<div style="background:#e60012;color:#fff;text-align:center;padding:5px;font-size:8.5px;font-weight:700;margin-bottom:4px">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">'
+    +'<span style="font-size:8.5px;color:#222;font-weight:800">일룸시험연구소 &nbsp; <span style="font-weight:400;color:#444">경기도 안성시 공도읍 서동대로 4279</span></span>'
+    +'<span style="font-size:8px;color:#444">T 02-1577-5670 &nbsp;|&nbsp; 기술책임자 010-9422-5518 &nbsp;|&nbsp; www.iloom.com</span>'
+    +'</div>'
+    +'<div style="padding:3px 0 6mm;border-top:1px solid #e5e7eb">'
+    +'<div style="font-size:7.5px;color:#555;line-height:1.9">'
+    +'<div>※ 용도가 KOLAS용이 아닌 경우 KS Q ISO/IEC 17025 및 KOLAS 인정과 무관함을 알려드립니다.</div>'
+    +'<div>※ 본 신청서의 기입 내용을 허위로 작성하여 발생한 문제에 대해서는 의뢰자에게 책임이 있음을 알려드립니다.</div>'
+    +'</div></div>'
+    +'</div>';
+
+  renderReqList();
+  alert('저장 완료! 미리보기를 확인하세요.');
+}
+
+
+function printReqPreview(){
+  const preview = document.getElementById('reqPreview');
+  if(!preview || preview.innerHTML.includes('입력 후')){ alert('먼저 저장 & 미리보기를 눌러주세요.'); return; }
+  const win = window.open('','_blank','width=794,height=1123');
+  const css = `
+    :root{--red:#e60012;--dark:#1f2937;--muted:#6b7280;--line:#e5e7eb}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
+    @page{size:A4;margin:0}
+    body{margin:20mm 18mm;font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Segoe UI",Arial,sans-serif;font-size:11px;color:#111}
+    .p1f-contact-bar{background:#e60012!important;color:#fff!important;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    .red-title{color:#e60012!important;font-weight:900;font-size:13px;margin:16px 0 6px}
+    .req-red-bar,[style*="background:#e60012"],[style*="background:var(--red)"]{background:#e60012!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    table{border-collapse:collapse;width:100%}
+    td,th{border:1px solid #ccc;padding:6px 8px;font-size:10px}
+  `;
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>시험 의뢰서</title>'
+    +'<style>'+css+'</style>'
+    +'</head><body>'+preview.innerHTML+'</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 600);
+}
+
+function clearRequest(){
+  ['req_date','req_dept','req_person','req_product','req_brand','req_color','req_note']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const noEl=document.getElementById('req_no');
+  if(noEl) noEl.value=generateReqNo();
+  const nameEl2=document.getElementById('req_items_custom_name'); if(nameEl2) nameEl2.value='';
+  const specEl2=document.getElementById('req_items_custom_spec'); if(specEl2) specEl2.value='';
+  // 체크박스 초기화
+  document.querySelectorAll('.req-item-chk').forEach(c=>c.checked=false);
+  // 커스텀 항목 제거
+  document.querySelectorAll('.req-item-custom').forEach(el=>el.remove());
+  const preview=document.getElementById('reqPreview');
+  if(preview) preview.innerHTML='<div style="text-align:center;color:#aaa;margin-top:60px;font-size:13px">입력 후 저장 &amp; 미리보기를 눌러주세요</div>';
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify({reports:getReports(),standards:getStandards()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iloom_backup.json';a.click();
+}
+
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.reports)setReports(d.reports);if(d.standards)setStandards(d.standards);renderList();renderStandards();renderStandardSelect();alert('복원 완료');}catch(ex){alert('파일 오류');}};
+  reader.readAsText(file);
+}
+
+function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
+
+
+function deleteCurrent(){
+  if(!currentId){alert('삭제할 저장 성적서가 없습니다.');return;}
+  if(!confirm('현재 성적서를 삭제할까요?'))return;
+  setReports(getReports().filter(r=>r.id!==currentId));
+  currentId=null; newReport(); renderList();
+}
+
+function saveStandard(){
+  const name = ($('stdName')?.value||'').trim();
+  const spec = ($('stdSpec')?.value||'').trim();
+  const cond = ($('stdCrit')?.value||'').trim();
+  const category = $('stdCategory')?.value || '물성시험';
+  if(!name){ alert('시험 항목을 입력해주세요.'); return; }
+  if(!spec){ alert('시험 규격을 입력해주세요.'); return; }
+  const list = getStandards();
+  if(list.find(s=>s.name===name)){ alert('이미 존재하는 시험 항목입니다.'); return; }
+  list.push({name, spec, cond, category});
+  setStandards(list);
+  $('stdName').value='';
+  $('stdSpec').value='';
+  if($('stdCrit')) $('stdCrit').value='';
+  renderStandards();
+  renderStandardSelect();
+  alert('"'+name+'" 규격이 저장되었습니다.');
+}
+
+function clearAll(){
+  if(!confirm('모든 저장 데이터를 초기화할까요?\n이 작업은 되돌릴 수 없습니다.'))return;
+  localStorage.removeItem(storeKey);
+  localStorage.removeItem(standardsKey);
+  init();
+}
+
+function loadReport(r){currentId=r.id; fields.forEach(id=>setVal(id,r[id]||'')); sampleImageData=r.image||''; $('testTable').querySelector('tbody').innerHTML=''; (r.tests||[]).forEach(addTest); renderImage(); renderPreview(); renderDetailSection(); restoreDetailData(r.detailData); document.querySelector('[data-tab="write"]').click();}
+async function saveReport(silent=false){
+  try {
+    const r=collectReport();
+    currentId=r.id;
+    // Supabase에 저장
+    await setReportAsync(r);
+    // 로컬 캐시도 업데이트
+    const list=getReports();
+    const idx=list.findIndex(x=>x.id===r.id);
+    if(idx>=0) list[idx]=r; else list.unshift(r);
+    setReports(list);
+    await renderListAsync();
+    clearUnsaved();
+    if(!silent){ showSaveToast(); }
+  } catch(e) {
+    console.error('saveReport error:', e);
+    alert('저장 중 오류: ' + e.message);
+  }
+}
+function autoSave(){} // 자동저장 비활성화
+function showSaveToast(){
+  const existing = document.getElementById('saveToastModal');
+  if(existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'saveToastModal';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:16px;padding:36px 48px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);min-width:240px';
+  const icon = document.createElement('div');
+  icon.style.cssText = 'font-size:44px;margin-bottom:12px';
+  icon.textContent = '✅';
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:900;color:#1f2937;margin-bottom:8px';
+  title.textContent = '저장 완료!';
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:13px;color:#6b7280;margin-bottom:24px';
+  sub.textContent = '성적서가 저장되었습니다.';
+  const btn = document.createElement('button');
+  btn.style.cssText = 'background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 40px;font-size:15px;font-weight:800;cursor:pointer';
+  btn.textContent = '확인';
+  btn.onclick = ()=>overlay.remove();
+  box.appendChild(icon); box.appendChild(title); box.appendChild(sub); box.appendChild(btn);
+  overlay.appendChild(box);
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
+
+// ── 계정 관리 ──────────────────────────────────────────
+const ACCOUNTS_KEY = 'iloom_accounts_v1';
+const ADMIN_ID = 'jiyoung_kang';
+
+function getAccounts(){
+  const defaultAdmin = {id:'jiyoung_kang', pw:'1111', name:'강지영', role:'관리자'};
+  try {
+    const raw = localStorage.getItem(ACCOUNTS_KEY);
+    if(raw){
+      const list = JSON.parse(raw);
+      if(!Array.isArray(list)) throw new Error('not array');
+      const adminIdx = list.findIndex(a=>a.id==='jiyoung_kang');
+      if(adminIdx === -1) list.unshift(defaultAdmin);
+      else list[adminIdx].pw = '1111'; // 관리자 비번 항상 1111 고정
+      return list;
+    }
+  } catch(e){
+    console.warn('계정 데이터 오류 - 초기화:', e);
+    localStorage.removeItem(ACCOUNTS_KEY);
+  }
+  return [defaultAdmin];
+}
+function setAccounts(list){ localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); }
+
+
+function deleteAccount(id){
+  if(id===ADMIN_ID){ alert('관리자 계정은 삭제할 수 없습니다.'); return; }
+  if(!confirm('"'+id+'" 계정을 삭제할까요?')) return;
+  const list = getAccounts().filter(a=>a.id!==id);
+  setAccounts(list); renderAccounts();
+}
+
+function renderSideMemberList(){
+  const list = getAccounts();
+  const box = document.getElementById('sideMemberList');
+  if(!box) return;
+  box.innerHTML = '';
+  list.forEach(function(acc){
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:#0f1923;border-radius:6px;padding:5px 8px';
+    const info = document.createElement('div');
+    info.innerHTML = '<div style="font-size:11px;font-weight:700;color:#fff">' + acc.id + '</div>'
+      + '<div style="font-size:10px;color:#aab2c0">' + (acc.name||'-') + ' · ' + acc.role + '</div>';
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '삭제';
+    delBtn.style.cssText = 'background:#7f1d1d;border:none;color:#fca5a5;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0';
+    delBtn.onclick = function(){
+      if(acc.id === ADMIN_ID){ alert('관리자 계정은 삭제할 수 없습니다.'); return; }
+      if(!confirm('"'+acc.id+'" 계정을 삭제할까요?')) return;
+      setAccounts(getAccounts().filter(a=>a.id!==acc.id));
+      renderSideMemberList(); renderAccounts();
+    };
+    if(acc.id === ADMIN_ID) delBtn.style.display = 'none';
+    row.appendChild(info); row.appendChild(delBtn);
+    box.appendChild(row);
+  });
+}
+
+function renderAccounts(){
+  const list = getAccounts();
+  const tbody = document.getElementById('accTableBody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  list.forEach(function(acc){
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid #f3f4f6';
+    const tdId = document.createElement('td'); tdId.style.cssText='padding:10px 12px;font-weight:700'; tdId.textContent=acc.id;
+    const tdName = document.createElement('td'); tdName.style.padding='10px 12px'; tdName.textContent=acc.name||'-';
+    const tdRole = document.createElement('td'); tdRole.style.padding='10px 12px';
+    const span = document.createElement('span');
+    span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(acc.role==='관리자'?'#fef2f2':'#f0fdf4')+';color:'+(acc.role==='관리자'?'#e60012':'#16a34a');
+    span.textContent=acc.role; tdRole.appendChild(span);
+    const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
+    if(acc.id===ADMIN_ID){
+      const s2=document.createElement('span'); s2.style.cssText='font-size:11px;color:#9ca3af'; s2.textContent='삭제 불가'; tdAct.appendChild(s2);
+    } else {
+      const btn=document.createElement('button');
+      btn.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer';
+      btn.textContent='삭제';
+      btn.onclick=function(){ deleteAccount(acc.id); renderAccounts(); renderSideMemberList(); };
+      tdAct.appendChild(btn);
+    }
+    tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct);
+    tbody.appendChild(tr);
+  });
+}
+
+function initAccounts(){
+  renderAccounts();
+  renderSideMemberList();
+}
+
+
+
+function initAdminRegTab(){
+  renderAdminRegTable();
+
+  // 등록 버튼 - onclick으로 단순하게
+  var btn = document.getElementById('adminRegBtn');
+  if(btn){
+    btn.onclick = function(){
+      var id   = (document.getElementById('adminRegId').value||'').trim();
+      var pw   = (document.getElementById('adminRegPw').value||'').trim();
+      var name = (document.getElementById('adminRegName').value||'').trim();
+      var err  = document.getElementById('adminRegErr');
+      if(!id){ err.textContent='아이디를 입력해주세요.'; return; }
+      if(!pw){ err.textContent='비밀번호를 입력해주세요.'; return; }
+      if(pw.length < 4){ err.textContent='비밀번호는 4자 이상이어야 합니다.'; return; }
+      var list = getAccounts();
+      if(list.find(function(a){ return a.id===id; })){ err.textContent='이미 존재하는 아이디입니다.'; return; }
+      list.push({id:id, pw:pw, name:name||id, role:'일반'});
+      setAccounts(list);
+      err.textContent='';
+      document.getElementById('adminRegId').value='';
+      document.getElementById('adminRegPw').value='';
+      document.getElementById('adminRegName').value='';
+      renderAdminRegTable(); renderAccounts(); renderSideMemberList();
+      alert('"'+id+'" 계정이 등록되었습니다.');
+    };
+  }
+
+  // 전체선택
+  var selAll = document.getElementById('adminSelectAll');
+  if(selAll){
+    selAll.onchange = function(){
+      document.querySelectorAll('.admin-acc-chk').forEach(function(c){ c.checked = selAll.checked; });
+      updateAdminDelBtn();
+    };
+  }
+
+  // 선택 삭제
+  var delSel = document.getElementById('adminDelSelectedBtn');
+  if(delSel){
+    delSel.onclick = function(){
+      var ids = [...document.querySelectorAll('.admin-acc-chk:checked')].map(function(c){ return c.dataset.id; });
+      if(!ids.length) return;
+      if(!confirm(ids.length+'개 계정을 삭제할까요?')) return;
+      setAccounts(getAccounts().filter(function(a){ return !ids.includes(a.id) || a.id===ADMIN_ID; }));
+      renderAdminRegTable(); renderAccounts(); renderSideMemberList();
+    };
+  }
+}
+
+
+// ── 로그인 ──────────────────────────────────────────
+(function(){
+  var LS = document.getElementById('loginScreen');
+
+  // 저장된 아이디 불러오기
+  var savedId = localStorage.getItem('iloom_saved_id');
+  if(savedId){
+    document.getElementById('loginId').value = savedId;
+    document.getElementById('saveIdCheck').checked = true;
+    document.getElementById('loginPw').focus();
+  }
+
+  function doLogin(){
+    var id = (document.getElementById('loginId').value||'').trim();
+    var pw = (document.getElementById('loginPw').value||'').trim();
+    var err = document.getElementById('loginErr');
+    var saveId = document.getElementById('saveIdCheck').checked;
+    if(!id){ err.textContent='아이디를 입력해주세요.'; return; }
+    if(!pw){ err.textContent='비밀번호를 입력해주세요.'; return; }
+    var accs = getAccounts();
+    console.log('로그인 시도:', id, '/ 저장 계정수:', accs.length);
+    var matched = accs.find(function(a){ return a.id===id && a.pw===pw; });
+    if(matched){
+      sessionStorage.setItem('iloom_auth','ok');
+      sessionStorage.setItem('iloom_user', JSON.stringify(matched));
+      if(saveId){ localStorage.setItem('iloom_saved_id', id); }
+      else { localStorage.removeItem('iloom_saved_id'); }
+      LS.style.setProperty('display','none','important');
+      LS.style.visibility = 'hidden';
+      if(!window._appInited){ window._appInited=true; init(); }
+      // 관리자면 회원 등록 패널 즉시 표시
+      const _adminPanel = document.getElementById('adminMemberBtn');
+      if(_adminPanel){
+        if(matched.role==='관리자' || matched.id===ADMIN_ID){
+          _adminPanel.style.display='block'; renderSideMemberList();
+        } else {
+          _adminPanel.style.display='none';
+        }
+      }
+    } else {
+      err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';
+      document.getElementById('loginPw').value='';
+      document.getElementById('loginPw').focus();
+    }
+  }
+
+  document.getElementById('loginBtn').onclick = doLogin;
+  document.getElementById('loginId').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('loginPw').focus(); };
+  document.getElementById('loginPw').onkeydown = function(e){ if(e.key==='Enter') doLogin(); };
+  document.getElementById('logoutBtn').onclick = function(){
+    sessionStorage.removeItem('iloom_auth');
+    sessionStorage.removeItem('iloom_user');
+    location.reload();
+  };
+
+  // 세션 유지
+  if(sessionStorage.getItem('iloom_auth')==='ok'){
+    LS.style.setProperty('display','none','important');
+    LS.style.visibility = 'hidden';
+    window._appInited=true; init();
+  }
+})();
+  
+// ══════════════════════════════════════════
+// Supabase 연동
+// ══════════════════════════════════════════
+const SUPA_URL = 'https://cfxjqjgvumdemeuzwhxg.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmeGpxamd2dW1kZW1ldXp3aHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMjM4NTIsImV4cCI6MjA2NDU5OTg1Mn0.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+
+async function supaFetch(table, method, body, id) {
+  const url = SUPA_URL + '/rest/v1/' + table + (id ? '?id=eq.' + encodeURIComponent(id) : '');
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : ''
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(method === 'GET') return res.json();
+  return res.ok;
+}
+
+// ── 성적서 ──
+async function getReportsAsync() {
+  const rows = await supaFetch('reports', 'GET');
+  return (rows||[]).map(r => r.data).sort((a,b) => new Date(b.savedAt||0) - new Date(a.savedAt||0));
+}
+async function setReportAsync(r) {
+  return supaFetch('reports', 'POST', {id: r.id, data: r, updated_at: new Date().toISOString()});
+}
+async function deleteReportsAsync(ids) {
+  for(const id of ids) {
+    await fetch(SUPA_URL + '/rest/v1/reports?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+  }
+}
+
+// ── 의뢰서 ──
+async function getRequestsAsync() {
+  const rows = await supaFetch('requests', 'GET');
+  return (rows||[]).map(r => r.data).sort((a,b) => new Date(b.savedAt||0) - new Date(a.savedAt||0));
+}
+async function setRequestAsync(r) {
+  return supaFetch('requests', 'POST', {id: r.no, data: r, updated_at: new Date().toISOString()});
+}
+
+// ── 계정 ──
+async function getAccountsAsync() {
+  const rows = await supaFetch('accounts', 'GET');
+  if(!rows || !rows.length) return null;
+  return (rows||[]).map(r => r.data);
+}
+async function setAccountsAsync(list) {
+  await fetch(SUPA_URL + '/rest/v1/accounts', {
+    method: 'DELETE',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' },
+  });
+  for(const a of list) {
+    await supaFetch('accounts', 'POST', {id: a.id, data: a});
+  }
+}
+
+// ── localStorage 캐시 래퍼 ──
+function getReports() { return JSON.parse(localStorage.getItem(storeKey)||'[]'); }
+function setReports(list) { localStorage.setItem(storeKey, JSON.stringify(list)); }
+
+</script>
+</body>
+</html>
