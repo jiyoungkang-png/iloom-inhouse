@@ -1096,15 +1096,6 @@ async function migrateLocalToSupabase(){
   console.log('Supabase 마이그레이션 시작...');
   let migrated = 0;
 
-  // 계정 먼저 동기화
-  try {
-    const accs = getAccounts();
-    for(const a of accs){
-      await supaFetch('accounts', 'POST', {id: a.id, data: a});
-    }
-    console.log('계정 동기화:', accs.length+'개');
-  } catch(e){ console.warn('계정 동기화 실패:', e); }
-
   // 성적서 마이그레이션 (여러 키 시도)
   const reportKeys = ['iloom_inhouse_reports_v1', 'iloom_reports_v2', storeKey];
   const allReports = {};
@@ -1287,6 +1278,8 @@ async function syncStandardsToSupabase(){
 }
 async function loadStandardsFromSupabase(){
   try {
+    const localData = localStorage.getItem(standardsKey);
+    if(localData) return false; // 로컬 데이터 우선
     const rows = await supaFetch('settings', 'GET');
     if(rows && rows.length){
       const stdRow = rows.find(function(r){ return r.id === 'standards'; });
@@ -1309,6 +1302,8 @@ async function syncReqItemsToSupabase(){
 }
 async function loadReqItemsFromSupabase(){
   try {
+    const localData = localStorage.getItem(REQ_ITEM_LIST_KEY);
+    if(localData) return false; // 로컬 데이터 우선
     const rows = await supaFetch('settings', 'GET');
     if(rows && rows.length){
       const row = rows.find(function(r){ return r.id === 'req_items'; });
@@ -1323,7 +1318,10 @@ async function loadReqItemsFromSupabase(){
 
 // ── 계정 Supabase 로드 ──
 async function loadAccountsFromSupabase(){
+  // 로컬 데이터 보호 - 로컬에 데이터 있으면 덮어쓰지 않음
   try {
+    const localData = localStorage.getItem(ACCOUNTS_KEY);
+    if(localData) return false; // 로컬 데이터 우선
     const rows = await getAccountsAsync();
     if(rows && rows.length > 0){
       localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(rows));
@@ -1337,16 +1335,10 @@ function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
   initAccounts(); initListActions();
-  // Supabase에서 계정/규격/의뢰항목 로드 후 렌더링
-  Promise.all([
-    loadAccountsFromSupabase(),
-    loadStandardsFromSupabase(),
-    loadReqItemsFromSupabase()
-  ]).then(function(results){
-    if(results[1]){ renderStandardSelect(); renderStandards(); }
-    if(results[0]){ renderAccounts(); renderSideMemberList(); }
-    migrateLocalToSupabase().then(function(){ renderListAsync(); });
-  }).catch(function(){ migrateLocalToSupabase().then(function(){ renderListAsync(); }); });
+  // 로컬 데이터 먼저 렌더링 후 Supabase에 업로드 (덮어쓰기 없음)
+  renderListAsync();
+  // 로컬 데이터를 Supabase에 업로드
+  migrateLocalToSupabase();
   // 로그인 사용자 표시 + 관리자 탭 제어
   try{
     const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
