@@ -358,8 +358,8 @@ button,input,select{font:inherit}
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
               <span>의뢰 시험 항목 (시험방법 포함)</span>
               <div style="display:flex;gap:6px">
-                <button type="button" onclick="saveReqItemList()" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">💾 목록 저장</button>
-                <button type="button" onclick="resetReqItemList()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">↺ 기본값 복원</button>
+                <button type="button" onclick="if(requireAdmin())saveReqItemList();" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">💾 목록 저장</button>
+                <button type="button" onclick="if(requireAdmin())resetReqItemList();" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">↺ 기본값 복원</button>
               </div>
             </div>
             <div id="req_items_checkboxes" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 14px;background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:0">
@@ -596,9 +596,12 @@ button,input,select{font:inherit}
                 <input id="adminRegName" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;outline:none" placeholder="이름 입력">
               </label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
-                그룹
-                <input value="일반" readonly style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;background:#f5f5f5;color:#555;cursor:default">
-                <input type="hidden" id="adminRegRole" value="일반">
+                역할
+                <select id="adminRegRole" style="border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:13px;outline:none;background:#fff;cursor:pointer">
+                  <option value="의뢰자">의뢰자</option>
+                  <option value="시험원">시험원</option>
+                  <option value="관리자">관리자</option>
+                </select>
               </label>
             </div>
             <div id="adminRegErr" style="color:#e60012;font-size:12px;margin-top:10px;min-height:16px"></div>
@@ -787,11 +790,12 @@ function makeReqItemRow(item, isCustom){
   lbl.appendChild(chk);
   lbl.appendChild(txt);
 
-  // 수정 버튼
+  // 수정 버튼 (관리자만)
   const editBtn = document.createElement('button');
   editBtn.type = 'button';
   editBtn.textContent = '수정';
   editBtn.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;cursor:pointer;font-size:11px;font-weight:700;padding:3px 10px;flex-shrink:0;white-space:nowrap';
+  if(!isAdmin()) editBtn.style.display='none';
   editBtn.onmouseover = function(){ this.style.background='#dbeafe'; };
   editBtn.onmouseout  = function(){ this.style.background='#eff6ff'; };
   editBtn.onclick = function(e){
@@ -853,12 +857,13 @@ function makeReqItemRow(item, isCustom){
     };
   };
 
-  // 삭제 버튼
+  // 삭제 버튼 (관리자만)
   const delBtn = document.createElement('button');
   delBtn.type = 'button';
   delBtn.textContent = '삭제';
   delBtn.title = '항목 삭제';
   delBtn.style.cssText = 'background:#fee2e2;border:1px solid #fecaca;border-radius:6px;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:3px 10px;flex-shrink:0;white-space:nowrap';
+  if(!isAdmin()) delBtn.style.display='none';
   delBtn.onmouseover = function(){ this.style.background='#fecaca'; };
   delBtn.onmouseout  = function(){ this.style.background='#fee2e2'; };
   delBtn.onclick = function(e){ e.stopPropagation(); row.remove(); };
@@ -1125,6 +1130,44 @@ function showToast(msg){
   setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .5s'; setTimeout(function(){ t.remove(); }, 500); }, 3000);
 }
 
+// ── 역할별 탭 제어 ──
+function applyRoleTabControl(user){
+  const role = user.role || '시험원';
+  const isAdminUser = role === '관리자' || user.id === ADMIN_ID;
+  const isTester = role === '시험원';
+  const isRequester = role === '의뢰자';
+
+  // 탭 버튼 제어
+  const tabRules = {
+    'request':  true,                        // 모두 보임
+    'write':    isTester || isAdminUser,     // 시험원 + 관리자
+    'list':     isTester || isAdminUser,     // 시험원 + 관리자
+    'standard': isTester || isAdminUser,     // 시험원 + 관리자
+    'setting':  isAdminUser,                 // 관리자만
+    'admin':    isAdminUser,                 // 관리자만
+    'accounts': isAdminUser,                 // 관리자만
+  };
+
+  document.querySelectorAll('.nav-btn[data-tab]').forEach(function(btn){
+    const tab = btn.dataset.tab;
+    btn.style.display = tabRules[tab] ? '' : 'none';
+  });
+
+  // 의뢰자는 로그인 후 의뢰서 작성 탭으로 강제 이동
+  if(isRequester){
+    setTimeout(function(){
+      const reqBtn = document.querySelector('.nav-btn[data-tab="request"]');
+      if(reqBtn) reqBtn.click();
+    }, 100);
+  } else {
+    // 시험원/관리자는 성적서 작성 탭으로
+    setTimeout(function(){
+      const writeBtn = document.querySelector('.nav-btn[data-tab="write"]');
+      if(writeBtn && !writeBtn.classList.contains('active')) writeBtn.click();
+    }, 100);
+  }
+}
+
 function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
@@ -1140,6 +1183,7 @@ function init(){
       const nameText = u.name ? u.name+' ('+u.id+')' : u.id;
       el.innerHTML = crown + nameText;
     }
+    if(u.id) applyRoleTabControl(u);
     const accBtn = document.getElementById('accountsNavBtn');
     if(accBtn && (u.role==='관리자' || u.id===ADMIN_ID)) accBtn.style.display='';
     const adminMemberBtn = document.getElementById('adminMemberBtn');
@@ -1823,6 +1867,7 @@ function renderList(page){
 }
 
 async function listDeleteSelected(){
+  if(!requireAdmin()) return;
   var ids = [...document.querySelectorAll('#reportList .list-chk:checked')].map(function(c){ return c.dataset.id; });
   if(!ids.length){ return; }
   if(!confirm(ids.length+'개 성적서를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
@@ -1926,10 +1971,12 @@ function renderStandards(){
     const editBtn = document.createElement('button');
     editBtn.className='btn ghost'; editBtn.textContent='수정';
     editBtn.style.cssText='font-size:11px;padding:5px 12px;background:#eff6ff;border-color:#bfdbfe;color:#2563eb';
+    if(!isAdmin()) editBtn.style.display='none';
 
     const delBtn = document.createElement('button');
     delBtn.className='btn ghost'; delBtn.textContent='삭제';
     delBtn.style.cssText='font-size:11px;padding:5px 12px;background:#fee2e2;border-color:#fecaca;color:#dc2626';
+    if(!isAdmin()) delBtn.style.display='none';
     delBtn.onclick=function(){
       if(!confirm('"'+s.name+'" 규격을 삭제할까요?')) return;
       const l=getStandards(); l.splice(i,1); setStandards(l); renderStandards(); renderStandardSelect();
@@ -2172,7 +2219,7 @@ async function saveAndPreviewRequest(){
     +itemRows+'</table>'
     +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px">■ 비고</div>'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
-    +'<tr><td style="border:1px solid #bbb;padding:14px 12px;height:70px;vertical-align:top;white-space:pre-wrap;font-size:12px">'+data.note+'</td></tr></table>'
+    +'<tr><td style="border:1px solid #bbb;padding:14px 12px;height:120px;vertical-align:top;white-space:pre-wrap;font-size:12px">'+data.note+'</td></tr></table>'
     +'<div style="position:absolute;bottom:0;left:10mm;right:10mm">'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px">'
     +'<tr><th style="background:#f4f5f7;border:1px solid #bbb;padding:7px;text-align:center;font-size:12px" colspan="2">확인 (서명)</th></tr>'
@@ -2251,6 +2298,7 @@ function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&l
 
 
 function deleteCurrent(){
+  if(!requireAdmin()) return;
   if(!currentId){alert('삭제할 저장 성적서가 없습니다.');return;}
   if(!confirm('현재 성적서를 삭제할까요?'))return;
   setReports(getReports().filter(r=>r.id!==currentId));
@@ -2258,6 +2306,7 @@ function deleteCurrent(){
 }
 
 function saveStandard(){
+  if(!requireAdmin()) return;
   const name = ($('stdName')?.value||'').trim();
   const spec = ($('stdSpec')?.value||'').trim();
   const crit = ($('stdCrit')?.value||'').trim();
@@ -2286,6 +2335,16 @@ function clearAll(){
 function loadReport(r){currentId=r.id; fields.forEach(id=>setVal(id,r[id]||'')); sampleImageData=r.image||'';
   const matEl3=document.getElementById('sampleMaterials'); if(matEl3){ const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'}; matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':''; matEl3.dataset.materials=JSON.stringify(r.materials||[]); } $('testTable').querySelector('tbody').innerHTML=''; (r.tests||[]).forEach(addTest); renderImage(); renderPreview(); renderDetailSection(); restoreDetailData(r.detailData); document.querySelector('[data-tab="write"]').click();}
 async function saveReport(silent=false){
+  if(!isAdmin()){
+    // 비관리자는 본인이 작성한 성적서만 저장 가능 (새 성적서는 허용)
+    const existing = getReports().find(x=>x.id===currentId);
+    if(existing){
+      const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+      if(existing.tester && existing.tester !== (u.name||u.id)){
+        alert('본인이 작성한 성적서만 수정할 수 있습니다.'); return;
+      }
+    }
+  }
   try {
     const r=collectReport();
     currentId=r.id;
@@ -2336,6 +2395,27 @@ function showSaveToast(){
 // ── 계정 관리 ──────────────────────────────────────────
 const ACCOUNTS_KEY = 'iloom_accounts_v1';
 const ADMIN_ID = 'jiyoung_kang';
+// ── 권한 체크 ──
+function isAdmin(){
+  try {
+    const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    return u.id === ADMIN_ID || u.role === '관리자';
+  } catch(e){ return false; }
+}
+function getUserRole(){
+  try {
+    const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    if(u.id === ADMIN_ID || u.role === '관리자') return '관리자';
+    if(u.role === '시험원') return '시험원';
+    if(u.role === '의뢰자') return '의뢰자';
+    return u.role || '시험원';
+  } catch(e){ return '시험원'; }
+}
+function requireAdmin(){
+  if(!isAdmin()){ alert('관리자만 사용할 수 있는 기능입니다.'); return false; }
+  return true;
+}
+
 
 function getAccounts(){
   const defaultAdmin = {id:'jiyoung_kang', pw:'1111', name:'강지영', role:'관리자'};
@@ -2403,7 +2483,9 @@ function renderAccounts(){
     const tdName = document.createElement('td'); tdName.style.padding='10px 12px'; tdName.textContent=acc.name||'-';
     const tdRole = document.createElement('td'); tdRole.style.padding='10px 12px';
     const span = document.createElement('span');
-    span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(acc.role==='관리자'?'#fef2f2':'#f0fdf4')+';color:'+(acc.role==='관리자'?'#e60012':'#16a34a');
+    var roleColors = {'관리자':'#fef2f2','시험원':'#eff6ff','의뢰자':'#f0fdf4'};
+    var roleTextColors = {'관리자':'#e60012','시험원':'#2563eb','의뢰자':'#16a34a'};
+    span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(roleColors[acc.role]||'#f3f4f6')+';color:'+(roleTextColors[acc.role]||'#374151');
     span.textContent=acc.role; tdRole.appendChild(span);
     const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
     if(acc.id===ADMIN_ID){
@@ -2443,7 +2525,8 @@ function initAdminRegTab(){
       if(pw.length < 4){ err.textContent='비밀번호는 4자 이상이어야 합니다.'; return; }
       var list = getAccounts();
       if(list.find(function(a){ return a.id===id; })){ err.textContent='이미 존재하는 아이디입니다.'; return; }
-      list.push({id:id, pw:pw, name:name||id, role:'일반'});
+      var role = (document.getElementById('adminRegRole').value||'시험원');
+      list.push({id:id, pw:pw, name:name||id, role:role});
       setAccounts(list);
       err.textContent='';
       document.getElementById('adminRegId').value='';
@@ -2507,7 +2590,7 @@ function initAdminRegTab(){
       LS.style.setProperty('display','none','important');
       LS.style.visibility = 'hidden';
       if(!window._appInited){ window._appInited=true; init(); }
-      // 관리자면 회원 등록 패널 즉시 표시
+      // 역할별 탭 제어
       const _adminPanel = document.getElementById('adminMemberBtn');
       if(_adminPanel){
         if(matched.role==='관리자' || matched.id===ADMIN_ID){
@@ -2516,6 +2599,7 @@ function initAdminRegTab(){
           _adminPanel.style.display='none';
         }
       }
+      applyRoleTabControl(matched);
     } else {
       err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';
       document.getElementById('loginPw').value='';
@@ -2544,7 +2628,7 @@ function initAdminRegTab(){
 // Supabase 연동
 // ══════════════════════════════════════════
 const SUPA_URL = 'https://cfxjqjgvumdemeuzwhxg.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmeGpxamd2dW1kZW1ldXp3aHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMjM4NTIsImV4cCI6MjA2NDU5OTg1Mn0.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmeGpxamd2dW1kZW1ldXp3aHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExOTY5MDIsImV4cCI6MjA5Njc3MjkwMn0.2GyUEaAEbphYmRvXurObtyV4AAQnsEut9dD90i1ws4Y';
 
 async function supaFetch(table, method, body, id) {
   const url = SUPA_URL + '/rest/v1/' + table + (id ? '?id=eq.' + encodeURIComponent(id) : '');
