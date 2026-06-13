@@ -1323,6 +1323,45 @@ async function loadSharedFromSupabase(){
   } catch(e){ console.warn('Supabase 로드 실패:', e); }
 }
 
+function splitPage2ForPrint(){
+  const page2 = document.querySelector('.page-2');
+  if(!page2) return;
+  const subHead = page2.querySelector('.sub-head');
+  if(!subHead) return;
+  const subHtml = subHead.outerHTML;
+  const blocks = Array.from(page2.querySelectorAll('.result-block'));
+  if(!blocks.length) return;
+
+  // 각 result-block 앞에 헤더 삽입 (첫 번째 제외)
+  // 약 260mm(A4 기준) 넘으면 새 페이지로 분할
+  const PAGE_HEIGHT_MM = 260;
+  const MM_PER_PX = 0.264583;
+  let currentHeight = subHead.offsetHeight * MM_PER_PX + 10;
+
+  blocks.forEach(function(block, idx){
+    if(idx === 0){ currentHeight += block.offsetHeight * MM_PER_PX; return; }
+    currentHeight += block.offsetHeight * MM_PER_PX;
+    if(currentHeight > PAGE_HEIGHT_MM){
+      // 이 블록 앞에 페이지 브레이크 + 헤더 삽입
+      const breaker = document.createElement('div');
+      breaker.className = 'auto-page-break';
+      breaker.style.cssText = 'break-before:page;page-break-before:always';
+      const header = document.createElement('div');
+      header.className = 'auto-page-header';
+      header.innerHTML = subHtml;
+      header.style.marginBottom = '8px';
+      block.parentNode.insertBefore(breaker, block);
+      block.parentNode.insertBefore(header, block);
+      currentHeight = block.offsetHeight * MM_PER_PX;
+    }
+  });
+}
+
+function restorePage2AfterPrint(){
+  // 자동 삽입된 헤더/브레이크 제거
+  document.querySelectorAll('.auto-page-break, .auto-page-header').forEach(function(el){ el.remove(); });
+}
+
 function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
@@ -1460,7 +1499,12 @@ function bindInputs(){
   }
   pm.style.display = 'flex';
   document.getElementById('printCancel').onclick = ()=>{ pm.style.display='none'; };
-  document.getElementById('printGo').onclick = ()=>{ pm.style.display='none'; setTimeout(()=>window.print(),200); };
+  document.getElementById('printGo').onclick = ()=>{
+    pm.style.display='none';
+    // 인쇄 전 page-2를 분할해서 각 페이지마다 헤더 추가
+    splitPage2ForPrint();
+    setTimeout(()=>{ window.print(); restorePage2AfterPrint(); }, 300);
+  };
 }; $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
   $('searchReport').addEventListener('input',renderList);
   $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
