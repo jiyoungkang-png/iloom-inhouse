@@ -70,8 +70,8 @@ button,input,select{font:inherit}
 .preview-header span{color:var(--muted);font-size:13px}
 .report-preview{display:flex;flex-direction:column;gap:18px;align-items:center}
 .page{width:210mm;background:#fff;padding:16mm 10mm 20mm;box-shadow:0 8px 28px rgba(0,0,0,.12);position:relative;color:#111;font-size:11px}
-.page-1{height:297mm;padding:16mm 10mm 52mm;overflow:hidden;box-sizing:border-box}
-.page-2{min-height:0;height:auto;padding:0}
+.page-1{padding:16mm 10mm 52mm;box-sizing:border-box}
+.page-2{padding:0}
 .report-head{display:flex;flex-direction:column;border-bottom:2px solid var(--red);padding-bottom:0;gap:0;margin-bottom:0}
 .report-head-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
 .logo-block{display:flex;gap:14px;align-items:center}
@@ -170,7 +170,7 @@ button,input,select{font:inherit}
   .page:last-child{page-break-after:auto!important;break-after:auto!important}
   /* 1페이지: 고정 높이 */
   .page-1{height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important}
-  /* 2페이지: 내용 따라 자연스럽게 페이지 넘김 */
+  /* 2페이지 헤더 반복 — thead 방식 */
   .page-2{
     min-height:0!important;
     height:auto!important;
@@ -178,6 +178,8 @@ button,input,select{font:inherit}
     page-break-after:auto!important;
     break-after:auto!important;
   }
+  .page2-header{display:table-header-group!important}
+  .page2-body{display:table-row-group!important}
   /* 결과 블록 간격 — 화면과 동일 */
   .page-2 .result-block{margin-bottom:24px!important}
   .page-2 .result-table td,.page-2 .result-table th{padding:8px 10px!important;font-size:12px!important}
@@ -1935,11 +1937,14 @@ function renderPreview(){
         <div style="text-align:right;font-size:7px;color:#999;margin-top:2px">PAGE(S) : 1 / 2</div>
       </div>
     </section>
-    <section class="page page-2" style="padding:0!important">
-      <div style="padding:8mm 10mm 4mm">
-            <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
-            <h3 class="section-line-title" style="margin:0 0 6px;font-size:20px">세부 시험 결과 데이터</h3>
-          </div>
+    <section class="page page-2" style="padding:0!important;display:table;width:210mm;table-layout:fixed">
+      <div class="page2-header" style="display:table-header-group">
+        <div style="padding:6mm 10mm 3mm;border-bottom:2px solid #e60012">
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:11px;padding-bottom:4px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
+          <div style="border-left:3px solid #e60012;padding-left:10px;color:#e60012;font-size:16px;font-weight:900;margin-top:4px">세부 시험 결과 데이터</div>
+        </div>
+      </div>
+      <div class="page2-body" style="display:table-row-group">
       <div style="padding:0 10mm 10mm">
       ${(function(){
         const detail = r.detailData || {};
@@ -2046,6 +2051,7 @@ function renderPreview(){
       })()}
       <div class="result-end">- 시험결과 기록 완료 -</div>
       <div class="page-no" id="lastPageNo" style="text-align:right;font-size:7px;color:#999;margin-top:4mm">PAGE(S) : 2 / 2</div>
+      </div>
       </div>
     </section>`;
   // 페이지 수 업데이트 (미리보기 렌더 후)
