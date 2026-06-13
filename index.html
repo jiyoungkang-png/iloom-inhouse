@@ -1173,19 +1173,15 @@ function applyRoleTabControl(user){
     });
   }
 
-  // 의뢰자는 로그인 후 의뢰서 작성 탭으로 강제 이동
-  if(isRequester){
+  // 모든 역할 의뢰서 작성 탭으로 이동 후 Supabase 로드
+  setTimeout(function(){
+    const reqBtn = document.querySelector('.nav-btn[data-tab="request"]');
+    if(reqBtn) reqBtn.click();
+    // 탭 이동 후 Supabase에서 목록 로드
     setTimeout(function(){
-      const reqBtn = document.querySelector('.nav-btn[data-tab="request"]');
-      if(reqBtn) reqBtn.click();
-    }, 100);
-  } else {
-    // 시험원/관리자는 의뢰서 작성 탭으로
-    setTimeout(function(){
-      const reqBtn = document.querySelector('.nav-btn[data-tab="request"]');
-      if(reqBtn && !reqBtn.classList.contains('active')) reqBtn.click();
-    }, 100);
-  }
+      renderReqListAsync();
+    }, 500);
+  }, 200);
 }
 
 // ── 내 정보 / 비밀번호 변경 ──
