@@ -1601,6 +1601,20 @@ function renderDetailSection(){
 
     // ── 내구성시험 ──
     if(name.includes('내구성')){
+      // 기준 입력칸
+      const critLbl = document.createElement('label');
+      critLbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;margin-bottom:10px';
+      critLbl.textContent = '기준';
+      const critTa = document.createElement('textarea');
+      critTa.dataset.key = 'detail_crit_'+i;
+      critTa.rows = 3;
+      critTa.placeholder = '예: 1. 간격의 양 d1,d2,d3 모두 40mm 이하일 것.';
+      critTa.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%;box-sizing:border-box';
+      critTa.value = saved['detail_crit_'+i]||'';
+      critTa.addEventListener('input', renderPreview);
+      critLbl.appendChild(critTa);
+      sec.appendChild(critLbl);
+
       const grid = document.createElement('div');
       grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
       ['d1','d2','d3','d4'].forEach(function(d){
@@ -1637,6 +1651,20 @@ function renderDetailSection(){
 
     // ── 수직하중시험 ──
     } else if(name.includes('수직하중') || name.includes('하중')){
+      // 기준 입력칸
+      const critLbl2 = document.createElement('label');
+      critLbl2.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;margin-bottom:10px';
+      critLbl2.textContent = '기준';
+      const critTa2 = document.createElement('textarea');
+      critTa2.dataset.key = 'detail_crit_'+i;
+      critTa2.rows = 2;
+      critTa2.placeholder = '예: D1 ≤ 45mm, D2 ≥ 5mm';
+      critTa2.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%;box-sizing:border-box';
+      critTa2.value = saved['detail_crit_'+i]||'';
+      critTa2.addEventListener('input', renderPreview);
+      critLbl2.appendChild(critTa2);
+      sec.appendChild(critLbl2);
+
       const cycles = ['0회','200회','10000회','80000회','480000회'];
       cycles.forEach(function(cycle){
         const ckey = cycle.replace('회','');
@@ -1845,30 +1873,32 @@ function renderPreview(){
           const spec  = t.spec || '';
           const crit  = t.crit || '';
           const judge = detail['judge_'+i] || '';
-          const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td><td></td></tr>' : '';
+          const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td></tr>' : '';
 
           // 내구성시험
           if(name.includes('내구성')){
             const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
             const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
-            const critRows = crit ? crit.split('\n').map(function(line,ci){
-              return '<tr><td class="left" style="color:#444;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            const detailCrit = detail['detail_crit_'+i]||'';
+            const critRows = detailCrit ? detailCrit.split('\n').map(function(line){
+              return '<tr><td class="left" style="color:#333;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
             }).join('') : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
-              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
-              +critRows
-              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td><td></td></tr>'
-              +'<tr><td class="left">d2 (mm)</td><td class="result-val">'+d2+'</td><td></td></tr>'
-              +'<tr><td class="left">d3 (mm)</td><td class="result-val">'+d3+'</td><td></td></tr>'
-              +'<tr><td class="left">d4 (mm)</td><td class="result-val">'+d4+'</td><td></td></tr>'
-              +judgeCell
+              +(detailCrit?'<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">'+esc(detailCrit)+'</div>':'')
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
+              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td></tr>'
+              +'<tr><td class="left">d2 (mm)</td><td class="result-val">'+d2+'</td></tr>'
+              +'<tr><td class="left">d3 (mm)</td><td class="result-val">'+d3+'</td></tr>'
+              +'<tr><td class="left">d4 (mm)</td><td class="result-val">'+d4+'</td></tr>'
+              +judgeCell.replace('<td></td></tr>','</tr>')
               +'</table></div>';
 
           // 수직하중시험
           } else if(name.includes('수직하중')||name.includes('하중')){
             const cycles = [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']];
-            const critRowsLoad = crit ? crit.split('\n').map(function(line){
-              return '<tr><td class="left" style="color:#444;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            const detailCritLoad = detail['detail_crit_'+i]||'';
+            const critRowsLoad = detailCritLoad ? detailCritLoad.split('\n').map(function(line){
+              return '<tr><td class="left" style="color:#333;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
             }).join('') : '';
             let rows = '';
             cycles.forEach(function(c){
@@ -1877,8 +1907,9 @@ function renderPreview(){
               rows += '<tr><td class="left" style="font-weight:800">'+c[0]+'</td><td class="result-val">D1: '+d1+' / D2: '+d2+'</td><td></td></tr>';
             });
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
-              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
-              +critRowsLoad+rows+judgeCell+'</table></div>';
+              +(detailCritLoad?'<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">'+esc(detailCritLoad)+'</div>':'')
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
+              +rows.replace(/<td><\/td><\/tr>/g,'</tr>')+judgeCell.replace('<td></td></tr>','</tr>')+'</table></div>';
 
           // 염색견뢰도
           } else if(name.includes('염색')||name.includes('견뢰도')){
