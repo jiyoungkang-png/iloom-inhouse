@@ -1329,8 +1329,45 @@ async function loadSharedFromSupabase(){
   } catch(e){ console.warn('Supabase 로드 실패:', e); }
 }
 
-function splitPage2ForPrint(){ /* 사용 안 함 */ }
-function restorePage2AfterPrint(){ /* 사용 안 함 */ }
+function splitPage2ForPrint(){
+  const page2 = document.querySelector('.page-2');
+  if(!page2) return;
+
+  // A4 인쇄 시 실제 사용 가능한 높이 (mm → px, 96dpi 기준)
+  // A4=297mm, 상하여백 각 약 15mm → 유효 267mm → 약 1010px
+  const A4_PX = 1010;
+
+  // page-2 전체 높이로 총 페이지 수 계산
+  const page2Height = page2.scrollHeight;
+  const totalFromPage2 = Math.ceil(page2Height / A4_PX);
+  const totalPages = 1 + Math.max(1, totalFromPage2); // 1페이지 + 2페이지 이상
+
+  // sub-head 페이지 번호 업데이트
+  const subHead = page2.querySelector('.sub-head span:last-child');
+  if(subHead) subHead.textContent = 'PAGE(S) : 2 / ' + totalPages;
+
+  // lastPageNo 업데이트
+  const lastPageNo = document.getElementById('lastPageNo');
+  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : ' + totalPages + ' / ' + totalPages;
+
+  // thead 안의 페이지 번호도 업데이트
+  const theadSpan = page2.querySelector('thead span:last-child');
+  if(theadSpan) theadSpan.textContent = 'PAGE(S) : 2 / ' + totalPages;
+
+  console.log('총 페이지:', totalPages, '(page2 높이:', page2Height, 'px)');
+}
+
+function restorePage2AfterPrint(){
+  // 페이지 번호 원복
+  const page2 = document.querySelector('.page-2');
+  if(!page2) return;
+  const subHead = page2.querySelector('.sub-head span:last-child');
+  if(subHead) subHead.textContent = 'PAGE(S) : 2 / 2';
+  const lastPageNo = document.getElementById('lastPageNo');
+  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : 2 / 2';
+  const theadSpan = page2.querySelector('thead span:last-child');
+  if(theadSpan) theadSpan.textContent = 'PAGE(S) : 2 / 2';
+}
 
 function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
