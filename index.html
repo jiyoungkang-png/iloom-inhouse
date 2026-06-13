@@ -727,31 +727,27 @@ function val(id){const el=$(id); return el ? el.value.trim() : '';}
 function setVal(id,v){const el=$(id); if(el) el.value = v || '';}
 
 // ── 의뢰서 시험 항목 체크박스 ──
-const REQ_ITEM_LIST_DEFAULT = [
-  {label:'염색견뢰도 (세탁)', spec:'KS K ISO 105-C06'},
+
+const REQ_ITEM_LIST_KEY = 'iloom_req_item_list_v1';
+const DEFAULT_REQ_ITEMS = [
   {label:'염색견뢰도 (마찰)', spec:'KS K ISO 105-X12'},
   {label:'염색견뢰도 (땀)', spec:'KS K ISO 105-E04'},
   {label:'염색견뢰도 (물)', spec:'KS K ISO 105-E01'},
-  {label:'염색견뢰도 (일광)', spec:'KS K ISO 105-B02'},
-  {label:'치수변화율', spec:'KS K ISO 5077'},
   {label:'인장강도', spec:'KS K ISO 13934-1'},
   {label:'인열강도', spec:'KS K ISO 13937-2'},
   {label:'필링', spec:'KS K ISO 12945-1'},
-  {label:'내마모성', spec:'KS K ISO 12947-2'},
-  {label:'봉목강도', spec:'KS K ISO 13935-2'},
   {label:'pH', spec:'KS K ISO 3071'},
-  {label:'중금속', spec:'KS K 0150'},
   {label:'포름알데히드', spec:'KS K 0168'},
-  {label:'겉보기 밀도', spec:'KS K ISO 9073-6'},
+  {label:'내구성시험', spec:'KS G 4300'},
+  {label:'수직하중시험', spec:'KS G 4300'}
 ];
-const REQ_ITEM_LIST_KEY = 'iloom_req_item_list_v1';
 
 function getReqItemList(){
   try {
     const saved = localStorage.getItem(REQ_ITEM_LIST_KEY);
     if(saved) return JSON.parse(saved);
   } catch(e){}
-  return REQ_ITEM_LIST_DEFAULT.map(function(i){ return Object.assign({}, i); });
+  return DEFAULT_REQ_ITEMS.map(function(i){ return Object.assign({}, i); });
 }
 
 function saveReqItemList(){
@@ -769,7 +765,9 @@ function saveReqItemList(){
 
 function resetReqItemList(){
   if(!confirm('기본 항목 목록으로 복원할까요?\n현재 저장된 목록이 초기화됩니다.')) return;
-  localStorage.removeItem(REQ_ITEM_LIST_KEY);
+  localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(DEFAULT_REQ_ITEMS));
+  // Supabase에도 저장
+  supaFetch('settings','POST',{id:'req_items',data:DEFAULT_REQ_ITEMS,updated_at:new Date().toISOString()}).catch(function(e){});
   renderReqItemCheckboxes();
 }
 
