@@ -1342,17 +1342,13 @@ function splitPage2ForPrint(){
   const totalFromPage2 = Math.ceil(page2Height / A4_PX);
   const totalPages = 1 + Math.max(1, totalFromPage2); // 1페이지 + 2페이지 이상
 
-  // sub-head 페이지 번호 업데이트
-  const subHead = page2.querySelector('.sub-head span:last-child');
-  if(subHead) subHead.textContent = 'PAGE(S) : 2 / ' + totalPages;
-
-  // lastPageNo 업데이트
+  // lastPageNo 업데이트 (맨 밑)
   const lastPageNo = document.getElementById('lastPageNo');
   if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : ' + totalPages + ' / ' + totalPages;
 
-  // thead 안의 페이지 번호도 업데이트
-  const theadSpan = page2.querySelector('thead span:last-child');
-  if(theadSpan) theadSpan.textContent = 'PAGE(S) : 2 / ' + totalPages;
+  // 1페이지 번호도 업데이트
+  const page1No = document.querySelector('.page-1 [style*="PAGE(S)"]');
+  if(page1No) page1No.textContent = 'PAGE(S) : 1 / ' + totalPages;
 
   console.log('총 페이지:', totalPages, '(page2 높이:', page2Height, 'px)');
 }
@@ -1361,12 +1357,10 @@ function restorePage2AfterPrint(){
   // 페이지 번호 원복
   const page2 = document.querySelector('.page-2');
   if(!page2) return;
-  const subHead = page2.querySelector('.sub-head span:last-child');
-  if(subHead) subHead.textContent = 'PAGE(S) : 2 / 2';
   const lastPageNo = document.getElementById('lastPageNo');
   if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : 2 / 2';
-  const theadSpan = page2.querySelector('thead span:last-child');
-  if(theadSpan) theadSpan.textContent = 'PAGE(S) : 2 / 2';
+  const page1No = document.querySelector('.page-1 [style*="PAGE(S)"]');
+  if(page1No) page1No.textContent = 'PAGE(S) : 1 / 2';
 }
 
 function init(){
@@ -1922,14 +1916,11 @@ function renderPreview(){
       </div>
     </section>
     <section class="page page-2" style="padding:0!important">
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed">
-        <thead>
-          <tr><th style="padding:8mm 10mm 4mm;font-weight:normal;text-align:left">
-            <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span><span>PAGE(S) : 2+</span></div>
+      <div style="padding:8mm 10mm 4mm">
+            <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
             <h3 class="section-line-title" style="margin:0 0 6px">세부 시험 결과 데이터</h3>
-          </th></tr>
-        </thead>
-        <tbody><tr><td style="padding:0 10mm 10mm">
+          </div>
+      <div style="padding:0 10mm 10mm">
       ${(function(){
         const detail = r.detailData || {};
         const testItems = r.tests || [];
@@ -2034,9 +2025,8 @@ function renderPreview(){
         return blocks;
       })()}
       <div class="result-end">- 시험결과 기록 완료 -</div>
-      <div class="page-no" id="lastPageNo">PAGE(S) : last</div>
-        </td></tr></tbody>
-      </table>
+      <div class="page-no" id="lastPageNo" style="text-align:right;font-size:7px;color:#999;margin-top:4mm">PAGE(S) : 2 / 2</div>
+      </div>
     </section>`;
   // 페이지 수 업데이트 (미리보기 렌더 후)
   setTimeout(function(){
