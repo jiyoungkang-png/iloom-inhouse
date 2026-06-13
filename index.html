@@ -1317,23 +1317,19 @@ async function saveSharedToSupabase(){
 
 async function loadSharedFromSupabase(){
   try {
-    // 계정 불러오기
+    // 계정 불러오기 - Supabase가 정답! 완전히 덮어쓰기
     const accRows = await supaFetch('accounts', 'GET');
     if(accRows && accRows.length > 0){
       const remoteAccs = accRows.map(function(r){ return r.data; });
-      const localAccs = getAccounts();
-      // 원격 계정을 로컬에 병합 (중복 제거)
-      const merged = [...localAccs];
-      remoteAccs.forEach(function(ra){
-        if(!merged.find(function(la){ return la.id === ra.id; })){
-          merged.push(ra);
-        }
-      });
-      if(merged.length !== localAccs.length){
-        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(merged));
-        renderAccounts(); renderSideMemberList();
-        console.log('✅ 계정 동기화:', merged.length+'개');
+      // 관리자 계정은 항상 포함
+      const defaultAdmin = {id:'jiyoung_kang', pw:'1111', name:'강지영', role:'관리자'};
+      if(!remoteAccs.find(function(a){ return a.id===ADMIN_ID; })){
+        remoteAccs.unshift(defaultAdmin);
       }
+      // Supabase 데이터로 완전히 덮어쓰기 (병합 X)
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(remoteAccs));
+      renderAccounts(); renderSideMemberList();
+      console.log('✅ 계정 동기화 (덮어쓰기):', remoteAccs.length+'개');
     }
     // 규격 불러오기
     const settingRows = await supaFetch('settings', 'GET');
