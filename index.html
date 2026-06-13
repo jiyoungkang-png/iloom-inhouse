@@ -1328,38 +1328,61 @@ function splitPage2ForPrint(){
   if(!page2) return;
   const subHead = page2.querySelector('.sub-head');
   if(!subHead) return;
-  const subHtml = subHead.outerHTML;
+  const receiptNo = subHead.querySelector('span:first-child')?.textContent || '';
+  const sampleName = subHead.querySelector('span:nth-child(2)')?.textContent || '';
   const blocks = Array.from(page2.querySelectorAll('.result-block'));
   if(!blocks.length) return;
 
-  // 각 result-block 앞에 헤더 삽입 (첫 번째 제외)
-  // 약 260mm(A4 기준) 넘으면 새 페이지로 분할
-  const PAGE_HEIGHT_MM = 260;
-  const MM_PER_PX = 0.264583;
-  let currentHeight = subHead.offsetHeight * MM_PER_PX + 10;
+  // 페이지당 최대 높이 (px 기준, A4=297mm, 1mm≈3.78px, 여백 제외 약 750px)
+  const MAX_HEIGHT = 700;
+  let pageHeight = 60; // 헤더 높이
+  let pageNum = 2;
+  let totalPages = 2; // 나중에 업데이트
 
-  blocks.forEach(function(block, idx){
-    if(idx === 0){ currentHeight += block.offsetHeight * MM_PER_PX; return; }
-    currentHeight += block.offsetHeight * MM_PER_PX;
-    if(currentHeight > PAGE_HEIGHT_MM){
-      // 이 블록 앞에 페이지 브레이크 + 헤더 삽입
-      const breaker = document.createElement('div');
-      breaker.className = 'auto-page-break';
-      breaker.style.cssText = 'break-before:page;page-break-before:always';
-      const header = document.createElement('div');
-      header.className = 'auto-page-header';
-      header.innerHTML = subHtml;
-      header.style.marginBottom = '8px';
-      block.parentNode.insertBefore(breaker, block);
-      block.parentNode.insertBefore(header, block);
-      currentHeight = block.offsetHeight * MM_PER_PX;
-    }
+  // 먼저 총 페이지 수 계산
+  let tmpHeight = 60;
+  blocks.forEach(function(block){
+    const bh = block.offsetHeight + 16;
+    if(tmpHeight + bh > MAX_HEIGHT){ totalPages++; tmpHeight = 60; }
+    tmpHeight += bh;
   });
+
+  // 실제 분할
+  pageHeight = 60;
+  blocks.forEach(function(block, idx){
+    const bh = block.offsetHeight + 16;
+    if(pageHeight + bh > MAX_HEIGHT && idx > 0){
+      pageNum++;
+      // 페이지 브레이크 + 새 헤더 삽입
+      const newHeader = document.createElement('div');
+      newHeader.className = 'auto-page-header';
+      newHeader.style.cssText = 'break-before:page;page-break-before:always;display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:10px;font-weight:700;font-size:9px;color:#333';
+      newHeader.innerHTML = '<span>'+receiptNo+'</span><span>'+sampleName+'</span><span>PAGE(S) : '+pageNum+' / '+totalPages+'</span>';
+      block.parentNode.insertBefore(newHeader, block);
+      pageHeight = 60;
+    }
+    pageHeight += bh;
+  });
+
+  // 첫 번째 sub-head 페이지 수 업데이트
+  const lastSpan = subHead.querySelector('span:last-child');
+  if(lastSpan) lastSpan.textContent = 'PAGE(S) : 2 / ' + totalPages;
+
+  // 마지막 페이지 번호도 업데이트
+  const lastPageNo = document.getElementById('lastPageNo');
+  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : ' + totalPages + ' / ' + totalPages;
 }
 
 function restorePage2AfterPrint(){
-  // 자동 삽입된 헤더/브레이크 제거
-  document.querySelectorAll('.auto-page-break, .auto-page-header').forEach(function(el){ el.remove(); });
+  document.querySelectorAll('.auto-page-header').forEach(function(el){ el.remove(); });
+  // sub-head 원복
+  const subHead = document.querySelector('.page-2 .sub-head');
+  if(subHead){
+    const lastSpan = subHead.querySelector('span:last-child');
+    if(lastSpan) lastSpan.textContent = 'PAGE(S) : 2 / 2';
+  }
+  const lastPageNo = document.getElementById('lastPageNo');
+  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : 2 / 2';
 }
 
 function init(){
