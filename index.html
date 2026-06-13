@@ -69,7 +69,14 @@ button,input,select{font:inherit}
 .preview-header h2{margin:0}
 .preview-header span{color:var(--muted);font-size:13px}
 .report-preview{display:flex;flex-direction:column;gap:18px;align-items:center}
-.page{width:210mm;min-height:297mm;background:#fff;padding:16mm 10mm 46mm;box-shadow:0 8px 28px rgba(0,0,0,.12);position:relative;color:#111;font-size:11px}
+/* 미리보기 스케일 래퍼 */
+.preview-scale-outer{overflow-x:auto;width:100%;display:flex;justify-content:center}
+.preview-scale-inner{transform-origin:top center;display:flex;flex-direction:column;gap:18px;align-items:center}
+.page{width:210mm;background:#fff;padding:16mm 10mm 52mm;box-shadow:0 8px 28px rgba(0,0,0,.12);position:relative;color:#111;font-size:11px}
+/* 1페이지는 항상 A4 고정 높이 — 미리보기와 출력 동일 */
+.page-1{height:297mm!important;overflow:hidden!important;box-sizing:border-box!important}
+/* 2페이지는 내용에 따라 늘어남 */
+.page-2{min-height:297mm}
 .report-head{display:flex;flex-direction:column;border-bottom:2px solid var(--red);padding-bottom:0;gap:0;margin-bottom:0}
 .report-head-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
 .logo-block{display:flex;gap:14px;align-items:center}
@@ -154,10 +161,9 @@ button,input,select{font:inherit}
   .page{
     box-shadow:none!important;
     width:210mm!important;
-    min-height:297mm!important;
     height:auto!important;
     margin:0!important;
-    padding:16mm 10mm 20mm!important;
+    padding:16mm 10mm 52mm!important;
     page-break-after:always!important;
     break-after:page!important;
     overflow:visible!important;
@@ -166,22 +172,16 @@ button,input,select{font:inherit}
     transform:none!important;
   }
   .page:last-child{page-break-after:auto!important;break-after:auto!important}
-  /* 1페이지: 고정 높이 */
-  .page-1{height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important}
-  /* 2페이지: 내용 따라 늘어남, 폰트 작게 */
+  /* 1페이지: 고정 높이 — 미리보기와 동일 */
+  .page-1{height:297mm!important;overflow:hidden!important;box-sizing:border-box!important}
+  /* 2페이지: 내용 따라 늘어남 */
   .page-2{
-    min-height:0!important;
+    min-height:297mm!important;
     height:auto!important;
     padding:0!important;
     page-break-after:auto!important;
     break-after:auto!important;
-    font-size:9px!important;
   }
-  .page-2 .result-block{margin-bottom:6px!important}
-  .page-2 .result-table td,.page-2 .result-table th{padding:4px 6px!important;font-size:9px!important}
-  .page-2 .result-block-title{font-size:10px!important;margin-bottom:2px!important}
-  .page-2 .sub-head{font-size:8px!important;padding-bottom:4px!important}
-  .page-2 h3{font-size:10px!important;margin:4px 0!important}
   .page-2 .photo-card{max-height:80mm!important}
   .page-2 .photo-card img{max-height:80mm!important;object-fit:contain!important}
   /* 결과 블록은 중간에서 잘리지 않도록 */
@@ -531,7 +531,11 @@ button,input,select{font:inherit}
             <h2>출력 미리보기</h2>
             <span>A4 기준 / 인쇄 시 좌측 입력 패널은 제외됩니다.</span>
           </div>
-          <div id="reportPreview" class="report-preview"></div>
+          <div class="preview-scale-outer" id="previewScaleOuter">
+            <div class="preview-scale-inner" id="previewScaleInner">
+              <div id="reportPreview" class="report-preview"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -2071,7 +2075,29 @@ function renderPreview(){
     });
   }, 50);
   }catch(ex){ console.error('renderPreview error:',ex); }
+  // 렌더 후 미리보기 스케일 적용
+  setTimeout(scalePreview, 60);
 }
+
+// ── 미리보기 자동 스케일 ──
+// A4 용지(210mm = 794px @96dpi)를 미리보기 영역 너비에 맞게 축소 표시
+function scalePreview(){
+  const outer = document.getElementById('previewScaleOuter');
+  const inner = document.getElementById('previewScaleInner');
+  if(!outer || !inner) return;
+  const A4_PX = 794; // 210mm @ 96dpi
+  const available = outer.clientWidth - 40; // 양쪽 여백 20px씩
+  if(available <= 0) return;
+  const scale = Math.min(1, available / A4_PX);
+  inner.style.transform = 'scale(' + scale + ')';
+  inner.style.transformOrigin = 'top center';
+  // scale 후 실제 차지 높이를 outer에 반영 (레이아웃 깨짐 방지)
+  const innerH = inner.scrollHeight;
+  outer.style.minHeight = Math.round(innerH * scale) + 'px';
+}
+
+// 창 크기 변경 시 재계산
+window.addEventListener('resize', scalePreview);
 
 let _listPage = 1;
 const LIST_PAGE_SIZE = 10;
