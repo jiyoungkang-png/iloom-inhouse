@@ -1807,8 +1807,8 @@ function renderPreview(){
       <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
       <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
       <div class="red-title">■ 의뢰 시험 항목</div>
-      <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:25%">시험 규격</th><th style="width:22%">시험 기준</th></tr></thead>
-        <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td><td class="left" style="vertical-align:top">'+esc(t.crit||'').replace(/\n/g,'<br>')+'</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
+      <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:35%">시험 규격</th></tr></thead>
+        <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td></tr>').join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
       </table>
       <table class="report-table" style="margin-top:0;border-top:none"><tbody><tr>
         <td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border-top:1px solid #ddd;white-space:nowrap">비고</td>
@@ -1851,9 +1851,13 @@ function renderPreview(){
           if(name.includes('내구성')){
             const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
             const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
+            const critRows = crit ? crit.split('\n').map(function(line,ci){
+              return '<tr><td class="left" style="color:#444;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            }).join('') : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
-              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td><td>'+(crit||'40mm 이하')+'</td></tr>'
+              +critRows
+              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td><td></td></tr>'
               +'<tr><td class="left">d2 (mm)</td><td class="result-val">'+d2+'</td><td></td></tr>'
               +'<tr><td class="left">d3 (mm)</td><td class="result-val">'+d3+'</td><td></td></tr>'
               +'<tr><td class="left">d4 (mm)</td><td class="result-val">'+d4+'</td><td></td></tr>'
@@ -1863,6 +1867,9 @@ function renderPreview(){
           // 수직하중시험
           } else if(name.includes('수직하중')||name.includes('하중')){
             const cycles = [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']];
+            const critRowsLoad = crit ? crit.split('\n').map(function(line){
+              return '<tr><td class="left" style="color:#444;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            }).join('') : '';
             let rows = '';
             cycles.forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
@@ -1871,7 +1878,7 @@ function renderPreview(){
             });
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
-              +rows+judgeCell+'</table></div>';
+              +critRowsLoad+rows+judgeCell+'</table></div>';
 
           // 염색견뢰도
           } else if(name.includes('염색')||name.includes('견뢰도')){
