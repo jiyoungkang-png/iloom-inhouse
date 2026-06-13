@@ -79,7 +79,7 @@ button,input,select{font:inherit}
 .company-text{font-size:10px;color:#555;line-height:1.5}
 .report-title{color:var(--red);font-size:24px;font-weight:900;letter-spacing:1px;text-align:left;padding-bottom:0;margin-top:0;border-bottom:none}
 .meta-table{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}
-.meta-table th,.meta-table td{border:1px solid #e5e7eb;padding:6px 11px;word-break:break-all;vertical-align:middle}
+.meta-table th,.meta-table td{border:1px solid #e5e7eb;padding:10px 11px;word-break:break-all;vertical-align:middle}
 
 .meta-table td{font-weight:600;font-size:11px}
 
@@ -99,7 +99,7 @@ button,input,select{font:inherit}
 .result-table .result-val{font-weight:900}
 .result-end{text-align:center;font-size:11px;font-weight:700;margin-top:16px;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
 .report-table th{background:#f7f8fa;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:10px}
-.report-table td{border-bottom:1px solid #e5e5e5;padding:7px;text-align:center}
+.report-table td{border-bottom:1px solid #e5e5e5;padding:10px;text-align:center}
 .report-table td.left{text-align:left}
 .report-table .bold{font-weight:900}
 .report-table .red{color:var(--red);font-weight:900}
@@ -125,8 +125,8 @@ button,input,select{font:inherit}
 .sub-head{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:10px;font-weight:700}
 .section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:16px;margin:28px 0 24px}
 .note{color:#555;font-size:10px;margin-top:10px}
-.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:106mm;display:grid;place-items:center;margin-top:10px;background:#fcfcfc}
-.photo-card{width:80mm;height:70mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
+.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin:6mm 0;background:#fcfcfc}
+.photo-card{width:70mm;height:58mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
 .photo-card img{width:100%;height:100%;object-fit:contain}
 .caption{text-align:center;font-weight:800;margin-top:10px}
 .list-item,.standard-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;margin:8px 0;background:#fff}
@@ -149,14 +149,12 @@ button,input,select{font:inherit}
   .no-print,.sidebar,.topbar,.card,.preview-header{display:none!important}
   .app-shell{display:block!important}
   .workspace{padding:0!important;margin:0!important;max-width:none!important}
-  .report-preview{display:block!important;padding:0!important;margin:0!important;gap:0!important}
+  .report-preview{display:block!important;padding:0!important;margin:0!important}
   .preview-wrap{padding:0!important;margin:0!important}
-  .preview-scale-outer{display:block!important;padding:0!important;margin:0!important;background:none!important;border-radius:0!important;height:auto!important;overflow:visible!important}
-  .preview-scale-inner{display:block!important;transform:none!important;width:auto!important;gap:0!important}
   .page{
     box-shadow:none!important;
     width:210mm!important;
-    min-height:0!important;
+    min-height:297mm!important;
     height:auto!important;
     margin:0!important;
     padding:16mm 10mm 20mm!important;
@@ -169,8 +167,8 @@ button,input,select{font:inherit}
   }
   .page:last-child{page-break-after:auto!important;break-after:auto!important}
   /* 1페이지: 고정 높이 */
-  .page-1{height:297mm!important;min-height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important;box-sizing:border-box!important}
-  /* 2페이지: 내용만큼만 */
+  .page-1{height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important}
+  /* 2페이지: 내용 따라 늘어남, 폰트 작게 */
   .page-2{
     min-height:0!important;
     height:auto!important;
@@ -184,8 +182,8 @@ button,input,select{font:inherit}
   .page-2 .result-block-title{font-size:10px!important;margin-bottom:2px!important}
   .page-2 .sub-head{font-size:8px!important;padding-bottom:4px!important}
   .page-2 h3{font-size:10px!important;margin:4px 0!important}
-  .page-2 .photo-card{max-height:80mm!important}
-  .page-2 .photo-card img{max-height:80mm!important;object-fit:contain!important}
+  .page-2 .photo-card{max-height:58mm!important}
+  .page-2 .photo-card img{max-height:58mm!important;object-fit:contain!important}
   /* 결과 블록은 중간에서 잘리지 않도록 */
   .result-block{break-inside:avoid!important;page-break-inside:avoid!important}
   .photo-box{break-inside:avoid!important;page-break-inside:avoid!important}
@@ -216,12 +214,6 @@ button,input,select{font:inherit}
   background: #fff5f5 !important;
   border-left: 3px solid #e60012 !important;
   padding-left: 7px !important;
-}
-/* ── 미리보기 스케일 (화면 표시용만, 출력 무관) ── */
-.preview-scale-outer{width:100%;overflow-x:auto;display:flex;justify-content:center;background:#e5e7eb;padding:20px;border-radius:12px;box-sizing:border-box}
-.preview-scale-inner{transform-origin:top center;display:flex;flex-direction:column;gap:18px;align-items:center}
-@media print{
-  .preview-scale-outer,.preview-scale-inner{display:block!important;padding:0!important;margin:0!important;background:none!important;transform:none!important;border-radius:0!important}
 }
 
 </style>
@@ -537,16 +529,9 @@ button,input,select{font:inherit}
         <div class="preview-wrap">
           <div class="preview-header no-print">
             <h2>출력 미리보기</h2>
-            <span>실제 출력과 동일하게 표시됩니다.</span>
+            <span>A4 기준 / 인쇄 시 좌측 입력 패널은 제외됩니다.</span>
           </div>
-          <!-- iframe 미리보기: @media print CSS 그대로 적용 -->
-          <div id="previewIframeWrap" style="width:100%;overflow-x:auto;background:#e5e7eb;padding:20px;border-radius:12px;box-sizing:border-box;display:flex;justify-content:center">
-            <iframe id="reportPreviewFrame"
-              style="border:none;transform-origin:top left;display:block;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.18)"
-              scrolling="no"></iframe>
-          </div>
-          <!-- 기존 호환용 hidden div (collectReport 등 내부 참조용) -->
-          <div id="reportPreview" class="report-preview" style="display:none"></div>
+          <div id="reportPreview" class="report-preview"></div>
         </div>
       </section>
 
@@ -1522,11 +1507,8 @@ function bindInputs(){
   document.getElementById('printCancel').onclick = ()=>{ pm.style.display='none'; };
   document.getElementById('printGo').onclick = ()=>{
     pm.style.display='none';
-    const r = collectReport();
-    const {css, body} = buildReportHTML(r, sampleImageData);
-    const fullHTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${body}<script>window.onload=function(){window.print();}<\/script></body></html>`;
-    const pw = window.open('','_blank','width=900,height=700');
-    if(pw){ pw.document.write(fullHTML); pw.document.close(); }
+    splitPage2ForPrint();
+    setTimeout(()=>{ window.print(); restorePage2AfterPrint(); }, 300);
   };
 
   // 자동 배율 계산
@@ -1918,177 +1900,176 @@ function restoreDetailData(data){
   });
 }
 
-function buildReportHTML(r, sampleImg){
-  const tests = r.tests || [];
-  const detail = r.detailData || {};
-  const esc2 = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const kolasSrc = document.getElementById('kolas-logo-src') ? document.getElementById('kolas-logo-src').src : '';
-
-  // ── 세부 결과 블록 ──
-  let blocks = '';
-  tests.forEach(function(t, i){
-    const name = (t.name||'').toLowerCase();
-    const title = t.name||('항목 '+(i+1));
-    const spec  = t.spec||'';
-    const crit  = t.crit||'';
-    const judge = detail['judge_'+i]||'';
-    const judgeRow = judge ? `<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="color:${judge==='합격'||judge==='PASS'?'#008a3d':'#e60012'}">${judge}</td><td></td></tr>` : '';
-
-    if(name.includes('내구성')){
-      const dc=detail['detail_crit_'+i]||'';
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div>${dc?`<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">${esc2(dc)}</div>`:''}<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr><tr><td class="left">d1 (mm)</td><td class="result-val">${detail['d1_'+i]||''}</td></tr><tr><td class="left">d2 (mm)</td><td class="result-val">${detail['d2_'+i]||''}</td></tr><tr><td class="left">d3 (mm)</td><td class="result-val">${detail['d3_'+i]||''}</td></tr><tr><td class="left">d4 (mm)</td><td class="result-val">${detail['d4_'+i]||''}</td></tr>${judgeRow}</table></div>`;
-    } else if(name.includes('수직하중')||name.includes('하중')){
-      const dc2=detail['detail_crit_'+i]||'';
-      let rows2='';
-      [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']].forEach(function(c){
-        rows2+=`<tr><td class="left">${c[0]}</td><td class="result-val">D1: ${detail['load_'+c[1]+'_d1_'+i]||''} / D2: ${detail['load_'+c[1]+'_d2_'+i]||''}</td></tr>`;
-      });
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div>${dc2?`<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">${esc2(dc2)}</div>`:''}<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>${rows2}${judgeRow}</table></div>`;
-    } else if(name.includes('염색')||name.includes('견뢰도')){
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div><table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">변퇴색 (급)</td><td class="result-val">${detail['colorChange_'+i]||''}</td><td>${crit}</td></tr><tr><td class="left">이염 (급)</td><td class="result-val">${detail['staining_'+i]||''}</td><td></td></tr>${judgeRow}</table></div>`;
-    } else if(name.includes('치수')||name.includes('변화율')||name.includes('수축')){
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div><table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">길이 세탁 전(cm)</td><td class="result-val">${detail['lenBefore_'+i]||''}</td><td></td></tr><tr><td class="left">길이 세탁 후(cm)</td><td class="result-val">${detail['lenAfter_'+i]||''}</td><td></td></tr><tr><td class="left">길이 변화율(%)</td><td class="result-val" style="color:#e60012">${detail['lenPct_'+i]||'-'}</td><td>${crit}</td></tr><tr><td class="left">폭 세탁 전(cm)</td><td class="result-val">${detail['widBefore_'+i]||''}</td><td></td></tr><tr><td class="left">폭 세탁 후(cm)</td><td class="result-val">${detail['widAfter_'+i]||''}</td><td></td></tr><tr><td class="left">폭 변화율(%)</td><td class="result-val" style="color:#e60012">${detail['widPct_'+i]||'-'}</td><td></td></tr>${judgeRow}</table></div>`;
-    } else if(name.includes('필링')||name.includes('pilling')){
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div><table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">등급(급)</td><td class="result-val">${detail['pillingResult_'+i]||''}</td><td>${crit}</td></tr>${judgeRow}</table></div>`;
-    } else if(name.includes('외관')||name.includes('세탁 후')){
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div><table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">외관 상태</td><td class="result-val left">${esc2(detail['appearanceResult_'+i]||'')}</td><td>${crit}</td></tr>${judgeRow}</table></div>`;
-    } else {
-      blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>${title}</span>${spec?`<span style="font-weight:400;font-size:10px">(${spec})</span>`:''}</div></div><table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">결과</td><td class="result-val">${esc2(detail['genResult_'+i]||'')}</td><td>${crit||t.result||''}</td></tr>${detail['genNote_'+i]?`<tr><td class="left">비고</td><td class="left" colspan="2">${esc2(detail['genNote_'+i])}</td></tr>`:''} ${judgeRow}</table></div>`;
-    }
-  });
-  blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box" style="margin-top:6px"><div><div class="photo-card">${sampleImg?`<img src="${sampleImg}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
-
-  const matLabel = {fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'};
-  const matText = (r.materials&&r.materials.length) ? ' ['+r.materials.map(m=>matLabel[m]||m).join(', ')+']' : '';
-
-  const CSS = `
-    :root{--red:#e60012;--green:#008a3d}
-    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
-    body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff;color:#111;font-size:11px}
-    @page{size:210mm 297mm;margin:0}
-    .page{width:210mm;background:#fff;position:relative;display:block}
-    .page-1{height:297mm;padding:16mm 10mm 52mm;box-sizing:border-box;overflow:hidden;page-break-after:always;break-after:page}
-    .page-2{padding:0;page-break-after:auto;break-after:auto}
-    .report-head-row{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:8px;border-bottom:2px solid var(--red)}
-    .report-title{color:var(--red);font-size:24px;font-weight:900;letter-spacing:1px}
-    .meta-table{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}
-    .meta-table th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 11px;font-weight:700;font-size:11px;vertical-align:middle}
-    .meta-table td{border:1px solid #e5e7eb;padding:6px 11px;font-weight:600;font-size:11px;vertical-align:middle;word-break:break-all}
-    .red-title{color:var(--red);font-weight:900;font-size:15px;margin:12px 0 6px}
-    .report-table{width:100%;border-collapse:collapse;font-size:11px}
-    .report-table th{background:#f7f8fa;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:8px 10px;font-weight:700}
-    .report-table td{border-bottom:1px solid #e5e5e5;padding:7px 10px;text-align:center}
-    .report-table td.left{text-align:left}
-    .report-table .bold{font-weight:900}
-    .page1-footer{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}
-    .p1f-sign-row{display:flex;border:1px solid #bbb}
-    .p1f-confirm{display:flex;align-items:center;justify-content:center;background:#f5f5f5;padding:8px 12px;font-weight:900;font-size:11px;border-right:1px solid #bbb;min-width:32px;writing-mode:vertical-lr;letter-spacing:2px}
-    .p1f-signer{flex:1;border-right:1px solid #bbb;padding:8px 10px;font-size:10px;min-height:54px}
-    .p1f-signer:last-child{border-right:none}
-    .p1f-signer-label{color:#555;font-size:9px;margin-bottom:3px}
-    .p1f-signer-name{font-weight:700}
-    .p1f-contact-bar{background:var(--red);color:#fff;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0}
-    .p1f-addr-row{display:flex;justify-content:space-between;font-size:9.5px;color:#333;margin-bottom:3px}
-    .p1f-notes{font-size:8.5px;color:#444;line-height:1.7;border-top:1px solid #ddd;padding-top:4px;margin-top:2px}
-    .p1f-notes li{list-style:none;padding-left:12px;text-indent:-12px}
-    .sub-head{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:6mm 10mm 6px;font-weight:700;font-size:10px}
-    .section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:13px;margin:4px 10mm 6px}
-    .result-block{margin-bottom:6px;padding:0 10mm}
-    .result-block-title{display:flex;align-items:center;gap:6px;font-weight:900;font-size:11px;margin-bottom:3px}
-    .result-block-title::before{content:"";display:inline-block;width:4px;height:24px;background:var(--red);border-radius:2px;flex-shrink:0}
-    .result-block-title-text{display:flex;flex-direction:column;gap:1px}
-    .result-table{width:100%;border-collapse:collapse;font-size:10px}
-    .result-table th{background:#f4f5f7;border:1px solid #ddd;padding:4px 8px;text-align:center;font-weight:700}
-    .result-table td{border:1px solid #ddd;padding:4px 8px;text-align:center}
-    .result-table td.left{text-align:left}
-    .result-table .result-val{font-weight:900}
-    .result-end{text-align:center;font-size:11px;font-weight:700;margin:8px 10mm 0;padding:5px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
-    .photo-box{border:1px solid #dfe3e8;border-radius:4px;height:60mm;display:grid;place-items:center;margin:6px 10mm 0;background:#fcfcfc}
-    .photo-card{width:70mm;height:55mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
-    .photo-card img{width:100%;height:100%;object-fit:contain}
-    .caption{text-align:center;font-weight:800;margin-top:6px;font-size:10px}
-    .page-no{text-align:right;font-size:7px;color:#999;margin:3mm 10mm 0}
-  `;
-
-  const body = `
-  <div class="page page-1">
-    <div class="report-head-row">
-      <div class="report-title">${esc2(r.reportTitle||'In House Test Report')}</div>
-      <div><img src="${kolasSrc}" style="height:48px;object-fit:contain"></div>
-    </div>
-    <table class="meta-table">
-      <tr><th>접수번호</th><td>${esc2(r.receiptNo)}</td><th>용도</th><td>${esc2(r.purpose)}</td></tr>
-      <tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr>
-      <tr><th>의뢰자</th><td>${esc2(r.requestDept)}</td><th>색상</th><td>${esc2(r.colorInfo)}</td></tr>
-      <tr><th>시료명</th><td>${esc2(r.sampleName)}${matText}</td><th>브랜드</th><td>${esc2(r.brand||'')}</td></tr>
-    </table>
-    <div class="red-title">■ 의뢰 시험 항목</div>
-    <table class="report-table">
-      <thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:35%">시험 규격</th></tr></thead>
-      <tbody>${tests.length?tests.map((t,i)=>`<tr><td>${i+1}</td><td class="left bold">${esc2(t.name||'')}</td><td class="left">${esc2(t.spec||'')}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
-    </table>
-    <table class="report-table" style="margin-top:0;border-top:none">
-      <tbody><tr>
-        <td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border-top:1px solid #ddd;white-space:nowrap">비고</td>
-        <td class="left" colspan="2" style="height:34px;border:1px solid #e5e7eb;vertical-align:top;padding:6px 10px">${esc2(r.remarkNote||'')}</td>
-      </tr></tbody>
-    </table>
-    <div class="page1-footer">
-      <div class="p1f-sign-row">
-        <div class="p1f-confirm">확&nbsp;인</div>
-        <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc2(r.tester)} &nbsp;&nbsp; (서명)</div></div>
-        <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name">성 명 : ${esc2(r.techManager)} &nbsp;&nbsp; (서명)</div></div>
-        <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc2(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
-        <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
-      </div>
-      <div class="p1f-contact-bar">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
-      <div class="p1f-addr-row"><span><b>${esc2(r.companyName)}</b> &nbsp; ${esc2(r.companyAddress)}</span><span>T ${esc2(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${esc2(r.companyWeb)}</span></div>
-      <div class="p1f-notes"><ul style="margin:0;padding:0">
-        <li>1. 본 성적서는 의뢰자가 제시한 시료 및 시료명으로 시험한 평가 결과로서, 전체 제품에 대한 품질 및 성능을 보증하지 않습니다.</li>
-        <li>2. 본 성적서는 당 연구원의 사전 서면 동의 없이 광고, 선전 등 홍보 목적 및 소송용으로 사용할 수 없으며, 용도 외 사용을 금합니다.</li>
-      </ul></div>
-      <div style="text-align:right;font-size:7px;color:#999;margin-top:2px">PAGE(S) : 1 / 2</div>
-    </div>
-  </div>
-  <div class="page page-2">
-    <div class="sub-head"><span>접수번호 : ${esc2(r.receiptNo)}</span><span>시료명 : ${esc2(r.sampleName||'')}</span></div>
-    <div class="section-line-title">세부 시험 결과 데이터</div>
-    ${blocks}
-    <div class="result-end">- 시험결과 기록 완료 -</div>
-    <div class="page-no">PAGE(S) : 2 / 2</div>
-  </div>`;
-
-  return {css: CSS, body: body};
-}
-
 function renderPreview(){
+  if(!$('reportPreview')) return;
   try{
-    const r = collectReport();
-    const lpEl=$('lengthPctDisplay'); if(lpEl) lpEl.textContent=pct(num(r.lengthBefore),num(r.lengthAfter))||'—';
-    const wpEl=$('widthPctDisplay');  if(wpEl) wpEl.textContent=pct(num(r.widthBefore),num(r.widthAfter))||'—';
+    const r=collectReport();
 
-    const {css, body} = buildReportHTML(r, sampleImageData);
-    const fullHTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${body}</body></html>`;
+    const tests=r.tests;
+    const lenPct=pct(num(r.lengthBefore),num(r.lengthAfter));
+    const widPct=pct(num(r.widthBefore),num(r.widthAfter));
+    const lpEl=$('lengthPctDisplay'); if(lpEl) lpEl.textContent=lenPct||'—';
+    const wpEl=$('widthPctDisplay'); if(wpEl) wpEl.textContent=widPct||'—';
+    const logoSrc = document.getElementById('iloom-logo-src') ? document.getElementById('iloom-logo-src').src : '';
+    const kolasSrc = document.getElementById('kolas-logo-src') ? document.getElementById('kolas-logo-src').src : '';
+    $('reportPreview').innerHTML=`
+    <section class="page page-1">
+      <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
+      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
+      <div class="red-title">■ 의뢰 시험 항목</div>
+      <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:35%">시험 규격</th></tr></thead>
+        <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td></tr>').join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
+      </table>
+      <table class="report-table" style="margin-top:0;border-top:none"><tbody><tr>
+        <td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border-top:1px solid #ddd;white-space:nowrap">비고</td>
+        <td class="left" colspan="2" style="height:70px;border:1px solid #e5e7eb;vertical-align:top;padding:8px 10px">${esc(r.remarkNote||'')}</td>
+      </tr></tbody></table>
+      <div class="page1-footer">
+        <div class="p1f-sign-row">
+          <div class="p1f-confirm">확&nbsp;인</div>
+          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc(r.tester)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.techManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+        </div>
+        <div class="p1f-contact-bar">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
+        <div class="p1f-addr-row"><span><b>${esc(r.companyName)}</b> &nbsp; ${esc(r.companyAddress)}</span><span>T ${esc(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${esc(r.companyWeb)}</span></div>
+        <div class="p1f-notes"><ul style="margin:0;padding:0">
+          <li>1. 본 성적서는 의뢰자가 제시한 시료 및 시료명으로 시험한 평가 결과로서, 전체 제품에 대한 품질 및 성능을 보증하지 않습니다.</li>
+          <li>2. 본 성적서는 당 연구원의 사전 서면 동의 없이 광고, 선전 등 홍보 목적 및 소송용으로 사용할 수 없으며, 용도 외 사용을 금합니다.</li>
+        </ul></div>
+        <div style="text-align:right;font-size:7px;color:#999;margin-top:2px">PAGE(S) : 1 / 2</div>
+      </div>
+    </section>
+    <section class="page page-2" style="padding:0!important">
+      <div style="padding:8mm 10mm 4mm">
+            <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
+            <h3 class="section-line-title" style="margin:0 0 6px">세부 시험 결과 데이터</h3>
+          </div>
+      <div style="padding:0 10mm 10mm">
+      ${(function(){
+        const detail = r.detailData || {};
+        const testItems = r.tests || [];
+        let blocks = '';
 
-    const frame = document.getElementById('reportPreviewFrame');
-    if(!frame) return;
-    const fd = frame.contentDocument || frame.contentWindow.document;
-    fd.open(); fd.write(fullHTML); fd.close();
+        testItems.forEach(function(t, i){
+          const name = (t.name||'').toLowerCase();
+          const title = t.name || ('항목 '+(i+1));
+          const spec  = t.spec || '';
+          const crit  = t.crit || '';
+          const judge = detail['judge_'+i] || '';
+          const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td></tr>' : '';
 
-    // 화면 너비에 맞게 스케일
-    setTimeout(function(){
-      const wrap = document.getElementById('previewIframeWrap');
-      if(!wrap) return;
-      const PW = 794; // 210mm @ 96dpi
-      const scale = Math.min(1, (wrap.clientWidth - 40) / PW);
-      const h = fd.body ? fd.body.scrollHeight : 1200;
-      frame.style.width  = PW + 'px';
-      frame.style.height = h + 'px';
-      frame.style.transform = `scale(${scale})`;
-      frame.style.transformOrigin = 'top left';
-      frame.style.marginLeft = ((PW * scale - PW) / 2) + 'px';
-      wrap.style.height = Math.round(h * scale + 40) + 'px';
-    }, 200);
+          // 내구성시험
+          if(name.includes('내구성')){
+            const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
+            const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
+            const detailCrit = detail['detail_crit_'+i]||'';
+            const critRows = detailCrit ? detailCrit.split('\n').map(function(line){
+              return '<tr><td class="left" style="color:#333;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            }).join('') : '';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +(detailCrit?'<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">'+esc(detailCrit)+'</div>':'')
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
+              +'<tr><td class="left">d1 (mm)</td><td class="result-val">'+d1+'</td></tr>'
+              +'<tr><td class="left">d2 (mm)</td><td class="result-val">'+d2+'</td></tr>'
+              +'<tr><td class="left">d3 (mm)</td><td class="result-val">'+d3+'</td></tr>'
+              +'<tr><td class="left">d4 (mm)</td><td class="result-val">'+d4+'</td></tr>'
+              +judgeCell.replace('<td></td></tr>','</tr>')
+              +'</table></div>';
+
+          // 수직하중시험
+          } else if(name.includes('수직하중')||name.includes('하중')){
+            const cycles = [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']];
+            const detailCritLoad = detail['detail_crit_'+i]||'';
+            const critRowsLoad = detailCritLoad ? detailCritLoad.split('\n').map(function(line){
+              return '<tr><td class="left" style="color:#333;font-size:10px" colspan="2">'+esc(line)+'</td><td></td></tr>';
+            }).join('') : '';
+            let rows = '';
+            cycles.forEach(function(c){
+              const d1=detail['load_'+c[1]+'_d1_'+i]||'';
+              const d2=detail['load_'+c[1]+'_d2_'+i]||'';
+              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+d1+' / D2: '+d2+'</td></tr>';
+            });
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +(detailCritLoad?'<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">'+esc(detailCritLoad)+'</div>':'')
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
+              +rows.replace(/<td><\/td><\/tr>/g,'</tr>')+judgeCell.replace('<td></td></tr>','</tr>')+'</table></div>';
+
+          // 염색견뢰도
+          } else if(name.includes('염색')||name.includes('견뢰도')){
+            const chg=detail['colorChange_'+i]||''; const sta=detail['staining_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">변퇴색 (급)</td><td class="result-val">'+chg+'</td><td>'+(crit||'')+'</td></tr>'
+              +'<tr><td class="left">이염 (급)</td><td class="result-val">'+sta+'</td><td></td></tr>'
+              +judgeCell+'</table></div>';
+
+          // 치수변화율
+          } else if(name.includes('치수')||name.includes('변화율')||name.includes('수축')){
+            const lb=detail['lenBefore_'+i]||''; const la=detail['lenAfter_'+i]||'';
+            const lp=detail['lenPct_'+i]||'-';
+            const wb=detail['widBefore_'+i]||''; const wa=detail['widAfter_'+i]||'';
+            const wp=detail['widPct_'+i]||'-';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">길이 세탁 전 (cm)</td><td class="result-val">'+lb+'</td><td></td></tr>'
+              +'<tr><td class="left">길이 세탁 후 (cm)</td><td class="result-val">'+la+'</td><td></td></tr>'
+              +'<tr><td class="left">길이 치수변화율 (%)</td><td class="result-val" style="color:var(--red)">'+lp+'</td><td>'+(crit||'')+'</td></tr>'
+              +'<tr><td class="left">폭 세탁 전 (cm)</td><td class="result-val">'+wb+'</td><td></td></tr>'
+              +'<tr><td class="left">폭 세탁 후 (cm)</td><td class="result-val">'+wa+'</td><td></td></tr>'
+              +'<tr><td class="left">폭 치수변화율 (%)</td><td class="result-val" style="color:var(--red)">'+wp+'</td><td></td></tr>'
+              +judgeCell+'</table><div class="note" style="margin-top:3px">※ (-) 수축, (+) 신장</div></div>';
+
+          // 필링
+          } else if(name.includes('필링')||name.includes('pilling')){
+            const pil=detail['pilling_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">필링 등급 (급)</td><td class="result-val">'+pil+'</td><td>'+(crit||'')+'</td></tr>'
+              +judgeCell+'</table></div>';
+
+          // 기타
+          } else {
+            const res=detail['result_'+i]||''; const critVal=detail['crit_val_'+i]||''; const app=detail['appearance_'+i]||'';
+            const val = res || app;
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr>'
+              +'<tr><td class="left">시험 결과</td><td class="result-val">'+val+'</td><td>'+(crit||critVal||'')+'</td></tr>'
+              +judgeCell+'</table></div>';
+          }
+        });
+
+        // 결과 블록들을 적절히 그룹화 (4개마다 페이지 브레이크 힌트)
+        // 사진 블록
+        blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
+          +'<div class="photo-box" style="margin-top:6px"><div>'
+          +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
+          +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
+          +'</div></div></div>';
+
+        return blocks;
+      })()}
+      <div class="result-end">- 시험결과 기록 완료 -</div>
+      <div class="page-no" id="lastPageNo" style="text-align:right;font-size:7px;color:#999;margin-top:4mm">PAGE(S) : 2 / 2</div>
+      </div>
+    </section>`;
+  // 페이지 수 업데이트 (미리보기 렌더 후)
+  setTimeout(function(){
+    const pages = document.querySelectorAll('#reportPreview .page');
+    const total = pages.length;
+    pages.forEach(function(p, i){
+      // sub-head PAGE 업데이트
+      const subHead = p.querySelector('.sub-head span:last-child');
+      if(subHead && subHead.textContent.includes('PAGE')) subHead.textContent = 'PAGE(S) : '+(i+1)+' / '+total;
+      // page-no 업데이트
+      const pno = p.querySelector('.page-no');
+      if(pno) pno.textContent = 'PAGE(S) : '+(i+1)+' / '+total;
+      // 1페이지 footer PAGE
+      const footerPno = p.querySelector('.p1f-notes')?.closest('.page1-footer')?.querySelector('.page-no-footer');
+      if(footerPno) footerPno.textContent = 'PAGE(S) : 1 / '+total;
+    });
+  }, 50);
   }catch(ex){ console.error('renderPreview error:',ex); }
 }
 
