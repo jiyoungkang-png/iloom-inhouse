@@ -149,12 +149,14 @@ button,input,select{font:inherit}
   .no-print,.sidebar,.topbar,.card,.preview-header{display:none!important}
   .app-shell{display:block!important}
   .workspace{padding:0!important;margin:0!important;max-width:none!important}
-  .report-preview{display:block!important;padding:0!important;margin:0!important}
+  .report-preview{display:block!important;padding:0!important;margin:0!important;gap:0!important}
   .preview-wrap{padding:0!important;margin:0!important}
+  .preview-scale-outer{display:block!important;padding:0!important;margin:0!important;background:none!important;border-radius:0!important;height:auto!important;overflow:visible!important}
+  .preview-scale-inner{display:block!important;transform:none!important;width:auto!important;gap:0!important}
   .page{
     box-shadow:none!important;
     width:210mm!important;
-    min-height:297mm!important;
+    min-height:0!important;
     height:auto!important;
     margin:0!important;
     padding:16mm 10mm 20mm!important;
@@ -167,8 +169,8 @@ button,input,select{font:inherit}
   }
   .page:last-child{page-break-after:auto!important;break-after:auto!important}
   /* 1페이지: 고정 높이 */
-  .page-1{height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important}
-  /* 2페이지: 내용 따라 늘어남, 폰트 작게 */
+  .page-1{height:297mm!important;min-height:297mm!important;padding:16mm 10mm 52mm!important;overflow:hidden!important;box-sizing:border-box!important}
+  /* 2페이지: 내용만큼만 */
   .page-2{
     min-height:0!important;
     height:auto!important;
