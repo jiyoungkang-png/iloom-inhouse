@@ -238,7 +238,7 @@ button,input,select{font:inherit}
           <img src="" id="sidebar-iloom-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;cursor:pointer" alt="iloom" onclick="(function(){ var b=document.querySelector('.nav-btn[data-tab=request]'); if(b)b.click(); })()">
         </div>
         <div>
-          <strong>IN HOUSE LAB</strong>
+          <strong>IN HOUSE TEST LAB</strong>
           <span>품질보증팀 (일룸시험연구소)</span>
         </div>
       </div>
@@ -1917,7 +1917,7 @@ function renderPreview(){
             cycles.forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
               const d2=detail['load_'+c[1]+'_d2_'+i]||'';
-              rows += '<tr><td class="left" style="font-weight:800">'+c[0]+'</td><td class="result-val">D1: '+d1+' / D2: '+d2+'</td><td></td></tr>';
+              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+d1+' / D2: '+d2+'</td></tr>';
             });
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +(detailCritLoad?'<div style="font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:5px;padding:4px 6px;background:#f9fafb;border-radius:4px">'+esc(detailCritLoad)+'</div>':'')
