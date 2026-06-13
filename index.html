@@ -153,9 +153,12 @@ button,input,select{font:inherit}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   html,body{margin:0!important;padding:0!important;background:#fff!important}
-  .no-print,.sidebar,.topbar,.card,.preview-header{display:none!important}
+  .no-print,.sidebar,.topbar,.card,.preview-header,
+  aside,nav,.nav-btn,.side-card,.brand,
+  .actions,.btn,#printBtn,#saveBtn,#newBtn,#deleteBtn,
+  #autoSaveStatus,.preview-header{display:none!important;visibility:hidden!important}
   .app-shell{display:block!important}
-  .workspace{padding:0!important;margin:0!important;max-width:none!important}
+  .workspace{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
   .report-preview{display:block!important;padding:0!important;margin:0!important}
   .preview-wrap,.preview-scale-outer,.preview-scale-inner{padding:0!important;margin:0!important;transform:none!important;min-height:0!important}
   #reportPreview.report-preview{display:block!important;gap:0!important;padding:0!important;margin:0!important;}
@@ -1501,7 +1504,7 @@ function bindInputs(){
         인쇄 창이 열리면 아래와 같이 설정해주세요:<br>
         <b>• 용지 크기:</b> A4<br>
         <b>• 여백:</b> 없음<br>
-        <b>• 배율:</b> 100% (맞춤 해제)<br>
+        <b>• 배율:</b> 기본값 (맞춤설정 X)<br>
         <b>• 배경 그래픽:</b> 체크 ✓
       </div>
       <div id="scaleInfo" style="font-size:12px;font-weight:700;margin-bottom:12px;padding:8px 12px;background:#f9fafb;border-radius:8px;text-align:left">계산 중...</div>
