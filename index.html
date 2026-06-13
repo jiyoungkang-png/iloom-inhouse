@@ -88,7 +88,7 @@ button,input,select{font:inherit}
 .request-box{margin-top:32px;background:#fafafa;border-left:4px solid var(--red);padding:20px 24px;font-size:14px;line-height:2}
 .red-title{color:var(--red);font-weight:900;font-size:15px;margin:30px 0 10px}
 .report-table{width:100%;border-collapse:collapse;font-size:11px}
-.result-block{margin-bottom:20px}
+.result-block{margin-bottom:16px}
 .result-block-title{display:flex;align-items:center;gap:6px;font-weight:900;font-size:11px;margin-bottom:6px}
 .result-block-title::before{content:"";display:inline-block;width:4px;height:32px;background:var(--red);border-radius:2px;flex-shrink:0}
 .result-block-title-text{display:flex;flex-direction:column;gap:1px}
@@ -125,10 +125,10 @@ button,input,select{font:inherit}
 .sub-head{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:10px;font-weight:700}
 .section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:16px;margin:28px 0 24px}
 .note{color:#555;font-size:10px;margin-top:10px}
-.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin:10mm 0;background:#fcfcfc}
+.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin:8mm 0 4mm;background:#fcfcfc}
 .photo-card{width:70mm;height:58mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
 .photo-card img{width:100%;height:100%;object-fit:contain}
-.caption{text-align:center;font-weight:800;margin-top:10px}
+.caption{text-align:center;font-weight:800;margin-top:8px;margin-bottom:4mm}
 .list-item,.standard-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;margin:8px 0;background:#fff}
 .list-item b,.standard-item b{display:block}
 .list-item span,.standard-item span{color:var(--muted);font-size:13px}
@@ -1334,27 +1334,10 @@ async function loadSharedFromSupabase(){
 }
 
 function splitPage2ForPrint(){
-  const page2 = document.querySelector('.page-2');
-  if(!page2) return;
-
-  // A4 인쇄 시 실제 사용 가능한 높이 (mm → px, 96dpi 기준)
-  // A4=297mm, 상하여백 각 약 15mm → 유효 267mm → 약 1010px
-  const A4_PX = 1010;
-
-  // page-2 전체 높이로 총 페이지 수 계산
-  const page2Height = page2.scrollHeight;
-  const totalFromPage2 = Math.ceil(page2Height / A4_PX);
-  const totalPages = 1 + Math.max(1, totalFromPage2); // 1페이지 + 2페이지 이상
-
-  // lastPageNo 업데이트 (맨 밑)
   const lastPageNo = document.getElementById('lastPageNo');
-  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : ' + totalPages + ' / ' + totalPages;
-
-  // 1페이지 번호도 업데이트
+  if(lastPageNo) lastPageNo.textContent = 'PAGE(S) : 2 / 2';
   const page1No = document.querySelector('.page-1 [style*="PAGE(S)"]');
-  if(page1No) page1No.textContent = 'PAGE(S) : 1 / ' + totalPages;
-
-  console.log('총 페이지:', totalPages, '(page2 높이:', page2Height, 'px)');
+  if(page1No) page1No.textContent = 'PAGE(S) : 1 / 2';
 }
 
 function restorePage2AfterPrint(){
