@@ -698,7 +698,12 @@ const num = (v) => Number.parseFloat(v || 0);
 const pct = (before, after) => before ? (((after-before)/before)*100).toFixed(1) + ' %' : '-';
 
 function getStandards(){return JSON.parse(localStorage.getItem(standardsKey) || JSON.stringify(defaultStandards));}
-function setStandards(v){localStorage.setItem(standardsKey, JSON.stringify(v));}
+function setStandards(v){
+  localStorage.setItem(standardsKey, JSON.stringify(v));
+  // Supabase에도 즉시 저장
+  supaFetch('settings','POST',{id:'standards',data:v,updated_at:new Date().toISOString()})
+    .catch(function(e){ console.warn('규격 Supabase 저장 실패:', e); });
+}
 function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
 function generateReceiptNo(){
   // 성적서 접수번호는 의뢰번호와 동일한 형식 (RQ_YYYY_NNN)
