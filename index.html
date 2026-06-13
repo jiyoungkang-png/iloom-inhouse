@@ -1093,10 +1093,14 @@ async function showRequestPickerModal(callback){
 
 
 async function migrateLocalToSupabase(){
-  // 성적서/의뢰서만 마이그레이션 (계정/규격/의뢰항목은 Supabase가 정답)
-  console.log('Supabase 마이그레이션 시작...');
+  // 최초 1회만 실행 (이후에는 Supabase가 정답)
+  const migKey = 'iloom_migrated_v3';
+  if(localStorage.getItem(migKey)) return;
+
+  console.log('Supabase 최초 마이그레이션...');
   let migrated = 0;
-  // 성적서 마이그레이션 (여러 키 시도)
+
+  // 성적서 마이그레이션
   const reportKeys = ['iloom_inhouse_reports_v1', 'iloom_reports_v2', storeKey];
   const allReports = {};
   reportKeys.forEach(function(key){
@@ -1105,42 +1109,23 @@ async function migrateLocalToSupabase(){
       data.forEach(function(r){ if(r && r.id) allReports[r.id] = r; });
     } catch(e){}
   });
-  const reports = Object.values(allReports);
-  for(const r of reports){
-    try { await setReportAsync(r); migrated++; } catch(e){ console.warn('성적서 마이그레이션 실패:', r.id, e); }
+  for(const r of Object.values(allReports)){
+    try { await setReportAsync(r); migrated++; } catch(e){}
   }
 
   // 의뢰서 마이그레이션
   try {
     const reqs = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
     for(const r of reqs){
-      try { await setRequestAsync(r); migrated++; } catch(e){ console.warn('의뢰서 마이그레이션 실패:', r.no, e); }
+      try { await setRequestAsync(r); migrated++; } catch(e){}
     }
   } catch(e){}
 
-  // 시험 규격 동기화
-  try {
-    const stds = getStandards();
-    if(stds.length > 0){
-      await supaFetch('settings', 'POST', {id:'standards', data:stds, updated_at:new Date().toISOString()});
-      console.log('시험 규격 동기화:', stds.length+'개');
-    }
-  } catch(e){ console.warn('규격 동기화 실패:', e); }
-
-  // 의뢰 시험 항목 동기화
-  try {
-    const reqItems = JSON.parse(localStorage.getItem(REQ_ITEM_LIST_KEY)||'null');
-    if(reqItems && reqItems.length > 0){
-      await supaFetch('settings', 'POST', {id:'req_items', data:reqItems, updated_at:new Date().toISOString()});
-      console.log('의뢰항목 동기화:', reqItems.length+'개');
-    }
-  } catch(e){ console.warn('의뢰항목 동기화 실패:', e); }
-
+  localStorage.setItem(migKey, '1');
   if(migrated > 0){
-    console.log('마이그레이션 완료:', migrated + '개');
-    showToast('기존 데이터 ' + migrated + '개를 서버에 동기화했습니다!');
+    console.log('최초 마이그레이션 완료:', migrated+'개');
+    showToast('기존 데이터 '+migrated+'개를 서버에 동기화했습니다!');
   }
-
 }
 
 function showToast(msg){
