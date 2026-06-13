@@ -1601,19 +1601,26 @@ function renderDetailSection(){
 
     // ── 내구성시험 ──
     if(name.includes('내구성')){
-      // 기준 입력칸
-      const critLbl = document.createElement('label');
-      critLbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;margin-bottom:10px';
-      critLbl.textContent = '기준';
-      const critTa = document.createElement('textarea');
-      critTa.dataset.key = 'detail_crit_'+i;
-      critTa.rows = 3;
-      critTa.placeholder = '예: 1. 간격의 양 d1,d2,d3 모두 40mm 이하일 것.';
-      critTa.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%;box-sizing:border-box';
-      critTa.value = saved['detail_crit_'+i]||'';
-      critTa.addEventListener('input', renderPreview);
-      critLbl.appendChild(critTa);
-      sec.appendChild(critLbl);
+      // 기준 - 시험 규격 라이브러리에서 가져와서 고정 표시
+      const critFromLib = t.crit || '';
+      if(critFromLib){
+        const critDiv = document.createElement('div');
+        critDiv.style.cssText = 'margin-bottom:10px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7';
+        const critTitle = document.createElement('div');
+        critTitle.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:5px';
+        critTitle.textContent = '기준';
+        critDiv.appendChild(critTitle);
+        const critText = document.createElement('div');
+        critText.textContent = critFromLib;
+        critDiv.appendChild(critText);
+        // hidden input으로 detail_crit 저장
+        const hiddenInp = document.createElement('input');
+        hiddenInp.type = 'hidden';
+        hiddenInp.dataset.key = 'detail_crit_'+i;
+        hiddenInp.value = critFromLib;
+        critDiv.appendChild(hiddenInp);
+        sec.appendChild(critDiv);
+      }
 
       const grid = document.createElement('div');
       grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
@@ -1651,19 +1658,25 @@ function renderDetailSection(){
 
     // ── 수직하중시험 ──
     } else if(name.includes('수직하중') || name.includes('하중')){
-      // 기준 입력칸
-      const critLbl2 = document.createElement('label');
-      critLbl2.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;margin-bottom:10px';
-      critLbl2.textContent = '기준';
-      const critTa2 = document.createElement('textarea');
-      critTa2.dataset.key = 'detail_crit_'+i;
-      critTa2.rows = 2;
-      critTa2.placeholder = '예: D1 ≤ 45mm, D2 ≥ 5mm';
-      critTa2.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%;box-sizing:border-box';
-      critTa2.value = saved['detail_crit_'+i]||'';
-      critTa2.addEventListener('input', renderPreview);
-      critLbl2.appendChild(critTa2);
-      sec.appendChild(critLbl2);
+      // 기준 - 시험 규격 라이브러리에서 가져와서 고정 표시
+      const critFromLib2 = t.crit || '';
+      if(critFromLib2){
+        const critDiv2 = document.createElement('div');
+        critDiv2.style.cssText = 'margin-bottom:10px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7';
+        const critTitle2 = document.createElement('div');
+        critTitle2.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:5px';
+        critTitle2.textContent = '기준';
+        critDiv2.appendChild(critTitle2);
+        const critText2 = document.createElement('div');
+        critText2.textContent = critFromLib2;
+        critDiv2.appendChild(critText2);
+        const hiddenInp2 = document.createElement('input');
+        hiddenInp2.type = 'hidden';
+        hiddenInp2.dataset.key = 'detail_crit_'+i;
+        hiddenInp2.value = critFromLib2;
+        critDiv2.appendChild(hiddenInp2);
+        sec.appendChild(critDiv2);
+      }
 
       const cycles = ['0회','200회','10000회','80000회','480000회'];
       cycles.forEach(function(cycle){
