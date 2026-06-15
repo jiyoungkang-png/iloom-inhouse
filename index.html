@@ -1789,8 +1789,17 @@ function renderDetailSection(){
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
 
+    // ── 롤링내구성 / 판정만 ──
+    if(name.includes('롤링')){
+      const jw=document.createElement('div'); jw.style.cssText='display:flex;align-items:center;gap:8px;margin-top:4px';
+      const jl=document.createElement('label'); jl.style.cssText='display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151'; jl.textContent='판정';
+      const js=document.createElement('select'); js.dataset.key='judge_'+i;
+      js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      ['','합격','불합격'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); jw.appendChild(jl); sec.appendChild(jw);
+
     // ── 내구성시험 ──
-    if(name.includes('내구성')){
+    } else if(name.includes('내구성')){
       // 기준 - 시험 규격 라이브러리에서 가져와서 고정 표시
       const critFromLib = t.crit || '';
       if(critFromLib){
@@ -2097,8 +2106,14 @@ function renderPreview(){
           const judge = detail['judge_'+i] || '';
           const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td></tr>' : '';
 
+          // 롤링내구성 - 판정만
+          if(name.includes('롤링')){
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
+              +judgeCell.replace('<td></td></tr>','</tr>')+'</table></div>';
+
           // 내구성시험
-          if(name.includes('내구성')){
+          } else if(name.includes('내구성')){
             const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
             const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
             const detailCrit = detail['detail_crit_'+i]||'';
