@@ -2057,9 +2057,9 @@ function renderPreview(){
       </div>
     </section>
     <section class="page page-2" style="padding:0!important">
-      <div style="padding:8mm 10mm 4mm">
+      <div style="padding:3mm 10mm 2mm">
             <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
-            <h3 class="section-line-title" style="margin:4mm 0 6px;line-height:1.25">세부 시험 결과 데이터</h3>
+            <h3 class="section-line-title" style="margin:2mm 0 4px;line-height:1.25">세부 시험 결과 데이터</h3>
           </div>
       <div style="padding:0 10mm 10mm">
       ${(function(){
@@ -2158,7 +2158,7 @@ function renderPreview(){
         // 결과 블록들을 적절히 그룹화 (4개마다 페이지 브레이크 힌트)
         // 사진 블록
         blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
-          +'<div class="photo-box" style="margin-top:0px"><div>'
+          +'<div class="photo-box" style="margin-top:8px"><div>'
           +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
           +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
           +'</div></div></div>';
