@@ -126,7 +126,7 @@ button,input,select{font:inherit}
 .sub-head{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding-bottom:10px;font-weight:700}
 .section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:16px;line-height:1.25;margin:18px 0 14px;break-inside:avoid;page-break-inside:avoid}
 .note{color:#555;font-size:10px;margin-top:10px}
-.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:106mm;display:grid;place-items:center;margin-top:10px;background:#fcfcfc}
+.photo-box{border:1px solid #dfe3e8;border-radius:4px;height:106mm;display:grid;place-items:center;margin-top:18px;background:#fcfcfc}
 .photo-card{width:80mm;height:70mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
 .photo-card img{width:100%;height:100%;object-fit:contain}
 .caption{text-align:center;font-weight:800;margin-top:10px}
@@ -2158,7 +2158,7 @@ function renderPreview(){
         // 결과 블록들을 적절히 그룹화 (4개마다 페이지 브레이크 힌트)
         // 사진 블록
         blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
-          +'<div class="photo-box" style="margin-top:6px"><div>'
+          +'<div class="photo-box" style="margin-top:0px"><div>'
           +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
           +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
           +'</div></div></div>';
