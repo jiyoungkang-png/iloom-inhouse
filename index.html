@@ -1722,7 +1722,7 @@ function addTest(item){
 
   tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',renderPreview));
   detailTr.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderPreview));
-  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderPreview(); markUnsaved();}; renumber(); renderPreview(); renderDetailSection(); markUnsaved();
+  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();}; renumber(); renderPreview(); renderDetailSection(); markUnsaved();
 }
 function renumber(){let n=0; document.querySelectorAll('#testTable tbody tr').forEach(tr=>{ if(!tr.classList.contains('t-detail-row')){ n++; const el=tr.querySelector('.rowno'); if(el) el.textContent=n; } });}
 function collectTests(){
@@ -1789,8 +1789,34 @@ function renderDetailSection(){
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
 
+    // ── 영구압축줄음률 ──
+    if(name.includes('압축줄음률') || name.includes('줄음률')){
+      const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px';
+      [{label:'시험 전 두께 t₀ (mm)',key:'t0_'+i},{label:'시험 후 두께 t₁ (mm)',key:'t1_'+i},{label:'줄음률 (%)',key:'cs_pct_'+i,readonly:true}].forEach(function(f){
+        const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151'; lbl.textContent=f.label;
+        const inp=document.createElement('input'); inp.type='number'; inp.step='0.01';
+        inp.dataset.key=f.key; inp.placeholder='0.00'; inp.value=saved[f.key]||'';
+        inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+        if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
+        inp.addEventListener('input',function(){
+          const t0=parseFloat(document.querySelector('[data-key="t0_'+i+'"]')?.value||'');
+          const t1=parseFloat(document.querySelector('[data-key="t1_'+i+'"]')?.value||'');
+          const pct=document.querySelector('[data-key="cs_pct_'+i+'"]');
+          if(pct&&!isNaN(t0)&&!isNaN(t1)&&t0!==0) pct.value=((t0-t1)/t0*100).toFixed(2)+'%';
+          renderPreview();
+        });
+        lbl.appendChild(inp); grid.appendChild(lbl);
+      });
+      sec.appendChild(grid);
+      const jw=document.createElement('div'); jw.style.cssText='display:flex;align-items:center;gap:8px;margin-top:8px';
+      const jl=document.createElement('label'); jl.style.cssText='display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151'; jl.textContent='판정';
+      const js=document.createElement('select'); js.dataset.key='judge_'+i;
+      js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      ['','합격','불합격'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
+      js.addEventListener('change',renderPreview); jl.appendChild(js); jw.appendChild(jl); sec.appendChild(jw);
+
     // ── 롤링내구성 / 판정만 ──
-    if(name.includes('롤링')){
+    } else if(name.includes('롤링')){
       const jw=document.createElement('div'); jw.style.cssText='display:flex;align-items:center;gap:8px;margin-top:4px';
       const jl=document.createElement('label'); jl.style.cssText='display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151'; jl.textContent='판정';
       const js=document.createElement('select'); js.dataset.key='judge_'+i;
@@ -2106,8 +2132,18 @@ function renderPreview(){
           const judge = detail['judge_'+i] || '';
           const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td></tr>' : '';
 
+          // 영구압축줄음률
+          if(name.includes('압축줄음률') || name.includes('줄음률')){
+            const t0=detail['t0_'+i]||''; const t1=detail['t1_'+i]||''; const pct=detail['cs_pct_'+i]||'';
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:50%">측정항목</th><th>값</th></tr>'
+              +'<tr><td class="left">시험 전 두께 (t₀)</td><td class="result-val">'+t0+(t0?' mm':'')+'</td></tr>'
+              +'<tr><td class="left">시험 후 두께 (t₁)</td><td class="result-val">'+t1+(t1?' mm':'')+'</td></tr>'
+              +'<tr><td class="left">줄음률</td><td class="result-val" style="color:var(--blue)">'+pct+(pct&&!pct.includes('%')?' %':'')+'</td></tr>'
+              +judgeCell.replace('<td></td></tr>','</tr>')+'</table></div>';
+
           // 롤링내구성 - 판정만
-          if(name.includes('롤링')){
+          } else if(name.includes('롤링')){
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +'<table class="result-table"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>'
               +judgeCell.replace('<td></td></tr>','</tr>')+'</table></div>';
