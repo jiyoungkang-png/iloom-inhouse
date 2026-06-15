@@ -129,7 +129,7 @@ button,input,select{font:inherit}
 .photo-box{border:1px solid #dfe3e8;border-radius:4px;height:106mm;display:grid;place-items:center;margin-top:18px;background:#fcfcfc}
 .photo-card{width:80mm;height:70mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden;padding:8px}
 .photo-card img{width:100%;height:100%;object-fit:contain}
-.caption{text-align:center;font-weight:800;margin-top:10px}
+.caption{text-align:center;font-weight:800;margin-top:20px}
 .list-item,.standard-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;margin:8px 0;background:#fff}
 .list-item b,.standard-item b{display:block}
 .list-item span,.standard-item span{color:var(--muted);font-size:13px}
@@ -182,6 +182,11 @@ button,input,select{font:inherit}
   .page-2 .result-table td,.page-2 .result-table th{padding:4px 6px!important;font-size:9px!important}
   .page-2 .result-block-title{font-size:10px!important;margin-bottom:10px!important}
   .page-2 .sub-head{font-size:8px!important;padding-bottom:4px!important}
+  .page-2 .p1f-sign-row{font-size:8px!important}
+  .page-2 .p1f-signer{min-height:44px!important;font-size:8px!important}
+  .page-2 .p1f-signer-label{font-size:7px!important}
+  .page-2 .p1f-signer-name{font-size:8px!important}
+  .page-2>div:first-child{padding:16mm 10mm 0mm!important}
   .page-2 h3{font-size:10px!important;margin:4mm 0 3mm!important;line-height:1.25!important;break-inside:avoid!important;page-break-inside:avoid!important}
   .page-2 .photo-box{margin-top:20px!important;height:auto!important;padding:16px 0!important}
   .page-2 .photo-card{height:70mm!important;max-height:70mm!important;padding:10px!important}
@@ -1554,11 +1559,11 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .pb{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin-top:6mm;background:#fcfcfc}
 .pc{width:70mm;height:58mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden;padding:6px}
 .pc img{width:100%;height:100%;object-fit:contain}
-.cap{text-align:center;font-weight:800;margin-top:8px;font-size:11px}
+.cap{text-align:center;font-weight:800;margin-top:20px;font-size:11px}
 .pn{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;margin-top:0;background:#fff;padding-top:2px}
-.p2page{width:210mm;height:297mm;padding:12mm 10mm 12mm;box-sizing:border-box;page-break-after:always;break-after:page;position:relative;background:#fff;overflow:hidden}
-.p2header{border-bottom:1px solid #ddd;padding-bottom:4mm;margin-bottom:6mm}
-.p2content{height:248mm;overflow:hidden;padding-top:0}
+.p2page{width:210mm;height:297mm;padding:0 0 12mm 0;box-sizing:border-box;page-break-after:always;break-after:page;position:relative;background:#fff;overflow:hidden}
+.p2header{padding:16mm 10mm 4mm;border-bottom:1px solid #ddd;margin-bottom:4mm;box-sizing:border-box;min-height:65mm}
+.p2content{height:195mm;overflow:hidden;padding:0 10mm}
 .p2footer{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;background:#fff}
 `;
 
@@ -1608,7 +1613,7 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 function _makeP2Page(){
   var page=document.createElement('div');
   page.className='p2page';
-  page.innerHTML='<div class="p2header"><div class="sh"><span>접수번호 : ${e2(r.receiptNo)}</span><span>시료명 : ${e2(r.sampleName||'')}</span></div></div><div class="p2content"></div><div class="p2footer"></div>';
+  page.innerHTML='<div class="p2header"><div class="sh" style="margin-bottom:4mm"><span>접수번호 : ${e2(r.receiptNo)}</span><span>시료명 : ${e2(r.sampleName||'')}</span></div><div class="sr"><div class="sc">확&nbsp;인</div><div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm">성 명 : ${e2(r.tester)} &nbsp;&nbsp; (서명)</div></div><div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm">성 명 : ${e2(r.techManager)} &nbsp;&nbsp; (서명)</div></div><div class="ss"><div class="ss-lbl">품질책임자</div><div class="ss-nm">성 명 : ${e2(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div><div class="stamp"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div></div></div><div class="p2content"></div><div class="p2footer"></div>';
   return page;
 }
 function _paginateForPrint(){
