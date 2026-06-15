@@ -1379,7 +1379,7 @@ function restorePage2AfterPrint(){
   if(page1No) page1No.textContent = 'PAGE(S) : 1 / 2';
 }
 
-function init(){
+async function init(){
   // 기존 localStorage에서 이미지 데이터 제거 (용량 확보)
   try {
     const existing = JSON.parse(localStorage.getItem(storeKey)||'[]');
@@ -1389,8 +1389,8 @@ function init(){
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
   initAccounts(); initListActions();
-  // 먼저 로컬 데이터로 렌더링
-  renderListAsync();
+  // Supabase에서 최신 데이터 가져온 뒤 렌더링 (await로 완료 보장)
+  await renderListAsync();
   // Supabase에서 공유 데이터 불러오기 (병합)
   loadSharedFromSupabase();
   // 로컬 데이터를 Supabase에 업로드
@@ -2431,11 +2431,25 @@ let _listPage = 1;
 const LIST_PAGE_SIZE = 10;
 
 async function renderListAsync(page){
-  // Supabase에서 최신 목록 가져와서 로컬 캐시 갱신
+  // 로딩 중 표시
+  const box = $('reportList');
+  if(box && !box.dataset.loaded){
+    box.innerHTML = '<p class="note" style="color:#6b7280;padding:24px 0;text-align:center">⏳ 서버에서 데이터를 불러오는 중...</p>';
+  }
+  // Supabase에서 최신 목록 가져와서 로컬 캐시 완전 갱신
   try {
     const rows = await getReportsAsync();
-    setReports(rows);
-  } catch(e){ console.warn('Supabase 조회 실패, 로컬 사용:', e); }
+    if(rows && rows.length >= 0){
+      // localStorage를 Supabase 데이터로 완전 덮어쓰기 (오래된 캐시 제거)
+      localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){
+        const c = Object.assign({}, r); delete c.image; return c;
+      })));
+    }
+    if(box) box.dataset.loaded = '1';
+  } catch(e){
+    console.warn('Supabase 조회 실패, 로컬 사용:', e);
+    if(box) box.dataset.loaded = '1';
+  }
   renderList(page);
 }
 
