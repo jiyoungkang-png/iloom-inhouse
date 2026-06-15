@@ -52,6 +52,7 @@ button,input,select{font:inherit}
 .input-table textarea{width:100%;border:1px solid #edf0f3;border-radius:8px;padding:8px;resize:vertical;font:inherit;font-size:13px;white-space:pre-wrap;word-break:break-word}
 .input-table td:nth-child(4){min-width:200px;max-width:300px}
 .icon-btn{border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:8px;cursor:pointer}
+.judge-fail{color:#e60012!important;font-weight:900!important;border-color:#fca5a5!important;background:#fff5f5!important}
 .detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .detail-section{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fafbfc}
 .detail-section-title{font-size:13px;font-weight:800;color:var(--red);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0d0d0;letter-spacing:.3px}
@@ -1724,6 +1725,16 @@ function addTest(item){
   detailTr.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderPreview));
   tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();}; renumber(); renderPreview(); renderDetailSection(); markUnsaved();
 }
+function updateJudgeColors(){
+  document.querySelectorAll('[data-key^="judge_"]').forEach(function(sel){
+    const v = sel.value;
+    if(v==='불합격'||v==='FAIL'){
+      sel.classList.add('judge-fail');
+    } else {
+      sel.classList.remove('judge-fail');
+    }
+  });
+}
 function renumber(){let n=0; document.querySelectorAll('#testTable tbody tr').forEach(tr=>{ if(!tr.classList.contains('t-detail-row')){ n++; const el=tr.querySelector('.rowno'); if(el) el.textContent=n; } });}
 function collectTests(){
   const rows = [...document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)')];
@@ -1802,8 +1813,82 @@ function renderDetailSection(){
       sec.appendChild(critBox);
     }
 
+    // ── 치수의 측정 ──
+    if(name.includes('치수의 측정') || name.includes('치수의측정')){
+      // 행 추가 함수
+      function makeDimRow(idx, sv){
+        const row = document.createElement('div');
+        row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px';
+        const fields = [
+          {label:'L (mm)', key:'dim_l_'+i+'_'+idx},
+          {label:'W (mm)', key:'dim_w_'+i+'_'+idx},
+          {label:'호칭 (자동)', key:'dim_result_'+i+'_'+idx, readonly:true}
+        ];
+        fields.forEach(function(f){
+          const lbl = document.createElement('label');
+          lbl.style.cssText = 'display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:12px;color:#374151';
+          lbl.textContent = f.label;
+          const inp = document.createElement('input');
+          inp.type = f.readonly ? 'text' : 'number'; inp.step='1';
+          inp.dataset.key = f.key; inp.placeholder = f.readonly ? '자동계산' : '0';
+          inp.value = sv[f.key]||'';
+          inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+          if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
+          if(!f.readonly){
+            inp.addEventListener('input', function(){
+              const lv = parseFloat(row.querySelector('[data-key="dim_l_'+i+'_'+idx+'"]')?.value||'');
+              const wv = parseFloat(row.querySelector('[data-key="dim_w_'+i+'_'+idx+'"]')?.value||'');
+              const res = row.querySelector('[data-key="dim_result_'+i+'_'+idx+'"]');
+              if(res && !isNaN(lv) && !isNaN(wv)){
+                // 호칭 산출: L*W/10000 → 반올림 후 등급
+                const area = lv * wv / 10000;
+                let label = Math.round(area*10)/10 + '';
+                // 등급 suffix: W/L 비율로 A/B/C 결정
+                let grade = '';
+                if(!isNaN(lv)&&!isNaN(wv)&&lv>0){
+                  const ratio = wv/lv;
+                  if(ratio >= 0.9) grade = '-A';
+                  else if(ratio >= 0.75) grade = '-B';
+                  else grade = '-C';
+                }
+                res.value = label + grade;
+              }
+              renderPreview();
+            });
+          }
+          lbl.appendChild(inp); row.appendChild(lbl);
+        });
+        // 삭제 버튼
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '✕'; delBtn.type='button';
+        delBtn.style.cssText = 'background:#fee2e2;border:none;border-radius:8px;color:#dc2626;padding:8px 10px;cursor:pointer;font-weight:900;align-self:end';
+        delBtn.onclick = function(){ row.remove(); renderPreview(); };
+        row.appendChild(delBtn);
+        return row;
+      }
+      const dimContainer = document.createElement('div');
+      dimContainer.className = 'dim-container-'+i;
+      // 기존 저장값 복원
+      let dimCount = 0;
+      while(saved['dim_l_'+i+'_'+dimCount] !== undefined || dimCount < 1){ 
+        dimContainer.appendChild(makeDimRow(dimCount, saved));
+        dimCount++;
+        if(dimCount >= 10) break;
+        if(dimCount > 0 && !saved['dim_l_'+i+'_'+dimCount]) break;
+      }
+      sec.appendChild(dimContainer);
+      // 행 추가 버튼
+      const addRowBtn = document.createElement('button');
+      addRowBtn.textContent = '+ 측정값 추가'; addRowBtn.type='button';
+      addRowBtn.style.cssText = 'margin-top:6px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#374151';
+      addRowBtn.onclick = function(){
+        const rows = dimContainer.querySelectorAll(':scope > div');
+        dimContainer.appendChild(makeDimRow(rows.length, {}));
+      };
+      sec.appendChild(addRowBtn);
+
     // ── 영구압축줄음률 ──
-    if(name.includes('압축줄음률') || name.includes('줄음률')){
+    } else if(name.includes('압축줄음률') || name.includes('줄음률')){
       const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px';
       [{label:'시험 전 두께 t₀ (mm)',key:'t0_'+i},{label:'시험 후 두께 t₁ (mm)',key:'t1_'+i},{label:'줄음률 (%)',key:'cs_pct_'+i,readonly:true}].forEach(function(f){
         const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151'; lbl.textContent=f.label;
@@ -2026,6 +2111,7 @@ function renderDetailSection(){
 
     box.appendChild(sec);
   });
+  setTimeout(updateJudgeColors,0);
 }
 
 function getDetailData(){
@@ -2046,6 +2132,7 @@ function restoreDetailData(data){
 }
 
 function renderPreview(){
+  updateJudgeColors();
   if(!$('reportPreview')) return;
   try{
     const r=collectReport();
@@ -2112,8 +2199,22 @@ function renderPreview(){
           const judge = detail['judge_'+i] || '';
           const judgeCell = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+judge+'</td></tr>' : '';
 
+          // 치수의 측정
+          if(name.includes('치수의 측정') || name.includes('치수의측정')){
+            let rows = '';
+            for(let di=0; di<10; di++){
+              const lv = detail['dim_l_'+i+'_'+di];
+              const wv = detail['dim_w_'+i+'_'+di];
+              const rv = detail['dim_result_'+i+'_'+di];
+              if(!lv && !wv) break;
+              rows += '<tr><td class="left">L='+esc(lv||'')+' mm / W='+esc(wv||'')+' mm</td><td class="result-val">'+esc(rv||'')+'</td></tr>';
+            }
+            blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +'<table class="result-table"><tr><th style="width:55%">측정값</th><th>결과</th></tr>'
+              +rows+'</table></div>';
+
           // 영구압축줄음률
-          if(name.includes('압축줄음률') || name.includes('줄음률')){
+          } else if(name.includes('압축줄음률') || name.includes('줄음률')){
             const t0=detail['t0_'+i]||''; const t1=detail['t1_'+i]||''; const pct=detail['cs_pct_'+i]||'';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +'<table class="result-table"><tr><th style="width:50%">측정항목</th><th>값</th></tr>'
