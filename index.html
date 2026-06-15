@@ -722,18 +722,17 @@ function setStandards(v){
 }
 function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
 function generateReceiptNo(){
-  // 성적서 접수번호는 의뢰번호와 동일한 형식 (RQ_YYYY_NNN)
+  // 의뢰서와 동일한 형식 IM_YYYY + 3자리 번호
   const reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
   const year = new Date().getFullYear();
-  const prefix = 'RQ_' + year + '_';
+  const prefix = 'IM_' + year;
   let max = 0;
   reqList.forEach(r=>{
-    const m = (r.no||'').match(/^RQ_\d{4}_(\d+)$/);
+    const m = (r.no||'').match(/^IM_\d{4}(\d+)$/);
     if(m) max = Math.max(max, parseInt(m[1]));
   });
-  // 저장된 성적서 번호도 함께 확인
   getReports().forEach(r=>{
-    const m = (r.receiptNo||'').match(/^RQ_\d{4}_(\d+)$/);
+    const m = (r.receiptNo||'').match(/^IM_\d{4}(\d+)$/);
     if(m) max = Math.max(max, parseInt(m[1]));
   });
   return prefix + String(max + 1).padStart(3, '0');
