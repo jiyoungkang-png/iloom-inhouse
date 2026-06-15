@@ -1794,17 +1794,21 @@ function renderDetailSection(){
       const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px';
       [{label:'시험 전 두께 t₀ (mm)',key:'t0_'+i},{label:'시험 후 두께 t₁ (mm)',key:'t1_'+i},{label:'줄음률 (%)',key:'cs_pct_'+i,readonly:true}].forEach(function(f){
         const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151'; lbl.textContent=f.label;
-        const inp=document.createElement('input'); inp.type='number'; inp.step='0.01';
+        const inp=document.createElement('input'); inp.step='0.01';
+        if(!f.readonly) inp.type='number';
         inp.dataset.key=f.key; inp.placeholder='0.00'; inp.value=saved[f.key]||'';
         inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
-        if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
-        inp.addEventListener('input',function(){
-          const t0=parseFloat(document.querySelector('[data-key="t0_'+i+'"]')?.value||'');
-          const t1=parseFloat(document.querySelector('[data-key="t1_'+i+'"]')?.value||'');
-          const pct=document.querySelector('[data-key="cs_pct_'+i+'"]');
-          if(pct&&!isNaN(t0)&&!isNaN(t1)&&t0!==0) pct.value=((t0-t1)/t0*100).toFixed(2)+'%';
-          renderPreview();
-        });
+        if(f.readonly){ inp.readOnly=true; inp.type='text'; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
+        if(!f.readonly){
+          inp.addEventListener('input',function(){
+            const t0=parseFloat(document.querySelector('[data-key="t0_'+i+'"]')?.value||'');
+            const t1=parseFloat(document.querySelector('[data-key="t1_'+i+'"]')?.value||'');
+            const pct=document.querySelector('[data-key="cs_pct_'+i+'"]');
+            if(pct&&!isNaN(t0)&&!isNaN(t1)&&t0!==0) pct.value=((t0-t1)/t0*100).toFixed(2)+'%';
+            else if(pct) pct.value='';
+            renderPreview();
+          });
+        }
         lbl.appendChild(inp); grid.appendChild(lbl);
       });
       sec.appendChild(grid);
