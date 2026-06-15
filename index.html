@@ -1468,8 +1468,8 @@ function bindInputs(){
       .meta-table td{border:1px solid #e5e7eb;padding:6px 11px;font-weight:600;font-size:11px;vertical-align:middle;word-break:break-all}
       .red-title{color:var(--red);font-weight:900;font-size:15px;margin:12px 0 6px}
       .report-table{width:100%;border-collapse:collapse;font-size:11px}
-      .report-table th{background:#f7f8fa;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:8px 10px;font-weight:700}
-      .report-table td{border-bottom:1px solid #e5e5e5;padding:7px 10px;text-align:center}
+      .report-table th{background:#f7f8fa;border:1px solid #ddd;padding:8px 10px;font-weight:700;text-align:center}
+      .report-table td{border:1px solid #ddd;padding:7px 10px;text-align:center}
       .report-table td.left{text-align:left}
       .report-table .bold{font-weight:900}
       .page1-footer{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}
@@ -1482,7 +1482,7 @@ function bindInputs(){
       .p1f-addr-row{display:flex;justify-content:space-between;font-size:9.5px;color:#333;margin-bottom:3px}
       .p1f-notes{font-size:8.5px;color:#444;line-height:1.7;border-top:1px solid #ddd;padding-top:4px;margin-top:2px}
       .p1f-notes li{list-style:none;padding-left:12px;text-indent:-12px}
-      .p2-top{padding:6mm 10mm 4mm;border-bottom:1px solid #ddd}
+      .p2-top{padding:10mm 10mm 4mm;border-bottom:1px solid #ddd}
       .p2-title-bar{padding:4mm 10mm 6mm}
       .p2-body{padding:0 10mm 10mm}
       .sub-head{display:flex;justify-content:space-between;font-weight:700;font-size:11px}
@@ -1539,7 +1539,7 @@ function bindInputs(){
     });
 
     // 사진 블록
-    blocks+=`<div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div>`;
+    blocks+=`<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
 
     const totalPagesEst = 2; // 기본 2페이지, 내용 많으면 자동으로 3페이지
 
