@@ -1508,7 +1508,7 @@ function bindInputs(){
         blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">결과</td><td class="rv">${e2(det['genResult_'+i]||'')}</td><td>${e2(crit||t.result||'')}</td></tr>${jr}</table></div>`;
       }
     });
-    blocks+=`<div class="rb photo-rb"><div class="rbt"><div class="rbtt"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="pb"><div><div class="pc">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${e2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="cap">${e2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${e2(r.sampleName)}</div></div></div></div>`;
+    blocks+=`<div class="rb photo-rb"><div class="rbt"><div class="rbtt"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="pb"><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="pc">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${e2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="cap">${e2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${e2(r.sampleName)}</div></div></div></div>`;
 
     const CSS=`
 :root{--red:#e60012}
@@ -2171,9 +2171,9 @@ function renderPreview(){
         // 결과 블록들을 적절히 그룹화 (4개마다 페이지 브레이크 힌트)
         // 사진 블록
         blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
-          +'<div class="photo-box" style="margin-top:20px"><div>'
+          +'<div class="photo-box" style="margin-top:20px"><div style="display:flex;flex-direction:column;align-items:center;gap:8px">'
           +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
-          +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
+          +'<div class="caption" style="margin-top:6px">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
           +'</div></div></div>';
 
         return blocks;
