@@ -1458,6 +1458,7 @@ function bindInputs(){
       *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
       body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff;color:#111;font-size:11px}
       @page{size:A4;margin:0}
+      .page-no{text-align:right;font-size:7px;color:#999;margin-top:4mm}
       .page{width:210mm;background:#fff;position:relative;display:block}
       .page-1{height:297mm;padding:16mm 10mm 52mm;box-sizing:border-box;overflow:hidden;page-break-after:always;break-after:page}
       .page-2{padding:0;page-break-after:auto;break-after:auto}
@@ -1489,7 +1490,7 @@ function bindInputs(){
       .p2-title-bar{padding:4mm 0 6mm}
       .sub-head{display:flex;justify-content:space-between;font-weight:700;font-size:11px}
       .section-line-title{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:20px;font-weight:900}
-      .page-no{position:fixed;bottom:6mm;right:10mm;font-size:7px;color:#999}
+      .page-no{text-align:right;font-size:7px;color:#999;margin-top:4mm;}
       .result-block{margin-bottom:20px;break-inside:avoid;page-break-inside:avoid}
       .result-block-title{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;margin-bottom:6px}
       .result-block-title::before{content:"";display:inline-block;width:4px;height:28px;background:var(--red);border-radius:2px;flex-shrink:0}
@@ -1500,11 +1501,10 @@ function bindInputs(){
       .result-table td.left{text-align:left}
       .result-table .result-val{font-weight:900}
       .result-end{text-align:center;font-size:12px;font-weight:700;margin:16px 0 0;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
-      .photo-box{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin:8mm 0 6mm;background:#fcfcfc}
+      .photo-box{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin:6mm 0 6mm;background:#fcfcfc}
       .photo-card{width:70mm;height:58mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden}
       .photo-card img{width:100%;height:100%;object-fit:contain}
       .caption{text-align:center;font-weight:800;margin-top:8px;font-size:11px}
-      .page-no{text-align:right;font-size:7px;color:#999;margin-top:4mm}
     `;
 
     const esc2 = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1542,7 +1542,7 @@ function bindInputs(){
     });
 
     // 사진 블록
-    blocks+=`<div class="result-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:8mm"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
+    blocks+=`<div class="result-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:8mm"><div class="result-block-title" style="margin-bottom:8mm"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
 
     const totalPagesEst = 2; // 기본 2페이지, 내용 많으면 자동으로 3페이지
 
@@ -1602,9 +1602,7 @@ function bindInputs(){
     </table>
     <script>
     window.onload = function(){
-      // 총 페이지 수 계산 후 표시
-      var A4 = 1122; // 297mm @ 96dpi
-      var p1h = A4;
+      var A4 = 1122;
       var p2h = document.querySelector('.page-2-wrap').offsetHeight;
       var total = 1 + Math.ceil(p2h / A4);
       document.getElementById('lastPageNo').textContent = 'PAGE(S) : ' + total + ' / ' + total;
