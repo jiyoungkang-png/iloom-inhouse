@@ -180,10 +180,11 @@ button,input,select{font:inherit}
   }
   .page-2 .result-block{margin-bottom:6px!important}
   .page-2 .result-table td,.page-2 .result-table th{padding:4px 6px!important;font-size:9px!important}
-  .page-2 .result-block-title{font-size:10px!important;margin-bottom:2px!important}
+  .page-2 .result-block-title{font-size:10px!important;margin-bottom:10px!important}
   .page-2 .sub-head{font-size:8px!important;padding-bottom:4px!important}
   .page-2 h3{font-size:10px!important;margin:4mm 0 3mm!important;line-height:1.25!important;break-inside:avoid!important;page-break-inside:avoid!important}
-  .page-2 .photo-card{max-height:80mm!important}
+  .page-2 .photo-box{margin-top:20px!important}
+  .page-2 .photo-card{max-height:80mm!important;padding:10px!important}
   .page-2 .photo-card img{max-height:80mm!important;object-fit:contain!important}
   /* 결과 블록은 중간에서 잘리지 않도록 */
   .result-block{break-inside:avoid!important;page-break-inside:avoid!important}
@@ -2158,7 +2159,7 @@ function renderPreview(){
         // 결과 블록들을 적절히 그룹화 (4개마다 페이지 브레이크 힌트)
         // 사진 블록
         blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div>'
-          +'<div class="photo-box" style="margin-top:8px"><div>'
+          +'<div class="photo-box" style="margin-top:20px"><div>'
           +'<div class="photo-card">'+(sampleImageData ? '<img src="'+sampleImageData+'">' : '[ '+esc(r.sampleName||'시료')+' ]<br><br>시험 후 시료 촬영 이미지<br>첨부 구역')+'</div>'
           +'<div class="caption">'+esc(r.receiptNo)+(r.receiptNo&&r.sampleName?'_':'')+esc(r.sampleName)+'</div>'
           +'</div></div></div>';
