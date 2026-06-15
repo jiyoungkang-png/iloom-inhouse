@@ -1808,7 +1808,7 @@ function renderDetailSection(externalData){
   tests.forEach(function(t, i){
     const sec = document.createElement('div');
     sec.className = 'detail-section';
-    sec.style.marginBottom = '12px';
+    sec.style.marginBottom = '24px';
 
     const title = document.createElement('div');
     title.className = 'detail-section-title';
@@ -1835,104 +1835,152 @@ function renderDetailSection(externalData){
 
     // ── 치수의 측정 ──
     if(name.includes('치수의 측정') || name.includes('치수의측정')){
+      // 테이블 헤더
+      const tblHeader = document.createElement('table');
+      tblHeader.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px';
+      tblHeader.innerHTML = '<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
+      sec.appendChild(tblHeader);
+
       // 행 추가 함수
       function makeDimRow(idx, sv){
-        const row = document.createElement('div');
-        row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px';
-        const fields = [
-          {label:'L (mm)', key:'dim_l_'+i+'_'+idx},
-          {label:'W (mm)', key:'dim_w_'+i+'_'+idx},
-          {label:'호칭 (자동)', key:'dim_result_'+i+'_'+idx, readonly:true}
-        ];
-        fields.forEach(function(f){
-          const lbl = document.createElement('label');
-          lbl.style.cssText = 'display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:12px;color:#374151';
-          lbl.textContent = f.label;
-          const inp = document.createElement('input');
-          inp.type = f.readonly ? 'text' : 'number'; inp.step='1';
-          inp.dataset.key = f.key; inp.placeholder = f.readonly ? '자동계산' : '0';
-          inp.value = sv[f.key]||'';
-          inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
-          if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
-          if(!f.readonly){
-            (function(capturedRow){
-              inp.addEventListener('input', function(){
-                const lv = parseFloat(capturedRow.querySelector('[data-key^="dim_l_"]')?.value||'');
-                const wv = parseFloat(capturedRow.querySelector('[data-key^="dim_w_"]')?.value||'');
-                const res = capturedRow.querySelector('[data-key^="dim_result_"]');
-                if(res && !isNaN(lv) && !isNaN(wv) && lv > 0){
-                  const hoching = Math.round(wv / 10);
-                  const ratio = wv / lv;
-                  let grade = '';
-                  if(ratio < 0.6) grade = '-A';
-                  else if(ratio < 0.8) grade = '-B';
-                  else grade = '-C';
-                  res.value = hoching + grade;
-                }
-                renderPreview();
-              });
-            })(row);
-          }
-          lbl.appendChild(inp); row.appendChild(lbl);
-        });
-        // 삭제 버튼
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '✕'; delBtn.type='button';
-        delBtn.style.cssText = 'background:#fee2e2;border:none;border-radius:8px;color:#dc2626;padding:8px 10px;cursor:pointer;font-weight:900;align-self:end';
-        delBtn.onclick = function(){ row.remove(); renderPreview(); };
-        row.appendChild(delBtn);
+        const row = document.createElement('table');
+        row.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;margin-bottom:0';
+        const tr = document.createElement('tr');
+
+        const tdA = document.createElement('td');
+        tdA.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:left;width:35%';
+        const lInp = document.createElement('input'); lInp.type='number'; lInp.step='1';
+        lInp.dataset.key='dim_l_'+i+'_'+idx; lInp.placeholder='L (mm)'; lInp.value=sv['dim_l_'+i+'_'+idx]||'';
+        lInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%;margin-right:2%';
+        const wInp = document.createElement('input'); wInp.type='number'; wInp.step='1';
+        wInp.dataset.key='dim_w_'+i+'_'+idx; wInp.placeholder='W (mm)'; wInp.value=sv['dim_w_'+i+'_'+idx]||'';
+        wInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%';
+        tdA.appendChild(lInp); tdA.appendChild(wInp);
+
+        const tdB = document.createElement('td');
+        tdB.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center;width:35%';
+        const resInp = document.createElement('input'); resInp.type='text';
+        resInp.dataset.key='dim_result_'+i+'_'+idx; resInp.placeholder='자동계산'; resInp.value=sv['dim_result_'+i+'_'+idx]||'';
+        resInp.readOnly=true;
+        resInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
+        tdB.appendChild(resInp);
+
+        const tdC = document.createElement('td');
+        tdC.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center;color:#555';
+        const delBtn2 = document.createElement('button');
+        delBtn2.textContent='✕'; delBtn2.type='button';
+        delBtn2.style.cssText='background:#fee2e2;border:none;border-radius:6px;color:#dc2626;padding:5px 10px;cursor:pointer;font-weight:900';
+        delBtn2.onclick=function(){ row.remove(); renderPreview(); };
+        tdC.appendChild(delBtn2);
+
+        // 자동계산
+        function calcDim(){
+          const lv=parseFloat(lInp.value||''); const wv=parseFloat(wInp.value||'');
+          if(!isNaN(lv)&&!isNaN(wv)&&lv>0){
+            const hoching=Math.round(wv/10); const ratio=wv/lv;
+            let grade = ratio<0.6?'-A':ratio<0.8?'-B':'-C';
+            resInp.value=hoching+grade;
+          } else resInp.value='';
+          renderPreview();
+        }
+        lInp.addEventListener('input',calcDim); wInp.addEventListener('input',calcDim);
+
+        tr.appendChild(tdA); tr.appendChild(tdB); tr.appendChild(tdC);
+        row.appendChild(tr);
         return row;
       }
+
       const dimContainer = document.createElement('div');
       dimContainer.className = 'dim-container-'+i;
-      // 기존 저장값 복원
       let dimCount = 0;
-      while(saved['dim_l_'+i+'_'+dimCount] !== undefined || dimCount < 1){ 
+      while(saved['dim_l_'+i+'_'+dimCount] !== undefined || dimCount < 1){
         dimContainer.appendChild(makeDimRow(dimCount, saved));
         dimCount++;
         if(dimCount >= 10) break;
         if(dimCount > 0 && !saved['dim_l_'+i+'_'+dimCount]) break;
       }
       sec.appendChild(dimContainer);
-      // 행 추가 버튼
       const addRowBtn = document.createElement('button');
       addRowBtn.textContent = '+ 측정값 추가'; addRowBtn.type='button';
       addRowBtn.style.cssText = 'margin-top:6px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#374151';
       addRowBtn.onclick = function(){
-        const rows = dimContainer.querySelectorAll(':scope > div');
+        const rows = dimContainer.querySelectorAll(':scope > table');
         dimContainer.appendChild(makeDimRow(rows.length, {}));
       };
       sec.appendChild(addRowBtn);
 
     // ── 영구압축줄음률 ──
     } else if(name.includes('압축줄음률') || name.includes('줄음률')){
-      const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px';
-      [{label:'시험 전 두께 t₀ (mm)',key:'t0_'+i},{label:'시험 후 두께 t₁ (mm)',key:'t1_'+i},{label:'줄음률 (%)',key:'cs_pct_'+i,readonly:true}].forEach(function(f){
-        const lbl=document.createElement('label'); lbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151'; lbl.textContent=f.label;
-        const inp=document.createElement('input'); inp.step='0.01';
-        if(!f.readonly) inp.type='number';
-        inp.dataset.key=f.key; inp.placeholder='0.00'; inp.value=saved[f.key]||'';
-        inp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
-        if(f.readonly){ inp.readOnly=true; inp.type='text'; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
-        if(!f.readonly){
-          inp.addEventListener('input',function(){
-            const t0=parseFloat(document.querySelector('[data-key="t0_'+i+'"]')?.value||'');
-            const t1=parseFloat(document.querySelector('[data-key="t1_'+i+'"]')?.value||'');
-            const pct=document.querySelector('[data-key="cs_pct_'+i+'"]');
-            if(pct&&!isNaN(t0)&&!isNaN(t1)&&t0!==0) pct.value=((t0-t1)/t0*100).toFixed(2)+'%';
-            else if(pct) pct.value='';
-            renderPreview();
-          });
-        }
-        lbl.appendChild(inp); grid.appendChild(lbl);
-      });
-      sec.appendChild(grid);
-      const jw=document.createElement('div'); jw.style.cssText='display:flex;align-items:center;gap:8px;margin-top:8px';
-      const jl=document.createElement('label'); jl.style.cssText='display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:#374151'; jl.textContent='판정';
+      // 테이블 형식 (내구성시험과 동일한 구분/시험결과/기준 레이아웃)
+      const tbl = document.createElement('table');
+      tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
+      const thead = document.createElement('thead');
+      thead.innerHTML = '<tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr>';
+      tbl.appendChild(thead);
+      const tbody = document.createElement('tbody');
+
+      // 행 1: 시험 전 두께 t₀
+      const row0 = document.createElement('tr');
+      const td0a = document.createElement('td'); td0a.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left'; td0a.textContent='시험 전 두께 (t₀)';
+      const td0b = document.createElement('td'); td0b.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+      const inp0 = document.createElement('input'); inp0.type='number'; inp0.step='0.01';
+      inp0.dataset.key='t0_'+i; inp0.placeholder='0.00'; inp0.value=saved['t0_'+i]||'';
+      inp0.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
+      td0b.appendChild(inp0);
+      const td0c = document.createElement('td'); td0c.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; td0c.textContent='mm';
+      row0.appendChild(td0a); row0.appendChild(td0b); row0.appendChild(td0c);
+      tbody.appendChild(row0);
+
+      // 행 2: 시험 후 두께 t₁
+      const row1 = document.createElement('tr');
+      const td1a = document.createElement('td'); td1a.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left'; td1a.textContent='시험 후 두께 (t₁)';
+      const td1b = document.createElement('td'); td1b.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+      const inp1 = document.createElement('input'); inp1.type='number'; inp1.step='0.01';
+      inp1.dataset.key='t1_'+i; inp1.placeholder='0.00'; inp1.value=saved['t1_'+i]||'';
+      inp1.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
+      td1b.appendChild(inp1);
+      const td1c = document.createElement('td'); td1c.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; td1c.textContent='mm';
+      row1.appendChild(td1a); row1.appendChild(td1b); row1.appendChild(td1c);
+      tbody.appendChild(row1);
+
+      // 행 3: 줄음률 (자동계산)
+      const row2 = document.createElement('tr');
+      const td2a = document.createElement('td'); td2a.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left'; td2a.textContent='영구압축 줄음률';
+      const td2b = document.createElement('td'); td2b.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+      const inp2 = document.createElement('input'); inp2.type='text';
+      inp2.dataset.key='cs_pct_'+i; inp2.placeholder='자동계산'; inp2.value=saved['cs_pct_'+i]||'';
+      inp2.readOnly=true;
+      inp2.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
+      td2b.appendChild(inp2);
+      const td2c = document.createElement('td'); td2c.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; td2c.textContent='%';
+      row2.appendChild(td2a); row2.appendChild(td2b); row2.appendChild(td2c);
+      tbody.appendChild(row2);
+
+      // 자동계산 이벤트
+      function calcCs(){
+        const t0=parseFloat(document.querySelector('[data-key="t0_'+i+'"]')?.value||'');
+        const t1=parseFloat(document.querySelector('[data-key="t1_'+i+'"]')?.value||'');
+        const pctEl=document.querySelector('[data-key="cs_pct_'+i+'"]');
+        if(pctEl&&!isNaN(t0)&&!isNaN(t1)&&t0!==0) pctEl.value=((t0-t1)/t0*100).toFixed(2)+'%';
+        else if(pctEl) pctEl.value='';
+        renderPreview();
+      }
+      inp0.addEventListener('input',calcCs); inp1.addEventListener('input',calcCs);
+
+      // 행 4: 판정
+      const row3 = document.createElement('tr');
+      const td3a = document.createElement('td'); td3a.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;font-weight:800'; td3a.textContent='판정';
+      const td3b = document.createElement('td'); td3b.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
       const js=document.createElement('select'); js.dataset.key='judge_'+i;
-      js.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer';
+      js.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer;width:100%';
       ['','합격','불합격'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
-      js.addEventListener('change',renderPreview); jl.appendChild(js); jw.appendChild(jl); sec.appendChild(jw);
+      js.addEventListener('change',renderPreview); td3b.appendChild(js);
+      const td3c = document.createElement('td'); td3c.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; td3c.textContent='KS G 4300 기준 만족';
+      row3.appendChild(td3a); row3.appendChild(td3b); row3.appendChild(td3c);
+      tbody.appendChild(row3);
+
+      tbl.appendChild(tbody);
+      sec.appendChild(tbl);
 
     // ── 롤링내구성 / 판정만 ──
     } else if(name.includes('롤링')){
