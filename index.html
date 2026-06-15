@@ -1600,22 +1600,21 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
     <div class="pn" id="lastPageNo">PAGE(S) : ? / ?</div>
   </td></tr></tbody>
 </table>
+<script>
+window.addEventListener('load',function(){
+  var A4=1122;
+  var wrap=document.querySelector('.p2w');
+  var p2h=wrap?wrap.offsetHeight:A4;
+  var total=1+Math.ceil(p2h/A4);
+  var el=document.getElementById('lastPageNo');
+  if(el) el.textContent='PAGE(S) : '+total+' / '+total;
+  setTimeout(function(){ window.print(); },300);
+});
+<\/script>
 </body></html>`;
 
     const pw=window.open('','_blank');
-    if(pw){
-      pw.document.write(HTML);
-      pw.document.close();
-      setTimeout(function(){
-        var A4=1122;
-        var wrap=pw.document.querySelector('.p2w');
-        var p2h=wrap?wrap.offsetHeight:A4;
-        var total=1+Math.ceil(p2h/A4);
-        var el=pw.document.getElementById('lastPageNo');
-        if(el) el.textContent='PAGE(S) : '+total+' / '+total;
-        pw.print();
-      },600);
-    }
+    if(pw){ pw.document.write(HTML); pw.document.close(); }
   }; $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
   $('searchReport').addEventListener('input',renderList);
   $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
