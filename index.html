@@ -1495,7 +1495,23 @@ function bindInputs(){
       const jg=det['judge_'+i]||'';
       const jr=jg?`<tr><td class="left" style="font-weight:800">판정</td><td class="rv" colspan="2" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${jg}</td></tr>`:'';
       const th=`<div class="rbt"><div class="rbtt"><span>${e2(title)}</span>${spec?`<span style="font-weight:400;font-size:11px">(${e2(spec)})</span>`:''}</div></div>`;
-      if(nm.includes('내구성')){
+      if(nm.includes('치수의 측정') || nm.includes('치수의측정')){
+        let rows='';
+        for(let di=0; di<10; di++){
+          const lv=det['dim_l_'+i+'_'+di]||'';
+          const wv=det['dim_w_'+i+'_'+di]||'';
+          const rv=det['dim_result_'+i+'_'+di]||'';
+          if(!lv && !wv && !rv) continue;
+          rows+=`<tr><td class="left">L=${e2(lv)} mm / W=${e2(wv)} mm</td><td class="rv" style="color:#2563eb">${e2(rv)}</td></tr>`;
+        }
+        if(!rows) rows='<tr><td colspan="2" style="color:#aaa">입력된 측정값 없음</td></tr>';
+        blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt"><tr><th style="width:55%">측정값</th><th>시험 결과</th></tr>${rows}</table></div>`;
+      } else if(nm.includes('압축줄음률') || nm.includes('영구압축') || nm.includes('줄음률')){
+        const t0=det['t0_'+i]||'';
+        const t1=det['t1_'+i]||'';
+        const pct=det['cs_pct_'+i]||'';
+        blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt"><tr><th style="width:40%">측정항목</th><th>값</th><th style="width:25%">판정</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}${t0?' mm':''}</td><td rowspan="3" class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}${t1?' mm':''}</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}${pct&&!String(pct).includes('%')?' %':''}</td></tr></table></div>`;
+      } else if(nm.includes('내구성')){
         const dc=det['detail_crit_'+i]||'';
         blocks+=`<div class="rb">${th}${dc?`<div class="dc">${e2(dc)}</div>`:''}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr><tr><td class="left">d1 (mm)</td><td class="rv">${det['d1_'+i]||''}</td></tr><tr><td class="left">d2 (mm)</td><td class="rv">${det['d2_'+i]||''}</td></tr><tr><td class="left">d3 (mm)</td><td class="rv">${det['d3_'+i]||''}</td></tr><tr><td class="left">d4 (mm)</td><td class="rv">${det['d4_'+i]||''}</td></tr>${jr}</table></div>`;
       } else if(nm.includes('수직하중')||nm.includes('하중')){
@@ -1545,15 +1561,15 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .sh{display:flex;justify-content:space-between;font-weight:700;font-size:11px}
 .p2bt{padding:14mm 10mm 18mm;border:none;vertical-align:top;position:relative;min-height:245mm}
 .slt{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:18px;font-weight:900;line-height:1.25;margin:0 0 6mm 0;display:block;break-inside:avoid;page-break-inside:avoid}
-.rb{margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
+.rb{margin-bottom:12px;break-inside:auto;page-break-inside:auto}
 .photo-rb{margin-top:0mm}
 .rbt{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;margin-bottom:6px}
 .rbt::before{content:"";display:inline-block;width:4px;height:28px;background:var(--red);border-radius:2px;flex-shrink:0}
 .rbtt{display:flex;flex-direction:row;align-items:center;gap:6px}
 .dc{font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:6px;padding:4px 6px;background:#f9fafb;border-radius:4px}
-.rt{width:100%;border-collapse:collapse;font-size:10px}
-.rt th{background:#f4f5f7;border:1px solid #ddd;padding:4px 8px;text-align:center;font-weight:700}
-.rt td{border:1px solid #ddd;padding:4px 8px;text-align:center}
+.rt{width:100%;border-collapse:collapse;font-size:12px}
+.rt th{background:#f4f5f7;border:1px solid #ddd;padding:6px 10px;text-align:center;font-weight:700}
+.rt td{border:1px solid #ddd;padding:6px 10px;text-align:center}
 .rt td.left{text-align:left}
 .rv{font-weight:900}
 .re{text-align:center;font-size:12px;font-weight:700;margin:30px 0 0;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
@@ -1563,9 +1579,8 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .cap{text-align:center;font-weight:800;margin-top:20px;font-size:11px}
 .pn{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;margin-top:0;background:#fff;padding-top:2px}
 .p2page{width:210mm;height:297mm;padding:0 0 12mm 0;box-sizing:border-box;page-break-after:always;break-after:page;position:relative;background:#fff;overflow:hidden}
-.p2page:last-child{page-break-after:auto;break-after:auto}
 .p2header{padding:16mm 10mm 4mm;border-bottom:1px solid #ddd;margin-bottom:4mm;box-sizing:border-box}
-.p2content{height:245mm;overflow:hidden;padding:0 10mm}
+.p2content{height:215mm;overflow:hidden;padding:0 10mm}
 .p2footer{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;background:#fff}
 `;
 
@@ -1636,10 +1651,6 @@ function _paginateForPrint(){
       body=page.querySelector('.p2content');
       body.appendChild(node);
     }
-    // 단일 시험 블록이 한 페이지 높이를 초과하는 경우 숨김 방지
-    if(body.scrollHeight > body.clientHeight && body.children.length===1){
-      body.style.overflow='visible';
-    }
   });
   var pages=Array.from(document.querySelectorAll('.p1,.p2page'));
   var total=pages.length;
@@ -1652,7 +1663,7 @@ function _paginateForPrint(){
 }
 window.addEventListener('load',function(){
   _paginateForPrint();
-  setTimeout(function(){ window.print(); },800);
+  setTimeout(function(){ _paginateForPrint(); window.print(); },600);
 });
 <\/script>
 </body></html>`;
