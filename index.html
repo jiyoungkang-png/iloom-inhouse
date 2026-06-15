@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -3088,74 +3089,112 @@ function initAdminRegTab(){
 
 
 // ── 로그인 ──────────────────────────────────────────
-(function(){
+// 중요: Supabase 설정/함수 선언이 모두 끝난 뒤 실행되도록 DOMContentLoaded에서 로그인 초기화
+window.addEventListener('DOMContentLoaded', function(){
   var LS = document.getElementById('loginScreen');
+  if(!LS) return;
+
+  var loginIdEl = document.getElementById('loginId');
+  var loginPwEl = document.getElementById('loginPw');
+  var loginBtnEl = document.getElementById('loginBtn');
+  var logoutBtnEl = document.getElementById('logoutBtn');
+  var saveIdEl = document.getElementById('saveIdCheck');
+  var errEl = document.getElementById('loginErr');
+
+  function showLogin(){
+    LS.style.removeProperty('display');
+    LS.style.visibility = 'visible';
+    LS.removeAttribute('data-hide');
+    LS.classList.remove('hidden');
+    setTimeout(function(){
+      if(loginIdEl && !loginIdEl.value) loginIdEl.focus();
+      else if(loginPwEl) loginPwEl.focus();
+    }, 50);
+  }
+
+  function hideLogin(){
+    LS.style.setProperty('display','none','important');
+    LS.style.visibility = 'hidden';
+    LS.setAttribute('data-hide','1');
+    LS.classList.add('hidden');
+  }
+
+  function startApp(user){
+    hideLogin();
+    if(!window._appInited){
+      window._appInited = true;
+      init();
+    }
+    if(user) applyRoleTabControl(user);
+  }
 
   // 저장된 아이디 불러오기
   var savedId = localStorage.getItem('iloom_saved_id');
-  if(savedId){
-    document.getElementById('loginId').value = savedId;
-    document.getElementById('saveIdCheck').checked = true;
-    document.getElementById('loginPw').focus();
+  if(savedId && loginIdEl){
+    loginIdEl.value = savedId;
+    if(saveIdEl) saveIdEl.checked = true;
   }
 
   function doLogin(){
-    var id = (document.getElementById('loginId').value||'').trim();
-    var pw = (document.getElementById('loginPw').value||'').trim();
-    var err = document.getElementById('loginErr');
-    var saveId = document.getElementById('saveIdCheck').checked;
-    if(!id){ err.textContent='아이디를 입력해주세요.'; return; }
-    if(!pw){ err.textContent='비밀번호를 입력해주세요.'; return; }
+    var id = (loginIdEl && loginIdEl.value || '').trim();
+    var pw = (loginPwEl && loginPwEl.value || '').trim();
+    var saveId = !!(saveIdEl && saveIdEl.checked);
+    if(errEl) errEl.textContent = '';
+
+    if(!id){ if(errEl) errEl.textContent='아이디를 입력해주세요.'; if(loginIdEl) loginIdEl.focus(); return; }
+    if(!pw){ if(errEl) errEl.textContent='비밀번호를 입력해주세요.'; if(loginPwEl) loginPwEl.focus(); return; }
+
     var accs = getAccounts();
-    console.log('로그인 시도:', id, '/ 저장 계정수:', accs.length);
     var matched = accs.find(function(a){ return a.id===id && a.pw===pw; });
-    if(matched){
-      sessionStorage.setItem('iloom_auth','ok');
-      sessionStorage.setItem('iloom_user', JSON.stringify(matched));
-      // 로그인 시 전체 계정 Supabase 동기화
-      var allAccs = getAccounts();
-      allAccs.forEach(function(a){
-        supaFetch('accounts', 'POST', {id:a.id, data:a})
-          .catch(function(e){ console.warn('계정 동기화 실패:', a.id, e); });
-      });
-      if(saveId){ localStorage.setItem('iloom_saved_id', id); }
-      else { localStorage.removeItem('iloom_saved_id'); }
-      LS.style.setProperty('display','none','important');
-      LS.style.visibility = 'hidden';
-      if(!window._appInited){ window._appInited=true; init(); }
-      // 역할별 탭 제어
-      const _adminPanel = document.getElementById('adminMemberBtn');
-      if(_adminPanel){
-        if(matched.role==='관리자' || matched.id===ADMIN_ID){
-          _adminPanel.style.display='block'; renderSideMemberList();
-        } else {
-          _adminPanel.style.display='none';
-        }
-      }
-      applyRoleTabControl(matched);
-    } else {
-      err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';
-      document.getElementById('loginPw').value='';
-      document.getElementById('loginPw').focus();
+
+    if(!matched){
+      if(errEl) errEl.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';
+      if(loginPwEl){ loginPwEl.value=''; loginPwEl.focus(); }
+      return;
     }
+
+    sessionStorage.setItem('iloom_auth','ok');
+    sessionStorage.setItem('iloom_user', JSON.stringify(matched));
+
+    if(saveId) localStorage.setItem('iloom_saved_id', id);
+    else localStorage.removeItem('iloom_saved_id');
+
+    // 로그인 성공 후 계정 서버 동기화는 실패해도 화면 사용 가능하게 처리
+    try {
+      getAccounts().forEach(function(a){
+        if(typeof supaFetch === 'function'){
+          supaFetch('accounts', 'POST', {id:a.id, data:a})
+            .catch(function(e){ console.warn('계정 동기화 실패:', a.id, e); });
+        }
+      });
+    } catch(e){ console.warn('계정 동기화 생략:', e); }
+
+    startApp(matched);
   }
 
-  document.getElementById('loginBtn').onclick = doLogin;
-  document.getElementById('loginId').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('loginPw').focus(); };
-  document.getElementById('loginPw').onkeydown = function(e){ if(e.key==='Enter') doLogin(); };
-  document.getElementById('logoutBtn').onclick = function(){
+  if(loginBtnEl) loginBtnEl.onclick = doLogin;
+  if(loginIdEl) loginIdEl.onkeydown = function(e){ if(e.key==='Enter' && loginPwEl) loginPwEl.focus(); };
+  if(loginPwEl) loginPwEl.onkeydown = function(e){ if(e.key==='Enter') doLogin(); };
+  if(logoutBtnEl) logoutBtnEl.onclick = function(){
     sessionStorage.removeItem('iloom_auth');
     sessionStorage.removeItem('iloom_user');
     location.reload();
   };
 
-  // 세션 유지
-  if(sessionStorage.getItem('iloom_auth')==='ok'){
-    LS.style.setProperty('display','none','important');
-    LS.style.visibility = 'hidden';
-    window._appInited=true; init();
+  // 세션 유지: script 전체 로딩 후 실행되므로 Supabase const 초기화 전 오류 방지
+  if(sessionStorage.getItem('iloom_auth') === 'ok'){
+    try {
+      var savedUser = JSON.parse(sessionStorage.getItem('iloom_user') || '{}');
+      startApp(savedUser);
+    } catch(e){
+      sessionStorage.removeItem('iloom_auth');
+      sessionStorage.removeItem('iloom_user');
+      showLogin();
+    }
+  } else {
+    showLogin();
   }
-})();
+});
   
 // ══════════════════════════════════════════
 // Supabase 연동
