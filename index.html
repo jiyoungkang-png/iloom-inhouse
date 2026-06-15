@@ -1789,12 +1789,16 @@ function renderDetailSection(){
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
 
-    // 내구성/수직하중은 각 블록 안에서 기준 표시하므로 제외
-    const hasCritInBlock = name.includes('내구성') || name.includes('수직하중') || name.includes('하중');
-    if(t.crit && !hasCritInBlock){
+    if(t.crit){
       const critBox = document.createElement('div');
-      critBox.style.cssText = 'font-size:11px;color:#374151;white-space:pre-wrap;margin-bottom:8px;padding:6px 10px;background:#f9fafb;border-left:3px solid #e60012;border-radius:4px;line-height:1.7';
-      critBox.innerHTML = '<span style="font-weight:700;color:#e60012;font-size:11px">기준</span><br>' + t.crit.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').split('\n').map(function(l){return l;}).join('<br>');
+      critBox.style.cssText = 'margin-bottom:10px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7';
+      const critBoxTitle = document.createElement('div');
+      critBoxTitle.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:5px';
+      critBoxTitle.textContent = '기준';
+      critBox.appendChild(critBoxTitle);
+      const critBoxText = document.createElement('div');
+      critBoxText.textContent = t.crit;
+      critBox.appendChild(critBoxText);
       sec.appendChild(critBox);
     }
 
@@ -1839,26 +1843,7 @@ function renderDetailSection(){
 
     // ── 내구성시험 ──
     } else if(name.includes('내구성')){
-      // 기준 - 시험 규격 라이브러리에서 가져와서 고정 표시
-      const critFromLib = t.crit || '';
-      if(critFromLib){
-        const critDiv = document.createElement('div');
-        critDiv.style.cssText = 'margin-bottom:10px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7';
-        const critTitle = document.createElement('div');
-        critTitle.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:5px';
-        critTitle.textContent = '기준';
-        critDiv.appendChild(critTitle);
-        const critText = document.createElement('div');
-        critText.textContent = critFromLib;
-        critDiv.appendChild(critText);
-        // hidden input으로 detail_crit 저장
-        const hiddenInp = document.createElement('input');
-        hiddenInp.type = 'hidden';
-        hiddenInp.dataset.key = 'detail_crit_'+i;
-        hiddenInp.value = critFromLib;
-        critDiv.appendChild(hiddenInp);
-        sec.appendChild(critDiv);
-      }
+
 
       const grid = document.createElement('div');
       grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
@@ -1896,25 +1881,7 @@ function renderDetailSection(){
 
     // ── 수직하중시험 ──
     } else if(name.includes('수직하중') || name.includes('하중')){
-      // 기준 - 시험 규격 라이브러리에서 가져와서 고정 표시
-      const critFromLib2 = t.crit || '';
-      if(critFromLib2){
-        const critDiv2 = document.createElement('div');
-        critDiv2.style.cssText = 'margin-bottom:10px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7';
-        const critTitle2 = document.createElement('div');
-        critTitle2.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:5px';
-        critTitle2.textContent = '기준';
-        critDiv2.appendChild(critTitle2);
-        const critText2 = document.createElement('div');
-        critText2.textContent = critFromLib2;
-        critDiv2.appendChild(critText2);
-        const hiddenInp2 = document.createElement('input');
-        hiddenInp2.type = 'hidden';
-        hiddenInp2.dataset.key = 'detail_crit_'+i;
-        hiddenInp2.value = critFromLib2;
-        critDiv2.appendChild(hiddenInp2);
-        sec.appendChild(critDiv2);
-      }
+
 
       const cycles = ['0회','200회','10000회','80000회','480000회'];
       cycles.forEach(function(cycle){
