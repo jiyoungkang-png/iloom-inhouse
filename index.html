@@ -1542,7 +1542,7 @@ function bindInputs(){
     });
 
     // 사진 블록
-    blocks+=`<div class="result-block" style="break-before:auto;page-break-before:auto"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
+    blocks+=`<div class="result-block" style="break-inside:avoid;page-break-inside:avoid;margin-top:8mm"><div class="result-block-title"><div class="result-block-title-text"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="photo-box"><div><div class="photo-card">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${esc2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="caption">${esc2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${esc2(r.sampleName)}</div></div></div></div>`;
 
     const totalPagesEst = 2; // 기본 2페이지, 내용 많으면 자동으로 3페이지
 
@@ -1589,11 +1589,11 @@ function bindInputs(){
       <thead>
         <tr><td class="p2-thead-td">
           <div class="p2-top"><div class="sub-head"><span>접수번호 : ${esc2(r.receiptNo)}</span><span>시료명 : ${esc2(r.sampleName||'')}</span></div></div>
-          <div class="p2-title-bar"><div class="section-line-title">세부 시험 결과 데이터</div></div>
         </td></tr>
       </thead>
       <tbody>
         <tr><td class="p2-body-td">
+          <div class="p2-title-bar"><div class="section-line-title">세부 시험 결과 데이터</div></div>
           ${blocks}
           <div class="result-end">- 시험결과 기록 완료 -</div>
           <div class="page-no" id="lastPageNo">PAGE(S) : ? / ?</div>
