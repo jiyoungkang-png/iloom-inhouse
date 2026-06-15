@@ -1540,7 +1540,7 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .p2bt{padding:14mm 10mm 18mm;border:none;vertical-align:top;position:relative;min-height:245mm}
 .slt{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:18px;font-weight:900;line-height:1.25;margin:0 0 6mm 0;display:block;break-inside:avoid;page-break-inside:avoid}
 .rb{margin-bottom:20px;break-inside:avoid;page-break-inside:avoid}
-.photo-rb{margin-top:10mm}
+.photo-rb{margin-top:3mm}
 .rbt{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;margin-bottom:6px}
 .rbt::before{content:"";display:inline-block;width:4px;height:28px;background:var(--red);border-radius:2px;flex-shrink:0}
 .rbtt{display:flex;flex-direction:row;align-items:center;gap:6px}
@@ -2059,9 +2059,16 @@ function renderPreview(){
     </section>
     <section class="page page-2" style="padding:0!important">
       <div style="padding:3mm 10mm 2mm">
-            <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
-            <h3 class="section-line-title" style="margin:2mm 0 4px;line-height:1.25">세부 시험 결과 데이터</h3>
-          </div>
+        <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
+        <div class="p1f-sign-row" style="margin-bottom:0">
+          <div class="p1f-confirm">확&nbsp;인</div>
+          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc(r.tester)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.techManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
+          <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+        </div>
+        <h3 class="section-line-title" style="margin:3mm 0 4px;line-height:1.25">세부 시험 결과 데이터</h3>
+      </div>
       <div style="padding:0 10mm 10mm">
       ${(function(){
         const detail = r.detailData || {};
