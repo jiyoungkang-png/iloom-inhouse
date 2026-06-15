@@ -1835,24 +1835,23 @@ function renderDetailSection(){
           inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
           if(f.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
           if(!f.readonly){
-            inp.addEventListener('input', function(){
-              const lv = parseFloat(row.querySelector('[data-key="dim_l_'+i+'_'+idx+'"]')?.value||'');
-              const wv = parseFloat(row.querySelector('[data-key="dim_w_'+i+'_'+idx+'"]')?.value||'');
-              const res = row.querySelector('[data-key="dim_result_'+i+'_'+idx+'"]');
-              if(res && !isNaN(lv) && !isNaN(wv)){
-                // 호칭 산출: L*W/10000 → 반올림 후 등급
-                // 호칭 숫자 = W(너비)/10 반올림
-                const hoching = Math.round(wv / 10);
-                // 등급: W/L 비율로 A/B/C
-                const ratio = wv / lv;
-                let grade = '';
-                if(ratio < 0.6) grade = '-A';
-                else if(ratio < 0.8) grade = '-B';
-                else grade = '-C';
-                res.value = hoching + grade;
-              }
-              renderPreview();
-            });
+            (function(capturedRow){
+              inp.addEventListener('input', function(){
+                const lv = parseFloat(capturedRow.querySelector('[data-key^="dim_l_"]')?.value||'');
+                const wv = parseFloat(capturedRow.querySelector('[data-key^="dim_w_"]')?.value||'');
+                const res = capturedRow.querySelector('[data-key^="dim_result_"]');
+                if(res && !isNaN(lv) && !isNaN(wv) && lv > 0){
+                  const hoching = Math.round(wv / 10);
+                  const ratio = wv / lv;
+                  let grade = '';
+                  if(ratio < 0.6) grade = '-A';
+                  else if(ratio < 0.8) grade = '-B';
+                  else grade = '-C';
+                  res.value = hoching + grade;
+                }
+                renderPreview();
+              });
+            })(row);
           }
           lbl.appendChild(inp); row.appendChild(lbl);
         });
