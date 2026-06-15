@@ -1545,15 +1545,15 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .sh{display:flex;justify-content:space-between;font-weight:700;font-size:11px}
 .p2bt{padding:14mm 10mm 18mm;border:none;vertical-align:top;position:relative;min-height:245mm}
 .slt{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:18px;font-weight:900;line-height:1.25;margin:0 0 6mm 0;display:block;break-inside:avoid;page-break-inside:avoid}
-.rb{margin-bottom:20px;break-inside:avoid;page-break-inside:avoid}
+.rb{margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
 .photo-rb{margin-top:0mm}
 .rbt{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;margin-bottom:6px}
 .rbt::before{content:"";display:inline-block;width:4px;height:28px;background:var(--red);border-radius:2px;flex-shrink:0}
 .rbtt{display:flex;flex-direction:row;align-items:center;gap:6px}
 .dc{font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:6px;padding:4px 6px;background:#f9fafb;border-radius:4px}
-.rt{width:100%;border-collapse:collapse;font-size:12px}
-.rt th{background:#f4f5f7;border:1px solid #ddd;padding:6px 10px;text-align:center;font-weight:700}
-.rt td{border:1px solid #ddd;padding:6px 10px;text-align:center}
+.rt{width:100%;border-collapse:collapse;font-size:10px}
+.rt th{background:#f4f5f7;border:1px solid #ddd;padding:4px 8px;text-align:center;font-weight:700}
+.rt td{border:1px solid #ddd;padding:4px 8px;text-align:center}
 .rt td.left{text-align:left}
 .rv{font-weight:900}
 .re{text-align:center;font-size:12px;font-weight:700;margin:30px 0 0;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}
@@ -1563,8 +1563,9 @@ body{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff
 .cap{text-align:center;font-weight:800;margin-top:20px;font-size:11px}
 .pn{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;margin-top:0;background:#fff;padding-top:2px}
 .p2page{width:210mm;height:297mm;padding:0 0 12mm 0;box-sizing:border-box;page-break-after:always;break-after:page;position:relative;background:#fff;overflow:hidden}
+.p2page:last-child{page-break-after:auto;break-after:auto}
 .p2header{padding:16mm 10mm 4mm;border-bottom:1px solid #ddd;margin-bottom:4mm;box-sizing:border-box}
-.p2content{height:195mm;overflow:hidden;padding:0 10mm}
+.p2content{height:245mm;overflow:hidden;padding:0 10mm}
 .p2footer{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;background:#fff}
 `;
 
@@ -1635,6 +1636,10 @@ function _paginateForPrint(){
       body=page.querySelector('.p2content');
       body.appendChild(node);
     }
+    // 단일 시험 블록이 한 페이지 높이를 초과하는 경우 숨김 방지
+    if(body.scrollHeight > body.clientHeight && body.children.length===1){
+      body.style.overflow='visible';
+    }
   });
   var pages=Array.from(document.querySelectorAll('.p1,.p2page'));
   var total=pages.length;
@@ -1647,7 +1652,7 @@ function _paginateForPrint(){
 }
 window.addEventListener('load',function(){
   _paginateForPrint();
-  setTimeout(function(){ window.print(); },300);
+  setTimeout(function(){ window.print(); },800);
 });
 <\/script>
 </body></html>`;
