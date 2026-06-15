@@ -1511,7 +1511,7 @@ function bindInputs(){
         const t1=det['t1_'+i]||'';
         const pct=det['cs_pct_'+i]||'';
         const csJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
-        blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}${t0?' mm':''}</td><td></td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}${t1?' mm':''}</td><td></td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}${pct&&!String(pct).includes('%')?' %':''}</td><td>${crit?e2(crit):''}</td></tr>${csJudge}</table></div>`;
+        blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}${t0?' mm':''}</td><td></td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}${t1?' mm':''}</td><td></td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}${pct&&!String(pct).includes('%')?' %':''}</td><td style="white-space:pre-wrap">${crit?e2(crit):''}</td></tr>${csJudge}</table></div>`;
       } else if(nm.includes('내구성')){
         const dc=det['detail_crit_'+i]||crit||'';
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
@@ -2286,7 +2286,7 @@ function renderPreview(){
               +'<table class="result-table"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr>'
               +'<tr><td class="left">시험 전 두께 (t₀)</td><td class="result-val">'+t0+(t0?' mm':'')+'</td><td></td></tr>'
               +'<tr><td class="left">시험 후 두께 (t₁)</td><td class="result-val">'+t1+(t1?' mm':'')+'</td><td></td></tr>'
-              +'<tr><td class="left">영구압축 줄음률</td><td class="result-val" style="color:var(--blue)">'+pct+(pct&&!pct.includes('%')?' %':'')+'</td><td>'+(crit?esc(crit):'')+'</td></tr>'
+              +'<tr><td class="left">영구압축 줄음률</td><td class="result-val" style="color:var(--blue)">'+pct+(pct&&!pct.includes('%')?' %':'')+'</td><td style="white-space:pre-wrap">'+(crit?esc(crit):'')+'</td></tr>'
               +csJudgeRow
               +'</table></div>';
 
