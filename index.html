@@ -1510,7 +1510,8 @@ function bindInputs(){
         const t0=det['t0_'+i]||'';
         const t1=det['t1_'+i]||'';
         const pct=det['cs_pct_'+i]||'';
-        blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt"><tr><th style="width:40%">측정항목</th><th>값</th><th style="width:25%">판정</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}${t0?' mm':''}</td><td rowspan="3" class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}${t1?' mm':''}</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}${pct&&!String(pct).includes('%')?' %':''}</td></tr></table></div>`;
+        const csJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
+        blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}${t0?' mm':''}</td><td></td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}${t1?' mm':''}</td><td></td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}${pct&&!String(pct).includes('%')?' %':''}</td><td>${crit?e2(crit):''}</td></tr>${csJudge}</table></div>`;
       } else if(nm.includes('내구성')){
         const dc=det['detail_crit_'+i]||crit||'';
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
@@ -2280,13 +2281,13 @@ function renderPreview(){
           // 영구압축줄음률
           } else if(name.includes('압축줄음률') || name.includes('줄음률')){
             const t0=detail['t0_'+i]||''; const t1=detail['t1_'+i]||''; const pct=detail['cs_pct_'+i]||'';
-            const critRow = crit ? '<div style="font-size:10px;color:#374151;white-space:pre-wrap;margin-bottom:6px;padding:6px 8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;line-height:1.7"><span style="font-weight:800;font-size:10px;color:#6b7280">기준</span><br>'+esc(crit)+'</div>' : '';
+            const csJudgeRow = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>KS G 4300 기준 만족</td></tr>' : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
-              +critRow
-              +'<table class="result-table"><tr><th style="width:40%">측정항목</th><th>값</th><th style="width:25%">시험결과</th></tr>'
-              +'<tr><td class="left">시험 전 두께 (t₀)</td><td class="result-val">'+t0+(t0?' mm':'')+'</td><td rowspan="3" style="text-align:center;font-weight:900;font-size:13px;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge||'')+'</td></tr>'
-              +'<tr><td class="left">시험 후 두께 (t₁)</td><td class="result-val">'+t1+(t1?' mm':'')+'</td></tr>'
-              +'<tr><td class="left">줄음률</td><td class="result-val" style="color:var(--blue)">'+pct+(pct&&!pct.includes('%')?' %':'')+'</td></tr>'
+              +'<table class="result-table"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr>'
+              +'<tr><td class="left">시험 전 두께 (t₀)</td><td class="result-val">'+t0+(t0?' mm':'')+'</td><td></td></tr>'
+              +'<tr><td class="left">시험 후 두께 (t₁)</td><td class="result-val">'+t1+(t1?' mm':'')+'</td><td></td></tr>'
+              +'<tr><td class="left">영구압축 줄음률</td><td class="result-val" style="color:var(--blue)">'+pct+(pct&&!pct.includes('%')?' %':'')+'</td><td>'+(crit?esc(crit):'')+'</td></tr>'
+              +csJudgeRow
               +'</table></div>';
 
           // 롤링내구성 - 판정만
