@@ -1794,7 +1794,14 @@ function addTest(item){
 
   tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',renderPreview));
   detailTr.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderPreview));
-  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();}; renumber(); renderPreview(); if(!window._loadingReport) renderDetailSection(); markUnsaved();
+  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();};
+  renumber();
+  renderPreview();
+  // 로딩 중이 아닐 때만 세부데이터 즉시 갱신 (규격 추가 시 자동으로 착착 표시)
+  if(!window._loadingReport){
+    renderDetailSection();
+  }
+  markUnsaved();
 }
 function updateJudgeColors(){
   document.querySelectorAll('[data-key^="judge_"]').forEach(function(sel){
@@ -1855,7 +1862,18 @@ function renderDetailSection(externalData){
   if(!tests || tests.length === 0){ box.innerHTML = ''; return; }
 
   const saved = {};
+  // 기존 세부데이터 섹션에서 입력값 수집
   box.querySelectorAll('[data-key]').forEach(el=>{ saved[el.dataset.key] = el.value; });
+  // name_edit / crit_edit은 시험항목 테이블에서도 보완 (항목 추가/삭제 시 유실 방지)
+  const testTableRows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+  testTableRows.forEach(function(tr, idx){
+    if(!saved['name_edit_'+idx]){
+      const ni = tr.querySelector('.t-name'); if(ni) saved['name_edit_'+idx] = ni.value;
+    }
+    if(!saved['crit_edit_'+idx]){
+      const ci = tr.querySelector('.t-crit'); if(ci) saved['crit_edit_'+idx] = ci.value;
+    }
+  });
   if(externalData) Object.assign(saved, externalData);
   box.innerHTML = '';
 
@@ -1870,7 +1888,8 @@ function renderDetailSection(externalData){
 
     const titleEl = document.createElement('div');
     titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px;margin-bottom:6px';
-    titleEl.textContent = (i+1) + '. ' + (t.name||'항목 '+(i+1)) + (t.spec ? '  ('+t.spec+')' : '');
+    const _displayName = saved['name_edit_'+i] || t.name || '항목 '+(i+1);
+    titleEl.textContent = (i+1) + '. ' + _displayName + (t.spec ? '  ('+t.spec+')' : '');
     header.appendChild(titleEl);
     sec.appendChild(header);
 
@@ -1882,7 +1901,7 @@ function renderDetailSection(externalData){
     nameLabel.textContent = '구분 (시험항목명)';
     const nameEdit = document.createElement('input');
     nameEdit.style.cssText = 'width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;box-sizing:border-box;font-weight:700';
-    nameEdit.value = t.name || '';
+    nameEdit.value = saved['name_edit_'+i] || t.name || '';
     nameEdit.dataset.key = 'name_edit_'+i;
     nameEdit.addEventListener('input', function(){
       titleEl.textContent = (i+1) + '. ' + (nameEdit.value||'항목 '+(i+1)) + (t.spec ? '  ('+t.spec+')' : '');
@@ -1906,7 +1925,7 @@ function renderDetailSection(externalData){
     critEdit.style.cssText = 'width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;color:#374151;line-height:1.7;resize:vertical;box-sizing:border-box';
     critEdit.rows = 3;
     critEdit.placeholder = '기준 없음';
-    critEdit.value = t.crit || '';
+    critEdit.value = saved['crit_edit_'+i] !== undefined ? saved['crit_edit_'+i] : (t.crit || '');
     critEdit.dataset.key = 'crit_edit_'+i;
     critEdit.addEventListener('input', function(){
       // 시험항목 테이블도 동기화
@@ -3057,6 +3076,11 @@ async function loadReport(r){
   renderImage();
   // detailData 복원 — addTest 완료 후 충분한 시간을 두고 실행
   const _savedDetailData = r.detailData || {};
+  // tests의 name/crit도 detailData에 병합해서 넘김 (구분/기준 복원 보장)
+  (r.tests||[]).forEach(function(t, i){
+    if(t.name && !_savedDetailData['name_edit_'+i]) _savedDetailData['name_edit_'+i] = t.name;
+    if(t.crit && !_savedDetailData['crit_edit_'+i]) _savedDetailData['crit_edit_'+i] = t.crit;
+  });
   setTimeout(function(){
     renderDetailSection(_savedDetailData);
     // renderDetailSection 후 DOM에 값이 세팅될 시간을 추가로 확보
