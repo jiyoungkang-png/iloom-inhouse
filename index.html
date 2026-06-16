@@ -1953,58 +1953,6 @@ function renderDetailSection(externalData){
     critWrap.appendChild(critEdit);
     sec.appendChild(critWrap);
 
-    // ── 수정/저장/취소 동작 (클로저로 각 항목 독립 보장) ──
-    (function(idx, _editBtn, _saveBtn, _cancelBtn, _nameWrap, _nameEdit, _critView, _critEdit, _sec, _titleEl, _t){
-      let origName = _nameEdit.value;
-      let origCrit = _critEdit.value;
-
-      function doEnter(){
-        _editBtn.style.display='none';
-        _saveBtn.style.display='inline-block';
-        _cancelBtn.style.display='inline-block';
-        _nameWrap.style.display='block';
-        _critView.style.display='none';
-        _critEdit.style.display='block';
-        _sec.style.border='2px solid #2563eb';
-        _sec.style.background='#f0f9ff';
-        _nameEdit.focus();
-      }
-      function doExit(){
-        _editBtn.style.display='inline-block';
-        _saveBtn.style.display='none';
-        _cancelBtn.style.display='none';
-        _nameWrap.style.display='none';
-        _critView.style.display='block';
-        _critEdit.style.display='none';
-        _sec.style.border='1px solid #e5e7eb';
-        _sec.style.background='#fafbfc';
-      }
-
-      _editBtn.onclick = doEnter;
-
-      _saveBtn.onclick = function(){
-        const newName = _nameEdit.value;
-        const newCrit = _critEdit.value;
-        _titleEl.textContent = (idx+1) + '. ' + (newName||'항목 '+(idx+1)) + (_t.spec ? '  ('+_t.spec+')' : '');
-        _critView.textContent = newCrit || '기준 없음';
-        const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
-        if(trows[idx]){
-          const ni = trows[idx].querySelector('.t-name'); if(ni && newName) ni.value = newName;
-          const ci = trows[idx].querySelector('.t-crit'); if(ci) ci.value = newCrit;
-        }
-        origName = newName; origCrit = newCrit;
-        doExit();
-        saveReport(true);
-        showToast('✅ 저장되었습니다.');
-      };
-
-      _cancelBtn.onclick = function(){
-        _nameEdit.value = origName;
-        _critEdit.value = origCrit;
-        doExit();
-      };
-    })(i, editBtn, saveBtn2, cancelBtn2, nameWrap, nameEdit, critView, critEdit, sec, titleEl, t);
-
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
 
@@ -2186,6 +2134,59 @@ function renderDetailSection(externalData){
     }
 
     sec.appendChild(fieldsWrap);
+
+    // ── 수정/저장/취소 동작 (모든 변수 준비된 후 클로저로 바인딩) ──
+    (function(idx, _editBtn, _saveBtn, _cancelBtn, _nameWrap, _nameEdit, _critView, _critEdit, _sec, _titleEl, _t){
+      let origName = _nameEdit.value;
+      let origCrit = _critEdit.value;
+
+      function doEnter(){
+        _editBtn.style.display='none';
+        _saveBtn.style.display='inline-block';
+        _cancelBtn.style.display='inline-block';
+        _nameWrap.style.display='block';
+        _critView.style.display='none';
+        _critEdit.style.display='block';
+        _sec.style.border='2px solid #2563eb';
+        _sec.style.background='#f0f9ff';
+        _nameEdit.focus();
+      }
+      function doExit(){
+        _editBtn.style.display='inline-block';
+        _saveBtn.style.display='none';
+        _cancelBtn.style.display='none';
+        _nameWrap.style.display='none';
+        _critView.style.display='block';
+        _critEdit.style.display='none';
+        _sec.style.border='1px solid #e5e7eb';
+        _sec.style.background='#fafbfc';
+      }
+
+      _editBtn.onclick = doEnter;
+
+      _saveBtn.onclick = function(){
+        const newName = _nameEdit.value;
+        const newCrit = _critEdit.value;
+        _titleEl.textContent = (idx+1) + '. ' + (newName||'항목 '+(idx+1)) + (_t.spec ? '  ('+_t.spec+')' : '');
+        _critView.textContent = newCrit || '기준 없음';
+        const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+        if(trows[idx]){
+          const ni = trows[idx].querySelector('.t-name'); if(ni && newName) ni.value = newName;
+          const ci = trows[idx].querySelector('.t-crit'); if(ci) ci.value = newCrit;
+        }
+        origName = newName; origCrit = newCrit;
+        doExit();
+        saveReport(true);
+        showToast('✅ 저장되었습니다.');
+      };
+
+      _cancelBtn.onclick = function(){
+        _nameEdit.value = origName;
+        _critEdit.value = origCrit;
+        doExit();
+      };
+    })(i, editBtn, saveBtn2, cancelBtn2, nameWrap, nameEdit, critView, critEdit, sec, titleEl, t);
+
     box.appendChild(sec);
 
 
