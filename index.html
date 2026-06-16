@@ -3126,6 +3126,12 @@ async function loadReport(r){
 async function saveReport(silent=false){
   const receiptNo = val('receiptNo');
 
+  // 의뢰번호 없으면 저장 불가
+  if(!receiptNo || !receiptNo.trim()){
+    if(!silent) alert('의뢰번호가 없습니다.\n의뢰서를 먼저 불러온 후 저장해주세요.');
+    return;
+  }
+
   // ── 의뢰번호 기준으로 항상 같은 ID 고정 ──
   // 1) currentId가 없으면 → receiptNo로 기존 성적서 ID 찾기
   if(!currentId && receiptNo){
