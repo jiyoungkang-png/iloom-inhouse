@@ -2057,9 +2057,10 @@ function renderDetailSection(externalData){
         var jsSel=document.createElement('select'); jsSel.dataset.key='judge_'+i; jsSel.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer;width:100%;text-align:center;text-align-last:center';
         ['','합격','불합격'].forEach(function(v){ var o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; jsSel.appendChild(o); });
         jsSel.addEventListener('change',renderPreview);
-        tbody2.appendChild(_makeRow('시험 전 두께 (t₀)',inp0,''));
-        tbody2.appendChild(_makeRow('시험 후 두께 (t₁)',inp1,''));
-        tbody2.appendChild(_makeRow('영구압축 줄음률',inp2,''));
+        tbody2.appendChild(_makeRow('시험 전 두께 (t₀)',inp0,'-'));
+        tbody2.appendChild(_makeRow('시험 후 두께 (t₁)',inp1,'-'));
+        tbody2.appendChild(_makeRow('영구압축 줄음률',inp2,'1종 ≤ 10
+2종 ≤ 13'));
         tbody2.appendChild(_makeRow('판정',jsSel,'KS G 4300 기준 만족'));
         tbl2.appendChild(tbody2); fieldsWrap.appendChild(tbl2);
 
