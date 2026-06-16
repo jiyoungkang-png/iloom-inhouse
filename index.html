@@ -821,7 +821,7 @@ function makeReqItemRow(item, isCustom){
   editBtn.type = 'button';
   editBtn.textContent = '수정';
   editBtn.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;cursor:pointer;font-size:11px;font-weight:700;padding:3px 10px;flex-shrink:0;white-space:nowrap';
-  if(!isAdmin()) editBtn.style.display='none';
+  if(!(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id===ADMIN_ID)) editBtn.style.display='none';
   editBtn.onmouseover = function(){ this.style.background='#dbeafe'; };
   editBtn.onmouseout  = function(){ this.style.background='#eff6ff'; };
   editBtn.onclick = function(e){
@@ -889,7 +889,7 @@ function makeReqItemRow(item, isCustom){
   delBtn.textContent = '삭제';
   delBtn.title = '항목 삭제';
   delBtn.style.cssText = 'background:#fee2e2;border:1px solid #fecaca;border-radius:6px;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:3px 10px;flex-shrink:0;white-space:nowrap';
-  if(!isAdmin()) delBtn.style.display='none';
+  if(!(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id===ADMIN_ID)) delBtn.style.display='none';
   delBtn.onmouseover = function(){ this.style.background='#fecaca'; };
   delBtn.onmouseout  = function(){ this.style.background='#fee2e2'; };
   delBtn.onclick = function(e){ e.stopPropagation(); row.remove(); };
@@ -1205,14 +1205,15 @@ function applyRoleTabControl(user){
   const isRequester = role === '의뢰자';
 
   // 탭 버튼 제어
+  const isOwner = user.id === ADMIN_ID; // jiyoung_kang만
   const tabRules = {
     'request':  true,                        // 모두 보임
     'write':    isTester || isAdminUser,     // 시험원 + 관리자
     'list':     isTester || isAdminUser,     // 시험원 + 관리자
-    'standard': isTester || isAdminUser,     // 시험원 + 관리자
-    'setting':  isAdminUser,                 // 관리자만
-    'admin':    isAdminUser,                 // 관리자만
-    'accounts': isAdminUser,                 // 관리자만
+    'standard': isOwner,                     // jiyoung_kang만
+    'setting':  isOwner,                     // jiyoung_kang만
+    'admin':    isOwner,                     // jiyoung_kang만
+    'accounts': isOwner,                     // jiyoung_kang만
   };
 
   document.querySelectorAll('.nav-btn[data-tab]').forEach(function(btn){
@@ -1800,7 +1801,9 @@ function addTest(item){
 
   tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',renderPreview));
   detailTr.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderPreview));
-  tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();};
+  var iconBtn = tr.querySelector('.icon-btn');
+  try{ if(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id!==ADMIN_ID) iconBtn.style.display='none'; }catch(e){}
+  iconBtn.onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();};
   renumber();
   renderPreview();
   // 로딩 중이 아닐 때만 세부데이터 갱신
@@ -1943,6 +1946,7 @@ function renderDetailSection(externalData){
       secBtnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
       const secEditBtn = document.createElement('button');
       secEditBtn.type='button'; secEditBtn.textContent='✏️ 수정';
+      try{ if(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id!==ADMIN_ID) secEditBtn.style.display='none'; }catch(e){}
       secEditBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
       const secSaveBtn = document.createElement('button');
       secSaveBtn.type='button'; secSaveBtn.textContent='💾 저장';
@@ -2504,7 +2508,7 @@ function renderList(page){
 }
 
 async function listDeleteSelected(){
-  if(!requireAdmin()) return;
+  if(!requireOwner()) return;
   var ids = [...document.querySelectorAll('#reportList .list-chk:checked')].map(function(c){ return c.dataset.id; });
   if(!ids.length){ return; }
   if(!confirm(ids.length+'개 성적서를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
@@ -2549,14 +2553,20 @@ function updateListActionBar(){
   var countEl = document.getElementById('listSelectedCount');
   var sa = document.getElementById('listSelectAll');
 
+  // 삭제 버튼 jiyoung_kang만 표시
+  try {
+    var u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    if(delBtn) delBtn.style.display = (u.id === ADMIN_ID) ? '' : 'none';
+  } catch(e){}
+
   // 삭제/PDF 버튼 활성·비활성 스타일
   if(checked > 0){
-    delBtn.style.opacity='1'; delBtn.style.cursor='pointer';
+    if(delBtn) { delBtn.style.opacity='1'; delBtn.style.cursor='pointer'; }
     pdfBtn.style.opacity='1'; pdfBtn.style.cursor='pointer';
     cancelBtn.style.display='';
     if(countEl){ countEl.style.display=''; countEl.textContent=checked+'개 선택됨'; }
   } else {
-    delBtn.style.opacity='0.4'; delBtn.style.cursor='not-allowed';
+    if(delBtn) { delBtn.style.opacity='0.4'; delBtn.style.cursor='not-allowed'; }
     pdfBtn.style.opacity='0.4'; pdfBtn.style.cursor='not-allowed';
     cancelBtn.style.display='none';
     if(countEl) countEl.style.display='none';
@@ -2805,7 +2815,11 @@ function updateReqDelBtn(){
   const btn = document.getElementById('reqDelSelectedBtn');
   const all = document.querySelectorAll('.req-chk');
   const selectAll = document.getElementById('reqSelectAll');
-  if(btn) btn.style.display = checked.length > 0 ? '' : 'none';
+  // jiyoung_kang만 삭제 버튼 표시
+  try {
+    const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    if(btn) btn.style.display = (u.id === ADMIN_ID && checked.length > 0) ? '' : 'none';
+  } catch(e){ if(btn) btn.style.display='none'; }
   if(selectAll && all.length > 0) selectAll.checked = checked.length === all.length;
 }
 
@@ -2841,6 +2855,7 @@ function initRequestTab(){
     });
     const delBtn = document.getElementById('reqDelSelectedBtn');
     if(delBtn) delBtn.onclick = async function(){
+      if(!requireOwner()) return;
       const nos = [...document.querySelectorAll('.req-chk:checked')].map(c=>c.dataset.no);
       if(!nos.length) return;
       if(!confirm(nos.length+'개 의뢰서를 삭제할까요?')) return;
@@ -3064,7 +3079,7 @@ function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&l
 
 
 function deleteCurrent(){
-  if(!requireAdmin()) return;
+  if(!requireOwner()) return;
   if(!currentId){alert('삭제할 저장 성적서가 없습니다.');return;}
   if(!confirm('현재 성적서를 삭제할까요?'))return;
   setReports(getReports().filter(r=>r.id!==currentId));
@@ -3268,6 +3283,14 @@ function getUserRole(){
 function requireAdmin(){
   if(!isAdmin()){ alert('관리자만 사용할 수 있는 기능입니다.'); return false; }
   return true;
+}
+function requireOwner(){
+  try {
+    const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+    if(u.id === ADMIN_ID){ return true; }
+    alert('삭제 권한이 없습니다. (jiyoung_kang 전용)');
+    return false;
+  } catch(e){ return false; }
 }
 
 
