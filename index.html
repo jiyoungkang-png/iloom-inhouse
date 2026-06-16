@@ -1912,7 +1912,7 @@ function renderDetailSection(externalData){
     if(inp.tagName==='SELECT'){ inp.style.width='100%'; inp.style.textAlign='center'; inp.style.textAlignLast='center'; }
     else if(inp.tagName==='INPUT'){ inp.style.width='100%'; inp.style.textAlign='center'; }
     tb.appendChild(inp);
-    const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; tc.textContent=crit||'';
+    const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;white-space:pre-line'; tc.textContent=crit||'';
     tr.appendChild(ta); tr.appendChild(tb); tr.appendChild(tc);
     return tr;
   }
@@ -2059,8 +2059,7 @@ function renderDetailSection(externalData){
         jsSel.addEventListener('change',renderPreview);
         tbody2.appendChild(_makeRow('시험 전 두께 (t₀)',inp0,'-'));
         tbody2.appendChild(_makeRow('시험 후 두께 (t₁)',inp1,'-'));
-        tbody2.appendChild(_makeRow('영구압축 줄음률',inp2,'1종 ≤ 10
-2종 ≤ 13'));
+        tbody2.appendChild(_makeRow('영구압축 줄음률',inp2,'1종 ≤ 10  /  2종 ≤ 13'));
         tbody2.appendChild(_makeRow('판정',jsSel,'KS G 4300 기준 만족'));
         tbl2.appendChild(tbody2); fieldsWrap.appendChild(tbl2);
 
