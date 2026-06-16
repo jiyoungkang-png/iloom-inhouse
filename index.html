@@ -985,23 +985,7 @@ async function importFromRequest(){
 }
 
 async function applyRequestToReport(req){
-  // ── 1. 기존 성적서가 있으면 loadReport로 완전 복원 ──
-  let existingReport = getReports().find(function(r){ return r.receiptNo === (req.no||''); });
-  if(!existingReport){
-    // Supabase에서도 확인
-    try {
-      const rows = await supaFetch('reports','GET');
-      const supaMatch = (rows||[]).find(function(x){ return x.data && x.data.receiptNo === req.no; });
-      if(supaMatch && supaMatch.data) existingReport = supaMatch.data;
-    } catch(e){}
-  }
-  if(existingReport){
-    await loadReport(existingReport);
-    showToast('📋 기존 성적서 [' + req.no + '] 를 불러왔습니다.');
-    return;
-  }
-
-  // ── 2. 새 성적서 — 의뢰서 정보로 채우기 ──
+  // ── 새 성적서 — 의뢰서 정보로만 채우기 ──
   currentId = null;
   _hasUnsaved = false;
 
@@ -1570,7 +1554,8 @@ function bindInputs(){
         const t1=det['t1_'+i]||'';
         const pct=det['cs_pct_'+i]||'';
         const csJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
-        blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과 (mm)</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}</td><td>-</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}</td><td>-</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}</td><td style="text-align:center">1종 ≤ 10<br>2종 ≤ 13</td></tr>${csJudge}</table></div>`;
+        const csCrit = crit || '1종 ≤ 10\n2종 ≤ 13';
+        blocks+=`<div class="rb">${th}${csCrit?`<div class="dc"><b>기준</b><br>${e2(csCrit)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과 (mm)</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}</td><td>-</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}</td><td>-</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}</td><td style="text-align:center">1종 ≤ 10<br>2종 ≤ 13</td></tr>${csJudge}</table></div>`;
       } else if(nm.includes('내구성')){
         const dc=det['detail_crit_'+i]||crit||'';
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
@@ -2270,8 +2255,11 @@ function renderPreview(){
           // 영구압축줄음률
           } else if(name.includes('압축줄음률') || name.includes('줄음률')){
             const t0=detail['t0_'+i]||''; const t1=detail['t1_'+i]||''; const pct=detail['cs_pct_'+i]||'';
+            const csCrit2 = crit || '1종 ≤ 10\n2종 ≤ 13';
+            const csCritBox = csCrit2 ? '<div style="font-size:10px;color:#374151;white-space:pre-wrap;margin-bottom:6px;padding:6px 8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;line-height:1.7"><span style="font-weight:800;font-size:10px;color:#6b7280">기준</span><br>'+esc(csCrit2)+'</div>' : '';
             const csJudgeRow = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>KS G 4300 기준 만족</td></tr>' : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
+              +csCritBox
               +'<table class="result-table"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과 (mm)</th><th>기준</th></tr>'
               +'<tr><td class="left">시험 전 두께 (t₀)</td><td class="result-val">'+t0+'</td><td>-</td></tr>'
               +'<tr><td class="left">시험 후 두께 (t₁)</td><td class="result-val">'+t1+'</td><td>-</td></tr>'
