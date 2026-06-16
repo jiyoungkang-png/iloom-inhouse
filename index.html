@@ -1861,339 +1861,297 @@ function renderDetailSection(externalData){
   const box = document.getElementById('detailDataSection');
   if(!box) return;
   const tests = collectTests();
-
   const card = document.getElementById('detailDataCard');
   if(card) card.style.display = (!tests || tests.length === 0) ? 'none' : '';
   if(!tests || tests.length === 0){ box.innerHTML = ''; return; }
 
   const saved = {};
-  // 기존 세부데이터 섹션에서 입력값 수집
-  box.querySelectorAll('[data-key]').forEach(el=>{ saved[el.dataset.key] = el.value; });
-  // name_edit / crit_edit은 시험항목 테이블에서도 보완 (항목 추가/삭제 시 유실 방지)
+  box.querySelectorAll('[data-key]').forEach(function(el){ saved[el.dataset.key] = el.value; });
   const testTableRows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
   testTableRows.forEach(function(tr, idx){
-    if(!saved['name_edit_'+idx]){
-      const ni = tr.querySelector('.t-name'); if(ni) saved['name_edit_'+idx] = ni.value;
-    }
-    if(!saved['crit_edit_'+idx]){
-      const ci = tr.querySelector('.t-crit'); if(ci) saved['crit_edit_'+idx] = ci.value;
-    }
+    if(!saved['name_edit_'+idx]){ const ni=tr.querySelector('.t-name'); if(ni) saved['name_edit_'+idx]=ni.value; }
+    if(!saved['crit_edit_'+idx]){ const ci=tr.querySelector('.t-crit'); if(ci) saved['crit_edit_'+idx]=ci.value; }
   });
   if(externalData) Object.assign(saved, externalData);
   box.innerHTML = '';
 
+  // ── 헬퍼 함수 (루프 밖 선언) ──
+  function _makeInput(cfg, savedData){
+    const lbl = document.createElement('label');
+    lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:120px';
+    lbl.textContent = cfg.label;
+    const inp = document.createElement('input');
+    if(cfg.type) inp.type = cfg.type;
+    if(cfg.step) inp.step = cfg.step;
+    inp.dataset.key = cfg.key;
+    inp.placeholder = cfg.ph||'';
+    inp.value = savedData[cfg.key]||'';
+    inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
+    if(cfg.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
+    if(cfg.onInput) inp.addEventListener('input', cfg.onInput);
+    inp.addEventListener('input', renderPreview);
+    lbl.appendChild(inp);
+    return lbl;
+  }
+  function _makeSelect(cfg, savedData){
+    const lbl = document.createElement('label');
+    lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:100px';
+    lbl.textContent = cfg.label;
+    const sel = document.createElement('select');
+    sel.dataset.key = cfg.key;
+    sel.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;cursor:pointer';
+    cfg.options.forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||(cfg.placeholder||'선택'); if((savedData[cfg.key]||'')===v) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change', renderPreview);
+    lbl.appendChild(sel);
+    return lbl;
+  }
+  function _makeRow(label, inp, crit){
+    const tr=document.createElement('tr');
+    const ta=document.createElement('td'); ta.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;font-weight:700'; ta.textContent=label;
+    const tb=document.createElement('td'); tb.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+    if(inp.tagName==='SELECT'){ inp.style.width='100%'; inp.style.textAlign='center'; inp.style.textAlignLast='center'; }
+    else if(inp.tagName==='INPUT'){ inp.style.width='100%'; inp.style.textAlign='center'; }
+    tb.appendChild(inp);
+    const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; tc.textContent=crit||'';
+    tr.appendChild(ta); tr.appendChild(tb); tr.appendChild(tc);
+    return tr;
+  }
+
   tests.forEach(function(t, i){
-    const sec = document.createElement('div');
-    sec.className = 'detail-section';
-    sec.style.cssText = 'margin-bottom:24px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fafbfc';
+    // 각 항목을 IIFE로 완전히 격리
+    (function(t, i){
+      const name = (t.name||'').toLowerCase();
+      const sec = document.createElement('div');
+      sec.style.cssText = 'margin-bottom:24px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fafbfc';
 
-    // ── 헤더: 번호 + 항목명 + 수정/저장/취소 버튼 ──
-    const header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
+      // ── 헤더 ──
+      const header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
+      const titleEl = document.createElement('div');
+      titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px';
+      const dispName = saved['name_edit_'+i] || t.name || ('항목 '+(i+1));
+      titleEl.textContent = (i+1) + '. ' + dispName + (t.spec ? '  ('+t.spec+')' : '');
+      header.appendChild(titleEl);
 
-    const titleEl = document.createElement('div');
-    titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px';
-    const _displayName = saved['name_edit_'+i] || t.name || '항목 '+(i+1);
-    titleEl.textContent = (i+1) + '. ' + _displayName + (t.spec ? '  ('+t.spec+')' : '');
-    header.appendChild(titleEl);
+      const secBtnWrap = document.createElement('div');
+      secBtnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
+      const secEditBtn = document.createElement('button');
+      secEditBtn.type='button'; secEditBtn.textContent='✏️ 수정';
+      secEditBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
+      const secSaveBtn = document.createElement('button');
+      secSaveBtn.type='button'; secSaveBtn.textContent='💾 저장';
+      secSaveBtn.style.cssText='background:#e60012;border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
+      const secCancelBtn = document.createElement('button');
+      secCancelBtn.type='button'; secCancelBtn.textContent='✕ 취소';
+      secCancelBtn.style.cssText='background:#f3f4f6;border:1px solid #d1d5db;color:#374151;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
+      secBtnWrap.appendChild(secEditBtn); secBtnWrap.appendChild(secSaveBtn); secBtnWrap.appendChild(secCancelBtn);
+      header.appendChild(secBtnWrap);
+      sec.appendChild(header);
 
-    const btnWrap = document.createElement('div');
-    btnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
+      // ── 구분 (수정 모드에서만 보임) ──
+      const nameWrap = document.createElement('div');
+      nameWrap.style.cssText = 'margin-bottom:10px;display:none';
+      const nameLabel = document.createElement('div');
+      nameLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
+      nameLabel.textContent = '구분 (시험항목명)';
+      const nameEdit = document.createElement('input');
+      nameEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;box-sizing:border-box;font-weight:700';
+      nameEdit.value = saved['name_edit_'+i] || t.name || '';
+      nameEdit.dataset.key = 'name_edit_'+i;
+      nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameEdit);
+      sec.appendChild(nameWrap);
 
-    const editBtn = document.createElement('button');
-    editBtn.type='button'; editBtn.textContent='✏️ 수정';
-    editBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
+      // ── 기준 ──
+      const critWrap = document.createElement('div');
+      critWrap.style.cssText = 'margin-bottom:10px';
+      const critLabel = document.createElement('div');
+      critLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
+      critLabel.textContent = '기준';
+      critWrap.appendChild(critLabel);
+      const critVal = saved['crit_edit_'+i] !== undefined ? saved['crit_edit_'+i] : (t.crit||'');
+      const critView = document.createElement('div');
+      critView.style.cssText = 'padding:8px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7;min-height:36px';
+      critView.textContent = critVal || '기준 없음';
+      critWrap.appendChild(critView);
+      const critEdit = document.createElement('textarea');
+      critEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;color:#374151;line-height:1.7;resize:vertical;box-sizing:border-box;display:none';
+      critEdit.rows=3; critEdit.placeholder='기준 없음'; critEdit.value=critVal;
+      critEdit.dataset.key = 'crit_edit_'+i;
+      critWrap.appendChild(critEdit);
+      sec.appendChild(critWrap);
 
-    const saveBtn2 = document.createElement('button');
-    saveBtn2.type='button'; saveBtn2.textContent='💾 저장';
-    saveBtn2.style.cssText='background:#e60012;border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
+      // ── 수정/저장/취소 이벤트 ──
+      var origName = nameEdit.value;
+      var origCrit = critEdit.value;
+      secEditBtn.onclick = function(){
+        secEditBtn.style.display='none'; secSaveBtn.style.display='inline-block'; secCancelBtn.style.display='inline-block';
+        nameWrap.style.display='block'; critView.style.display='none'; critEdit.style.display='block';
+        sec.style.border='2px solid #2563eb'; sec.style.background='#f0f9ff';
+        nameEdit.focus();
+      };
+      secSaveBtn.onclick = function(){
+        var newName=nameEdit.value; var newCrit=critEdit.value;
+        titleEl.textContent=(i+1)+'. '+(newName||'항목 '+(i+1))+(t.spec?'  ('+t.spec+')':'');
+        critView.textContent=newCrit||'기준 없음';
+        var trows=document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+        if(trows[i]){ var ni=trows[i].querySelector('.t-name'); if(ni&&newName) ni.value=newName; var ci=trows[i].querySelector('.t-crit'); if(ci) ci.value=newCrit; }
+        origName=newName; origCrit=newCrit;
+        secEditBtn.style.display='inline-block'; secSaveBtn.style.display='none'; secCancelBtn.style.display='none';
+        nameWrap.style.display='none'; critView.style.display='block'; critEdit.style.display='none';
+        sec.style.border='1px solid #e5e7eb'; sec.style.background='#fafbfc';
+        saveReport(true); showToast('✅ 저장되었습니다.');
+      };
+      secCancelBtn.onclick = function(){
+        nameEdit.value=origName; critEdit.value=origCrit;
+        secEditBtn.style.display='inline-block'; secSaveBtn.style.display='none'; secCancelBtn.style.display='none';
+        nameWrap.style.display='none'; critView.style.display='block'; critEdit.style.display='none';
+        sec.style.border='1px solid #e5e7eb'; sec.style.background='#fafbfc';
+      };
 
-    const cancelBtn2 = document.createElement('button');
-    cancelBtn2.type='button'; cancelBtn2.textContent='✕ 취소';
-    cancelBtn2.style.cssText='background:#f3f4f6;border:1px solid #d1d5db;color:#374151;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
+      // ── 항목별 입력 필드 ──
+      const fieldsWrap = document.createElement('div');
 
-    btnWrap.appendChild(editBtn); btnWrap.appendChild(saveBtn2); btnWrap.appendChild(cancelBtn2);
-    header.appendChild(btnWrap);
-    sec.appendChild(header);
-
-    // ── 구분(시험항목명) — 수정 모드에서만 편집 ──
-    const nameWrap = document.createElement('div');
-    nameWrap.style.cssText = 'margin-bottom:10px;display:none';
-    const nameLabel = document.createElement('div');
-    nameLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
-    nameLabel.textContent = '구분 (시험항목명)';
-    const nameEdit = document.createElement('input');
-    nameEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;box-sizing:border-box;font-weight:700';
-    nameEdit.value = saved['name_edit_'+i] || t.name || '';
-    nameEdit.dataset.key = 'name_edit_'+i;
-    nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameEdit);
-    sec.appendChild(nameWrap);
-
-    // ── 기준 — 수정 모드에서만 편집 ──
-    const critWrap = document.createElement('div');
-    critWrap.style.cssText = 'margin-bottom:10px';
-    const critLabel = document.createElement('div');
-    critLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
-    critLabel.textContent = '기준';
-    critWrap.appendChild(critLabel);
-
-    // 보기 모드
-    const critView = document.createElement('div');
-    const critVal = saved['crit_edit_'+i] !== undefined ? saved['crit_edit_'+i] : (t.crit||'');
-    critView.style.cssText = 'padding:8px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7;min-height:36px';
-    critView.textContent = critVal || '기준 없음';
-    critWrap.appendChild(critView);
-
-    // 편집 모드
-    const critEdit = document.createElement('textarea');
-    critEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;color:#374151;line-height:1.7;resize:vertical;box-sizing:border-box;display:none';
-    critEdit.rows = 3; critEdit.placeholder = '기준 없음';
-    critEdit.value = critVal;
-    critEdit.dataset.key = 'crit_edit_'+i;
-    critWrap.appendChild(critEdit);
-    sec.appendChild(critWrap);
-
-    const name = (t.name||'').toLowerCase();
-    const cat  = (t.category||'').toLowerCase();
-
-    // ── 입력 필드들 (기존과 동일) ──
-    const fieldsWrap = document.createElement('div');
-
-    function makeInput(cfg){
-      const lbl = document.createElement('label');
-      lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:120px';
-      lbl.textContent = cfg.label;
-      const inp = document.createElement('input');
-      if(cfg.type) inp.type = cfg.type;
-      if(cfg.step) inp.step = cfg.step;
-      inp.dataset.key = cfg.key;
-      inp.placeholder = cfg.ph||'';
-      inp.value = saved[cfg.key]||'';
-      inp.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit';
-      if(cfg.readonly){ inp.readOnly=true; inp.style.background='#f3f4f6'; inp.style.color='#2563eb'; inp.style.fontWeight='900'; }
-      if(cfg.onInput) inp.addEventListener('input', cfg.onInput);
-      inp.addEventListener('input', renderPreview);
-      lbl.appendChild(inp);
-      return lbl;
-    }
-
-    function makeSelect(cfg){
-      const lbl = document.createElement('label');
-      lbl.style.cssText = 'display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151;flex:1;min-width:100px';
-      lbl.textContent = cfg.label;
-      const sel = document.createElement('select');
-      sel.dataset.key = cfg.key;
-      sel.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;cursor:pointer';
-      cfg.options.forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||cfg.placeholder||'선택'; if((saved[cfg.key]||'')===v) o.selected=true; sel.appendChild(o); });
-      sel.addEventListener('change', renderPreview);
-      lbl.appendChild(sel);
-      return lbl;
-    }
-
-    // 항목별 필드 생성
-    if(name.includes('치수의 측정') || name.includes('치수의측정')){
-      const tblHeader = document.createElement('table');
-      tblHeader.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px';
-      tblHeader.innerHTML = '<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
-      fieldsWrap.appendChild(tblHeader);
-      const dimContainer = document.createElement('div');
-      function makeDimRow(idx, sv){
-        const row = document.createElement('table');
-        row.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;margin-bottom:0';
-        const tr = document.createElement('tr');
-        const tdA = document.createElement('td'); tdA.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:left;width:35%';
-        const lInp = document.createElement('input'); lInp.type='number'; lInp.step='1'; lInp.dataset.key='dim_l_'+i+'_'+idx; lInp.placeholder='L (mm)'; lInp.value=sv['dim_l_'+i+'_'+idx]||''; lInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%;margin-right:2%';
-        const wInp = document.createElement('input'); wInp.type='number'; wInp.step='1'; wInp.dataset.key='dim_w_'+i+'_'+idx; wInp.placeholder='W (mm)'; wInp.value=sv['dim_w_'+i+'_'+idx]||''; wInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%';
-        tdA.appendChild(lInp); tdA.appendChild(wInp);
-        const tdB = document.createElement('td'); tdB.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center;width:35%';
-        const resInp = document.createElement('input'); resInp.type='text'; resInp.dataset.key='dim_result_'+i+'_'+idx; resInp.placeholder='자동계산'; resInp.value=sv['dim_result_'+i+'_'+idx]||''; resInp.readOnly=true; resInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
-        tdB.appendChild(resInp);
-        const tdC = document.createElement('td'); tdC.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
-        const delBtn2 = document.createElement('button'); delBtn2.textContent='✕'; delBtn2.type='button'; delBtn2.style.cssText='background:#fee2e2;border:none;border-radius:6px;color:#dc2626;padding:5px 10px;cursor:pointer;font-weight:900';
-        delBtn2.onclick=function(){ row.remove(); renderPreview(); };
-        tdC.appendChild(delBtn2);
-        function calcDim(){ const lv=parseFloat(lInp.value||''); const wv=parseFloat(wInp.value||''); if(!isNaN(lv)&&!isNaN(wv)&&lv>0){ const hoching=Math.round(wv/10); const ratio=wv/lv; let grade=ratio<0.6?'-A':ratio<0.8?'-B':'-C'; resInp.value=hoching+grade; } else resInp.value=''; renderPreview(); }
-        lInp.addEventListener('input',calcDim); wInp.addEventListener('input',calcDim);
-        if(sv['dim_l_'+i+'_'+idx]) calcDim();
-        tr.appendChild(tdA); tr.appendChild(tdB); tr.appendChild(tdC); row.appendChild(tr);
-        return row;
-      }
-      let hasRows=false;
-      for(let di=0;di<10;di++){ if(saved['dim_l_'+i+'_'+di]||saved['dim_w_'+i+'_'+di]){ dimContainer.appendChild(makeDimRow(di,saved)); hasRows=true; } }
-      if(!hasRows) dimContainer.appendChild(makeDimRow(0,{}));
-      fieldsWrap.appendChild(dimContainer);
-      const addRowBtn = document.createElement('button'); addRowBtn.textContent='+ 측정값 추가'; addRowBtn.type='button'; addRowBtn.style.cssText='margin-top:6px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#374151';
-      addRowBtn.onclick=function(){ const rows=dimContainer.querySelectorAll(':scope > table'); dimContainer.appendChild(makeDimRow(rows.length,{})); };
-      fieldsWrap.appendChild(addRowBtn);
-
-    } else if(name.includes('압축줄음률') || name.includes('줄음률')){
-      const tbl = document.createElement('table'); tbl.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
-      tbl.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
-      const tbody = document.createElement('tbody');
-      const inp0 = document.createElement('input'); inp0.type='number'; inp0.step='0.01'; inp0.dataset.key='t0_'+i; inp0.placeholder='0.00'; inp0.value=saved['t0_'+i]||''; inp0.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
-      const inp1 = document.createElement('input'); inp1.type='number'; inp1.step='0.01'; inp1.dataset.key='t1_'+i; inp1.placeholder='0.00'; inp1.value=saved['t1_'+i]||''; inp1.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
-      const inp2 = document.createElement('input'); inp2.type='text'; inp2.dataset.key='cs_pct_'+i; inp2.placeholder='자동계산'; inp2.value=saved['cs_pct_'+i]||''; inp2.readOnly=true; inp2.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
-      function calcCs(){ const t0=parseFloat(inp0.value||''); const t1=parseFloat(inp1.value||''); if(!isNaN(t0)&&!isNaN(t1)&&t0!==0) inp2.value=((t0-t1)/t0*100).toFixed(2)+'%'; else inp2.value=''; renderPreview(); }
-      inp0.addEventListener('input',calcCs); inp1.addEventListener('input',calcCs);
-      function makeRow(label,inp,crit){ const tr=document.createElement('tr'); const ta=document.createElement('td'); ta.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;font-weight:700'; ta.textContent=label; const tb=document.createElement('td'); tb.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center'; if(inp.tagName==='SELECT'){ inp.style.width='100%'; inp.style.textAlign='center'; inp.style.textAlignLast='center'; } else if(inp.tagName==='INPUT'){ inp.style.width='100%'; inp.style.textAlign='center'; } tb.appendChild(inp); const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; tc.textContent=crit||''; tr.appendChild(ta); tr.appendChild(tb); tr.appendChild(tc); return tr; }
-      tbody.appendChild(makeRow('시험 전 두께 (t₀)',inp0,'mm'));
-      tbody.appendChild(makeRow('시험 후 두께 (t₁)',inp1,'mm'));
-      tbody.appendChild(makeRow('영구압축 줄음률',inp2,'%'));
-      const js=document.createElement('select'); js.dataset.key='judge_'+i; js.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer;width:100%';
-      ['','합격','불합격'].forEach(function(v){ const o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; js.appendChild(o); });
-      js.addEventListener('change',renderPreview);
-      tbody.appendChild(makeRow('판정',js,'KS G 4300 기준 만족'));
-      tbl.appendChild(tbody); fieldsWrap.appendChild(tbl);
-
-    } else if(name.includes('롤링')){
-      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      row.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'}));
-      fieldsWrap.appendChild(row);
-
-    } else if(name.includes('내구성')){
-      const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
-      ['d1','d2','d3','d4'].forEach(function(d){
-        grid.appendChild(makeInput({label:d.toUpperCase()+' (mm)',key:d+'_'+i,type:'number',step:'0.01',ph:'0.00'}));
-      });
-      fieldsWrap.appendChild(grid);
-      const critEditField = document.createElement('div'); critEditField.style.cssText='margin-bottom:10px';
-      const dcLbl=document.createElement('label'); dcLbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151'; dcLbl.textContent='상세 기준';
-      const dcInp=document.createElement('textarea'); dcInp.dataset.key='detail_crit_'+i; dcInp.rows=2; dcInp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%'; dcInp.value=saved['detail_crit_'+i]||t.crit||'';
-      dcInp.addEventListener('input',renderPreview); dcLbl.appendChild(dcInp); critEditField.appendChild(dcLbl); fieldsWrap.appendChild(critEditField);
-      const judgeWrap=document.createElement('div'); judgeWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      judgeWrap.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'}));
-      fieldsWrap.appendChild(judgeWrap);
-
-    } else if(name.includes('수직하중')||name.includes('하중')){
-      const tbl=document.createElement('table'); tbl.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
-      tbl.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D1 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D2 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
-      const tbody=document.createElement('tbody');
-      [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']].forEach(function(cv){
-        const tr=document.createElement('tr');
-        const ta=document.createElement('td'); ta.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; ta.textContent=cv[0];
-        const tbD1=document.createElement('td'); tbD1.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
-        const d1Inp=document.createElement('input'); d1Inp.type='number'; d1Inp.step='0.1'; d1Inp.dataset.key='load_'+cv[1]+'_d1_'+i; d1Inp.placeholder='0.0'; d1Inp.value=saved['load_'+cv[1]+'_d1_'+i]||''; d1Inp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d1Inp.addEventListener('input',renderPreview); tbD1.appendChild(d1Inp);
-        const tbD2=document.createElement('td'); tbD2.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
-        const d2Inp=document.createElement('input'); d2Inp.type='number'; d2Inp.step='0.1'; d2Inp.dataset.key='load_'+cv[1]+'_d2_'+i; d2Inp.placeholder='0.0'; d2Inp.value=saved['load_'+cv[1]+'_d2_'+i]||''; d2Inp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d2Inp.addEventListener('input',renderPreview); tbD2.appendChild(d2Inp);
-        const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc.textContent='D1 ≤ 45mm / D2 ≥ 5mm';
-        tr.appendChild(ta); tr.appendChild(tbD1); tr.appendChild(tbD2); tr.appendChild(tc); tbody.appendChild(tr);
-      });
-      tbl.appendChild(tbody); fieldsWrap.appendChild(tbl);
-      const jRow=document.createElement('div'); jRow.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      jRow.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'}));
-      fieldsWrap.appendChild(jRow);
-
-    } else if(name.includes('치수') || name.includes('수축') || name.includes('변화율')){
-      const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:10px';
-      const lenB=makeInput({label:'길이 세탁 전(cm)',key:'lenBefore_'+i,type:'number',step:'0.1',ph:'0.0'});
-      const lenA=makeInput({label:'길이 세탁 후(cm)',key:'lenAfter_'+i,type:'number',step:'0.1',ph:'0.0'});
-      const lenP=makeInput({label:'길이 변화율(%)',key:'lenPct_'+i,readonly:true});
-      const widB=makeInput({label:'폭 세탁 전(cm)',key:'widBefore_'+i,type:'number',step:'0.1',ph:'0.0'});
-      const widA=makeInput({label:'폭 세탁 후(cm)',key:'widAfter_'+i,type:'number',step:'0.1',ph:'0.0'});
-      const widP=makeInput({label:'폭 변화율(%)',key:'widPct_'+i,readonly:true});
-      function calcPct2(){
-        const b1=parseFloat(lenB.querySelector('input').value||''); const a1=parseFloat(lenA.querySelector('input').value||'');
-        const lp=lenP.querySelector('input'); if(lp&&!isNaN(b1)&&!isNaN(a1)&&b1!==0) lp.value=((a1-b1)/b1*100).toFixed(2)+'%';
-        const b2=parseFloat(widB.querySelector('input').value||''); const a2=parseFloat(widA.querySelector('input').value||'');
-        const wp=widP.querySelector('input'); if(wp&&!isNaN(b2)&&!isNaN(a2)&&b2!==0) wp.value=((a2-b2)/b2*100).toFixed(2)+'%';
-        renderPreview();
-      }
-      lenB.querySelector('input').addEventListener('input',calcPct2); lenA.querySelector('input').addEventListener('input',calcPct2);
-      widB.querySelector('input').addEventListener('input',calcPct2); widA.querySelector('input').addEventListener('input',calcPct2);
-      [lenB,lenA,lenP,widB,widA,widP].forEach(function(el){ grid.appendChild(el); });
-      fieldsWrap.appendChild(grid);
-      const jRow=document.createElement('div'); jRow.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-top:8px';
-      jRow.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'}));
-      fieldsWrap.appendChild(jRow);
-
-    } else if(name.includes('염색') || name.includes('견뢰도') || cat.includes('견뢰도')){
-      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      row.appendChild(makeInput({label:'변퇴색 (급)',key:'colorChange_'+i,ph:'예: 4-5'}));
-      row.appendChild(makeInput({label:'이염 (급)',key:'staining_'+i,ph:'예: 4-5'}));
-      row.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'}));
-      fieldsWrap.appendChild(row);
-
-    } else if(name.includes('필링') || name.includes('pilling')){
-      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      row.appendChild(makeInput({label:'필링 등급 (급)',key:'pilling_'+i,ph:'예: 4'}));
-      row.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'}));
-      fieldsWrap.appendChild(row);
-
-    } else if(name.includes('풀림')){
-      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      row.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'}));
-      fieldsWrap.appendChild(row);
-
-    } else {
-      const row=document.createElement('div'); row.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
-      const resultLabel = name.includes('외관') ? '외관 평가' : '시험 결과';
-      row.appendChild(makeInput({label:resultLabel,key:'result_'+i,ph:name.includes('외관')?'예: 이상 없음':'결과 입력'}));
-      row.appendChild(makeInput({label:'기준값',key:'crit_val_'+i,ph:'예: ≥ 300 N'}));
-      row.appendChild(makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'}));
-      fieldsWrap.appendChild(row);
-    }
-
-    sec.appendChild(fieldsWrap);
-
-    // ── 수정/저장/취소 동작 (모든 변수 준비된 후 클로저로 바인딩) ──
-    (function(idx, _editBtn, _saveBtn, _cancelBtn, _nameWrap, _nameEdit, _critView, _critEdit, _sec, _titleEl, _t){
-      let origName = _nameEdit.value;
-      let origCrit = _critEdit.value;
-
-      function doEnter(){
-        _editBtn.style.display='none';
-        _saveBtn.style.display='inline-block';
-        _cancelBtn.style.display='inline-block';
-        _nameWrap.style.display='block';
-        _critView.style.display='none';
-        _critEdit.style.display='block';
-        _sec.style.border='2px solid #2563eb';
-        _sec.style.background='#f0f9ff';
-        _nameEdit.focus();
-      }
-      function doExit(){
-        _editBtn.style.display='inline-block';
-        _saveBtn.style.display='none';
-        _cancelBtn.style.display='none';
-        _nameWrap.style.display='none';
-        _critView.style.display='block';
-        _critEdit.style.display='none';
-        _sec.style.border='1px solid #e5e7eb';
-        _sec.style.background='#fafbfc';
-      }
-
-      _editBtn.onclick = doEnter;
-
-      _saveBtn.onclick = function(){
-        const newName = _nameEdit.value;
-        const newCrit = _critEdit.value;
-        _titleEl.textContent = (idx+1) + '. ' + (newName||'항목 '+(idx+1)) + (_t.spec ? '  ('+_t.spec+')' : '');
-        _critView.textContent = newCrit || '기준 없음';
-        const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
-        if(trows[idx]){
-          const ni = trows[idx].querySelector('.t-name'); if(ni && newName) ni.value = newName;
-          const ci = trows[idx].querySelector('.t-crit'); if(ci) ci.value = newCrit;
+      if(name.includes('치수의 측정') || name.includes('치수의측정')){
+        const tblHeader = document.createElement('table');
+        tblHeader.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px';
+        tblHeader.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과 (mm, class)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
+        fieldsWrap.appendChild(tblHeader);
+        const dimContainer = document.createElement('div');
+        function makeDimRow(idx, sv){
+          const row=document.createElement('table'); row.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:0';
+          const tr=document.createElement('tr');
+          const tdA=document.createElement('td'); tdA.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:left;width:35%';
+          const lInp=document.createElement('input'); lInp.type='number'; lInp.step='1'; lInp.dataset.key='dim_l_'+i+'_'+idx; lInp.placeholder='L (mm)'; lInp.value=saved['dim_l_'+i+'_'+idx]||''; lInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%;margin-right:2%';
+          const wInp=document.createElement('input'); wInp.type='number'; wInp.step='1'; wInp.dataset.key='dim_w_'+i+'_'+idx; wInp.placeholder='W (mm)'; wInp.value=saved['dim_w_'+i+'_'+idx]||''; wInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:48%';
+          tdA.appendChild(lInp); tdA.appendChild(wInp);
+          const tdB=document.createElement('td'); tdB.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center;width:35%';
+          const resInp=document.createElement('input'); resInp.type='text'; resInp.dataset.key='dim_result_'+i+'_'+idx; resInp.placeholder='자동계산'; resInp.value=saved['dim_result_'+i+'_'+idx]||''; resInp.readOnly=true; resInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
+          tdB.appendChild(resInp);
+          const tdC=document.createElement('td'); tdC.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+          const delBtn2=document.createElement('button'); delBtn2.textContent='✕'; delBtn2.type='button'; delBtn2.style.cssText='background:#fee2e2;border:none;border-radius:6px;color:#dc2626;padding:5px 10px;cursor:pointer;font-weight:900';
+          delBtn2.onclick=function(){ row.remove(); renderPreview(); };
+          tdC.appendChild(delBtn2);
+          function calcDim(){ var lv=parseFloat(lInp.value||''); var wv=parseFloat(wInp.value||''); if(!isNaN(lv)&&!isNaN(wv)&&lv>0){ var h=Math.round(wv/10); var r=wv/lv; var g=r<0.6?'-A':r<0.8?'-B':'-C'; resInp.value=h+g; } else resInp.value=''; renderPreview(); }
+          lInp.addEventListener('input',calcDim); wInp.addEventListener('input',calcDim);
+          if(saved['dim_l_'+i+'_'+idx]) calcDim();
+          tr.appendChild(tdA); tr.appendChild(tdB); tr.appendChild(tdC); row.appendChild(tr);
+          return row;
         }
-        origName = newName; origCrit = newCrit;
-        doExit();
-        saveReport(true);
-        showToast('✅ 저장되었습니다.');
-      };
+        var hasRows=false;
+        for(var di=0;di<10;di++){ if(saved['dim_l_'+i+'_'+di]||saved['dim_w_'+i+'_'+di]){ dimContainer.appendChild(makeDimRow(di,saved)); hasRows=true; } }
+        if(!hasRows) dimContainer.appendChild(makeDimRow(0,{}));
+        fieldsWrap.appendChild(dimContainer);
+        var addRowBtn=document.createElement('button'); addRowBtn.textContent='+ 측정값 추가'; addRowBtn.type='button'; addRowBtn.style.cssText='margin-top:6px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#374151';
+        addRowBtn.onclick=function(){ var rows=dimContainer.querySelectorAll(':scope > table'); dimContainer.appendChild(makeDimRow(rows.length,{})); };
+        fieldsWrap.appendChild(addRowBtn);
 
-      _cancelBtn.onclick = function(){
-        _nameEdit.value = origName;
-        _critEdit.value = origCrit;
-        doExit();
-      };
-    })(i, editBtn, saveBtn2, cancelBtn2, nameWrap, nameEdit, critView, critEdit, sec, titleEl, t);
+      } else if(name.includes('압축줄음률') || name.includes('줄음률')){
+        var tbl2=document.createElement('table'); tbl2.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
+        tbl2.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700;width:35%">시험 결과 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
+        var tbody2=document.createElement('tbody');
+        var inp0=document.createElement('input'); inp0.type='number'; inp0.step='0.01'; inp0.dataset.key='t0_'+i; inp0.placeholder='0.00'; inp0.value=saved['t0_'+i]||''; inp0.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
+        var inp1=document.createElement('input'); inp1.type='number'; inp1.step='0.01'; inp1.dataset.key='t1_'+i; inp1.placeholder='0.00'; inp1.value=saved['t1_'+i]||''; inp1.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center';
+        var inp2=document.createElement('input'); inp2.type='text'; inp2.dataset.key='cs_pct_'+i; inp2.placeholder='자동계산'; inp2.value=saved['cs_pct_'+i]||''; inp2.readOnly=true; inp2.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
+        function calcCs(){ var t0v=parseFloat(inp0.value||''); var t1v=parseFloat(inp1.value||''); if(!isNaN(t0v)&&!isNaN(t1v)&&t0v!==0) inp2.value=((t0v-t1v)/t0v*100).toFixed(2)+'%'; else inp2.value=''; renderPreview(); }
+        inp0.addEventListener('input',calcCs); inp1.addEventListener('input',calcCs);
+        var jsSel=document.createElement('select'); jsSel.dataset.key='judge_'+i; jsSel.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer;width:100%;text-align:center;text-align-last:center';
+        ['','합격','불합격'].forEach(function(v){ var o=document.createElement('option'); o.value=v; o.textContent=v||'선택'; if((saved['judge_'+i]||'')===v) o.selected=true; jsSel.appendChild(o); });
+        jsSel.addEventListener('change',renderPreview);
+        tbody2.appendChild(_makeRow('시험 전 두께 (t₀)',inp0,''));
+        tbody2.appendChild(_makeRow('시험 후 두께 (t₁)',inp1,''));
+        tbody2.appendChild(_makeRow('영구압축 줄음률',inp2,''));
+        tbody2.appendChild(_makeRow('판정',jsSel,'KS G 4300 기준 만족'));
+        tbl2.appendChild(tbody2); fieldsWrap.appendChild(tbl2);
 
-    box.appendChild(sec);
+      } else if(name.includes('롤링')){
+        var row0=document.createElement('div'); row0.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        row0.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(row0);
 
+      } else if(name.includes('내구성')){
+        var grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px';
+        ['d1','d2','d3','d4'].forEach(function(d){ grid.appendChild(_makeInput({label:d.toUpperCase()+' (mm)',key:d+'_'+i,type:'number',step:'0.01',ph:'0.00'},saved)); });
+        fieldsWrap.appendChild(grid);
+        var dcWrap=document.createElement('div'); dcWrap.style.cssText='margin-bottom:10px';
+        var dcLbl=document.createElement('label'); dcLbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151';
+        dcLbl.textContent='상세 기준';
+        var dcInp=document.createElement('textarea'); dcInp.dataset.key='detail_crit_'+i; dcInp.rows=2; dcInp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%'; dcInp.value=saved['detail_crit_'+i]||t.crit||'';
+        dcInp.addEventListener('input',renderPreview); dcLbl.appendChild(dcInp); dcWrap.appendChild(dcLbl); fieldsWrap.appendChild(dcWrap);
+        var jWrap=document.createElement('div'); jWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        jWrap.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(jWrap);
 
+      } else if(name.includes('수직하중')||name.includes('하중')){
+        var tbl3=document.createElement('table'); tbl3.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
+        tbl3.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D1 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D2 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
+        var tbody3=document.createElement('tbody');
+        [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['480000회','480000']].forEach(function(cv){
+          var tr3=document.createElement('tr');
+          var ta3=document.createElement('td'); ta3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; ta3.textContent=cv[0];
+          var tbD1=document.createElement('td'); tbD1.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+          var d1i=document.createElement('input'); d1i.type='number'; d1i.step='0.1'; d1i.dataset.key='load_'+cv[1]+'_d1_'+i; d1i.placeholder='0.0'; d1i.value=saved['load_'+cv[1]+'_d1_'+i]||''; d1i.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d1i.addEventListener('input',renderPreview); tbD1.appendChild(d1i);
+          var tbD2=document.createElement('td'); tbD2.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+          var d2i=document.createElement('input'); d2i.type='number'; d2i.step='0.1'; d2i.dataset.key='load_'+cv[1]+'_d2_'+i; d2i.placeholder='0.0'; d2i.value=saved['load_'+cv[1]+'_d2_'+i]||''; d2i.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d2i.addEventListener('input',renderPreview); tbD2.appendChild(d2i);
+          var tc3=document.createElement('td'); tc3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc3.textContent='D1 ≤ 45mm / D2 ≥ 5mm';
+          tr3.appendChild(ta3); tr3.appendChild(tbD1); tr3.appendChild(tbD2); tr3.appendChild(tc3); tbody3.appendChild(tr3);
+        });
+        tbl3.appendChild(tbody3); fieldsWrap.appendChild(tbl3);
+        var jRow3=document.createElement('div'); jRow3.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        jRow3.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(jRow3);
+
+      } else if(name.includes('치수') || name.includes('수축') || name.includes('변화율')){
+        var grid2=document.createElement('div'); grid2.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:10px';
+        var lenB=_makeInput({label:'길이 세탁 전(cm)',key:'lenBefore_'+i,type:'number',step:'0.1',ph:'0.0'},saved);
+        var lenA=_makeInput({label:'길이 세탁 후(cm)',key:'lenAfter_'+i,type:'number',step:'0.1',ph:'0.0'},saved);
+        var lenP=_makeInput({label:'길이 변화율(%)',key:'lenPct_'+i,readonly:true},saved);
+        var widB=_makeInput({label:'폭 세탁 전(cm)',key:'widBefore_'+i,type:'number',step:'0.1',ph:'0.0'},saved);
+        var widA=_makeInput({label:'폭 세탁 후(cm)',key:'widAfter_'+i,type:'number',step:'0.1',ph:'0.0'},saved);
+        var widP=_makeInput({label:'폭 변화율(%)',key:'widPct_'+i,readonly:true},saved);
+        function calcPct2(){ var b1=parseFloat(lenB.querySelector('input').value||''); var a1=parseFloat(lenA.querySelector('input').value||''); var lp=lenP.querySelector('input'); if(lp&&!isNaN(b1)&&!isNaN(a1)&&b1!==0) lp.value=((a1-b1)/b1*100).toFixed(2)+'%'; var b2=parseFloat(widB.querySelector('input').value||''); var a2=parseFloat(widA.querySelector('input').value||''); var wp=widP.querySelector('input'); if(wp&&!isNaN(b2)&&!isNaN(a2)&&b2!==0) wp.value=((a2-b2)/b2*100).toFixed(2)+'%'; renderPreview(); }
+        lenB.querySelector('input').addEventListener('input',calcPct2); lenA.querySelector('input').addEventListener('input',calcPct2);
+        widB.querySelector('input').addEventListener('input',calcPct2); widA.querySelector('input').addEventListener('input',calcPct2);
+        [lenB,lenA,lenP,widB,widA,widP].forEach(function(el){ grid2.appendChild(el); });
+        fieldsWrap.appendChild(grid2);
+        var jRow2=document.createElement('div'); jRow2.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-top:8px';
+        jRow2.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(jRow2);
+
+      } else if(name.includes('염색') || name.includes('견뢰도')){
+        var rowE=document.createElement('div'); rowE.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        rowE.appendChild(_makeInput({label:'변퇴색 (급)',key:'colorChange_'+i,ph:'예: 4-5'},saved));
+        rowE.appendChild(_makeInput({label:'이염 (급)',key:'staining_'+i,ph:'예: 4-5'},saved));
+        rowE.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(rowE);
+
+      } else if(name.includes('필링') || name.includes('pilling')){
+        var rowP=document.createElement('div'); rowP.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        rowP.appendChild(_makeInput({label:'필링 등급 (급)',key:'pilling_'+i,ph:'예: 4'},saved));
+        rowP.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(rowP);
+
+      } else if(name.includes('풀림')){
+        var rowF=document.createElement('div'); rowF.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        rowF.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(rowF);
+
+      } else {
+        var rowG=document.createElement('div'); rowG.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        var resultLabel = name.includes('외관') ? '외관 평가' : '시험 결과';
+        rowG.appendChild(_makeInput({label:resultLabel,key:'result_'+i,ph:name.includes('외관')?'예: 이상 없음':'결과 입력'},saved));
+        rowG.appendChild(_makeInput({label:'기준값',key:'crit_val_'+i,ph:'예: ≥ 300 N'},saved));
+        rowG.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','PASS','FAIL'],placeholder:'선택'},saved));
+        fieldsWrap.appendChild(rowG);
+      }
+
+      sec.appendChild(fieldsWrap);
+      box.appendChild(sec);
+    })(t, i);
   });
 
   setTimeout(updateJudgeColors,0);
 }
+
 
 function getDetailData(){
   const result = {};
