@@ -1032,6 +1032,12 @@ function applyRequestToReport(req){
   setVal('sampleName',   req.product || '');
   setVal('brand',        req.brand   || '');
   setVal('colorInfo',    req.color   || '');
+  // KOLAS/내부 체크박스 → 성적서 용도 자동 설정
+  var purposeEl = document.getElementById('purpose');
+  if(purposeEl){
+    if(req.chk_kolas) purposeEl.value = 'KOLAS용';
+    else if(req.chk_internal) purposeEl.value = '내부 품질 관리용';
+  }
   // 재질 체크박스 복원 (의뢰서 탭)
   ['fabric','sponge','antibac','padding'].forEach(function(m){
     const el = document.getElementById('req_mat_'+m);
@@ -3079,8 +3085,42 @@ async function loadReport(r){
     const full = (rows||[]).find(function(x){ return x.id === r.id; });
     if(full && full.data) r = full.data;
   } catch(e){ console.warn('Supabase 불러오기 실패, 로컬 사용:', e); }
-  currentId=r.id; fields.forEach(id=>setVal(id,r[id]||'')); sampleImageData=r.image||'';
-  const matEl3=document.getElementById('sampleMaterials'); if(matEl3){ const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'}; matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':''; matEl3.dataset.materials=JSON.stringify(r.materials||[]); } $('testTable').querySelector('tbody').innerHTML=''; window._loadingReport=true; (r.tests||[]).forEach(addTest); window._loadingReport=false; renderImage(); renderDetailSection(r.detailData); setTimeout(function(){ renderPreview(); }, 100); document.querySelector('[data-tab="write"]').click();
+  currentId=r.id;
+  fields.forEach(id=>setVal(id,r[id]||''));
+  sampleImageData=r.image||'';
+  // 재질 표시
+  const matEl3=document.getElementById('sampleMaterials');
+  if(matEl3){
+    const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'};
+    matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':'';
+    matEl3.dataset.materials=JSON.stringify(r.materials||[]);
+  }
+  // 시험 항목 복원
+  $('testTable').querySelector('tbody').innerHTML='';
+  window._loadingReport=true;
+  (r.tests||[]).forEach(addTest);
+  window._loadingReport=false;
+  renderImage();
+  // detailData 복원 — addTest 완료 후 충분한 시간을 두고 실행
+  const _savedDetailData = r.detailData || {};
+  setTimeout(function(){
+    renderDetailSection(_savedDetailData);
+    // renderDetailSection 후 DOM에 값이 세팅될 시간을 추가로 확보
+    setTimeout(function(){
+      // data-key 입력값 직접 복원 (타이밍 문제 방지)
+      const box = document.getElementById('detailDataSection');
+      if(box){
+        box.querySelectorAll('[data-key]').forEach(function(el){
+          const k = el.dataset.key;
+          if(_savedDetailData[k] !== undefined && _savedDetailData[k] !== ''){
+            el.value = _savedDetailData[k];
+          }
+        });
+      }
+      renderPreview();
+    }, 100);
+  }, 50);
+  document.querySelector('[data-tab="write"]').click();
 }
 async function saveReport(silent=false){
   const receiptNo = val('receiptNo');
@@ -3145,7 +3185,10 @@ function autoSave(){
   if(!_hasUnsaved) return;
   // 현재 성적서 작성 탭이 활성화된 경우만
   if(!document.getElementById('tab-write')?.classList.contains('active')) return;
-  // currentId 없으면 (새 성적서 빈칸) 건너뜀
+  // 의뢰번호가 없으면 건너뜀 (빈 양식)
+  const receiptNo = val('receiptNo');
+  if(!receiptNo) return;
+  // 시험 항목이 1개 이상 있어야 저장
   const tbody = document.querySelector('#testTable tbody');
   const hasTests = tbody && tbody.querySelectorAll('tr:not(.t-detail-row)').length > 0;
   if(!hasTests) return;
@@ -3730,10 +3773,11 @@ async function syncAllFromServer(force){
   _lastSyncTime = now;
 
   try {
-    // 1. 성적서
+    // 1. 성적서 — 작성 중인 경우(미저장) localStorage만 갱신, 화면은 건드리지 않음
     const rows = await getReportsAsync();
     if(rows && rows.length >= 0){
       localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
+      // 작성 탭이 열려있고 미저장 데이터 있으면 목록만 갱신, 현재 작성 화면은 건드리지 않음
       if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
     }
 
@@ -3787,8 +3831,15 @@ function startSyncTimer(){
 }
 
 // 포커스 복귀 시 즉시 동기화 (모바일 앱 전환 등)
+// 단, 성적서 작성 중(미저장)이면 덮어쓰지 않음
 document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'visible') syncAllFromServer(true);
+  if(document.visibilityState === 'visible'){
+    if(_hasUnsaved && document.getElementById('tab-write')?.classList.contains('active')){
+      console.log('작성 중 - 자동 동기화 건너뜀');
+      return;
+    }
+    syncAllFromServer(true);
+  }
 });
 
 function getReports() { return JSON.parse(localStorage.getItem(storeKey)||'[]'); }
