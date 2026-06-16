@@ -1864,74 +1864,58 @@ function renderDetailSection(externalData){
     sec.className = 'detail-section';
     sec.style.cssText = 'margin-bottom:24px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fafbfc';
 
-    // ── 헤더: 제목 + 수정/저장 버튼 ──
+    // ── 헤더: 번호 + 항목명 ──
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
+    header.style.cssText = 'margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
 
     const titleEl = document.createElement('div');
-    titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px';
+    titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px;margin-bottom:6px';
     titleEl.textContent = (i+1) + '. ' + (t.name||'항목 '+(i+1)) + (t.spec ? '  ('+t.spec+')' : '');
     header.appendChild(titleEl);
-
-    const btnWrap = document.createElement('div');
-    btnWrap.style.cssText = 'display:flex;gap:6px';
-
-    const editBtn = document.createElement('button');
-    editBtn.type = 'button';
-    editBtn.textContent = '✏️ 수정';
-    editBtn.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
-
-    const saveBtn2 = document.createElement('button');
-    saveBtn2.type = 'button';
-    saveBtn2.textContent = '💾 저장';
-    saveBtn2.style.cssText = 'background:#e60012;border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
-
-    const cancelBtn2 = document.createElement('button');
-    cancelBtn2.type = 'button';
-    cancelBtn2.textContent = '✕ 취소';
-    cancelBtn2.style.cssText = 'background:#f3f4f6;border:1px solid #d1d5db;color:#374151;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
-
-    btnWrap.appendChild(editBtn);
-    btnWrap.appendChild(saveBtn2);
-    btnWrap.appendChild(cancelBtn2);
-    header.appendChild(btnWrap);
     sec.appendChild(header);
 
-    // ── 기준 표시/수정 ──
-    const critWrap = document.createElement('div');
-    critWrap.style.cssText = 'margin-bottom:10px';
-
-    const critLabel = document.createElement('div');
-    critLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
-    critLabel.textContent = '기준';
-    critWrap.appendChild(critLabel);
-
-    const critView = document.createElement('div');
-    critView.style.cssText = 'padding:8px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;white-space:pre-wrap;line-height:1.7;min-height:32px';
-    critView.textContent = t.crit || '기준 없음';
-    critWrap.appendChild(critView);
-
-    const critEdit = document.createElement('textarea');
-    critEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;color:#374151;line-height:1.7;resize:vertical;display:none;box-sizing:border-box';
-    critEdit.rows = 3;
-    critEdit.value = t.crit || '';
-    critEdit.dataset.key = 'crit_edit_'+i;
-    critWrap.appendChild(critEdit);
-    sec.appendChild(critWrap);
-
-    // ── 구분(시험항목명) 수정 ──
+    // ── 구분(시험항목명) — 항상 편집 가능 ──
     const nameWrap = document.createElement('div');
-    nameWrap.style.cssText = 'margin-bottom:10px;display:none';
+    nameWrap.style.cssText = 'margin-bottom:10px';
     const nameLabel = document.createElement('div');
     nameLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
     nameLabel.textContent = '구분 (시험항목명)';
     const nameEdit = document.createElement('input');
-    nameEdit.style.cssText = 'width:100%;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;box-sizing:border-box';
+    nameEdit.style.cssText = 'width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;box-sizing:border-box;font-weight:700';
     nameEdit.value = t.name || '';
     nameEdit.dataset.key = 'name_edit_'+i;
+    nameEdit.addEventListener('input', function(){
+      titleEl.textContent = (i+1) + '. ' + (nameEdit.value||'항목 '+(i+1)) + (t.spec ? '  ('+t.spec+')' : '');
+      // 시험항목 테이블도 동기화
+      const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+      if(trows[i]){ const ni = trows[i].querySelector('.t-name'); if(ni) ni.value = nameEdit.value; }
+      markUnsaved();
+    });
     nameWrap.appendChild(nameLabel);
     nameWrap.appendChild(nameEdit);
     sec.appendChild(nameWrap);
+
+    // ── 기준 — 항상 편집 가능 ──
+    const critWrap = document.createElement('div');
+    critWrap.style.cssText = 'margin-bottom:10px';
+    const critLabel = document.createElement('div');
+    critLabel.style.cssText = 'font-weight:800;font-size:11px;color:#6b7280;margin-bottom:4px';
+    critLabel.textContent = '기준';
+    critWrap.appendChild(critLabel);
+    const critEdit = document.createElement('textarea');
+    critEdit.style.cssText = 'width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;color:#374151;line-height:1.7;resize:vertical;box-sizing:border-box';
+    critEdit.rows = 3;
+    critEdit.placeholder = '기준 없음';
+    critEdit.value = t.crit || '';
+    critEdit.dataset.key = 'crit_edit_'+i;
+    critEdit.addEventListener('input', function(){
+      // 시험항목 테이블도 동기화
+      const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+      if(trows[i]){ const ci = trows[i].querySelector('.t-crit'); if(ci) ci.value = critEdit.value; }
+      markUnsaved();
+    });
+    critWrap.appendChild(critEdit);
+    sec.appendChild(critWrap);
 
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
@@ -2116,42 +2100,12 @@ function renderDetailSection(externalData){
     sec.appendChild(fieldsWrap);
     box.appendChild(sec);
 
-    // ── 수정/저장/취소 버튼 동작 ──
-    let originalCrit = t.crit || '';
-    let originalName = t.name || '';
-
-    function enterEditMode(){
-      editBtn.style.display = 'none';
-      saveBtn2.style.display = '';
-      cancelBtn2.style.display = '';
-      // 기준 편집 모드
-      critView.style.display = 'none';
-      critEdit.style.display = '';
-      // 구분 편집 모드
-      nameWrap.style.display = '';
-      // 모든 입력 필드 활성화 (이미 활성화 상태지만 테두리 강조)
-      sec.style.border = '2px solid #2563eb';
-      sec.style.background = '#f0f9ff';
-    }
-
-    function exitEditMode(){
-      editBtn.style.display = '';
-      saveBtn2.style.display = 'none';
-      cancelBtn2.style.display = 'none';
-      critView.style.display = '';
-      critEdit.style.display = 'none';
-      nameWrap.style.display = 'none';
-      sec.style.border = '1px solid #e5e7eb';
-      sec.style.background = '#fafbfc';
-    }
-
-    editBtn.onclick = enterEditMode;
-
-    saveBtn2.onclick = function(){
-      // 기준 업데이트
+    // crit_edit / name_edit 값은 getDetailData()에서 수집됨
+    // saveBtn2.onclick 로직 — 입력 시 실시간으로 테이블 동기화되므로 별도 저장 버튼 불필요
+    // (하위 호환을 위해 dummy 변수 유지)
+    const dummy_compat = function(){
       const newCrit = critEdit.value;
       const newName = nameEdit.value;
-      // 시험항목 테이블에서 해당 행 업데이트
       const rows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
       if(rows[i]){
         const nameInp = rows[i].querySelector('.t-name');
