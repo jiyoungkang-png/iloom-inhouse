@@ -265,6 +265,10 @@ button,input,select{font:inherit}
         </div>
       </div>
       <nav>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 4px;margin-bottom:4px">
+          <span id="syncDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#facc15;flex-shrink:0" title="동기화 중..."></span>
+          <span style="font-size:11px;color:#aab2c0" id="syncLabel">동기화 중...</span>
+        </div>
         <button class="nav-btn active" data-tab="request">의뢰서 작성</button>
         <button class="nav-btn" data-tab="write">성적서 작성</button>
         <button class="nav-btn" data-tab="list">성적서 조회</button>
@@ -313,10 +317,7 @@ button,input,select{font:inherit}
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               의뢰 번호 (자동생성)
-              <div style="display:flex;gap:6px">
-                <input id="req_no" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;flex:1">
-                <button type="button" onclick="document.getElementById('req_no').value=generateReqNo();" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#374151;cursor:pointer;white-space:nowrap">자동생성</button>
-              </div>
+              <input id="req_no" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;background:#f5f5f5;color:#555;cursor:default;font-weight:900" readonly>
             </label>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
               신청일
@@ -737,22 +738,7 @@ function setStandards(v){
     .catch(function(e){ console.warn('규격 Supabase 저장 실패:', e); });
 }
 function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
-function generateReceiptNo(){
-  // 의뢰서와 동일한 형식 IM_YYYY + 3자리 번호
-  const reqList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
-  const year = new Date().getFullYear();
-  const prefix = 'IM_' + year;
-  let max = 0;
-  reqList.forEach(r=>{
-    const m = (r.no||'').match(/^IM_\d{4}(\d+)$/);
-    if(m) max = Math.max(max, parseInt(m[1]));
-  });
-  getReports().forEach(r=>{
-    const m = (r.receiptNo||'').match(/^IM_\d{4}(\d+)$/);
-    if(m) max = Math.max(max, parseInt(m[1]));
-  });
-  return prefix + String(max + 1).padStart(3, '0');
-}
+// generateReceiptNo → generateReqNo로 통합
 function setReports(v){localStorage.setItem(storeKey, JSON.stringify(v));}
 function val(id){const el=$(id); return el ? el.value.trim() : '';}
 function setVal(id,v){const el=$(id); if(el) el.value = v || '';}
@@ -1434,6 +1420,7 @@ async function init(){
   // Supabase에서 공유 데이터 불러오기 (병합)
   loadSharedFromSupabase();
   startAutoSave(); // 5초 자동저장 시작
+  startSyncTimer(); // 10초 전체 동기화 시작
   // 로컬 데이터를 Supabase에 업로드
   migrateLocalToSupabase();
   // 로그인 사용자 표시 + 관리자 탭 제어
@@ -2769,16 +2756,23 @@ function previewRequestOnly(){
   showToast('✅ 의뢰서를 불러왔습니다!');
 }
 
-function generateReqNo(){
-  const list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
-  const year = new Date().getFullYear();
-  const prefix = 'IM_' + year;
+async function generateReqNo(){
+  // 로컬 + Supabase 모두 확인해서 가장 큰 번호 + 1
   let max = 0;
-  list.forEach(r=>{
+  const localList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  localList.forEach(r=>{
     const m=(r.no||'').match(/^IM_\d{4}(\d+)$/);
     if(m) max=Math.max(max,parseInt(m[1]));
   });
-  return prefix + String(max + 1).padStart(3, '0');
+  try {
+    const supaReqs = await getRequestsAsync();
+    (supaReqs||[]).forEach(r=>{
+      const m=(r.no||'').match(/^IM_\d{4}(\d+)$/);
+      if(m) max=Math.max(max,parseInt(m[1]));
+    });
+  } catch(e){}
+  const year = new Date().getFullYear();
+  return 'IM_' + year + String(max + 1).padStart(3, '0');
 }
 
 async function renderReqListAsync(){
@@ -2889,7 +2883,9 @@ function updateReqDelBtn(){
 
 function initRequestTab(){
   const noEl = document.getElementById('req_no');
-  if(noEl && !noEl.value) noEl.value = generateReqNo();
+  if(noEl && !noEl.value){
+    generateReqNo().then(function(no){ noEl.value = no; });
+  }
   const dateEl = document.getElementById('req_date');
   if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
   // 의뢰서 정보 항상 빈칸으로
@@ -3075,7 +3071,7 @@ function clearRequest(){
   ['req_date','req_dept','req_person','req_product','req_brand','req_color','req_note']
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const noEl=document.getElementById('req_no');
-  if(noEl) noEl.value=generateReqNo();
+  if(noEl) generateReqNo().then(function(no){ noEl.value = no; });
   const nameEl2=document.getElementById('req_items_custom_name'); if(nameEl2) nameEl2.value='';
   const specEl2=document.getElementById('req_items_custom_spec'); if(specEl2) specEl2.value='';
   ['req_mat_fabric','req_mat_sponge','req_mat_antibac','req_mat_padding'].forEach(function(id){ const el=document.getElementById(id); if(el) el.checked=false; });
@@ -3785,28 +3781,75 @@ async function forceUploadAll(){
   add('✅ 완료! 다른 컴퓨터에서 새로고침 후 확인해보세요.');
 }
 
-// ── 자동 동기화: 페이지 포커스 시 (모바일 전환, 탭 전환 등) ──
+// ── 전체 실시간 동기화 (10초마다 + 포커스 시) ──
 let _lastSyncTime = 0;
-document.addEventListener('visibilitychange', async function(){
-  if(document.visibilityState === 'visible'){
-    const now = Date.now();
-    if(now - _lastSyncTime < 30000) return; // 30초 이내 재동기화 방지
-    _lastSyncTime = now;
-    try {
-      const rows = await getReportsAsync();
-      if(rows && rows.length >= 0){
-        localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
-        // 현재 list 탭이 활성화되어 있으면 렌더링 갱신
-        if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
+let _syncTimer = null;
+
+async function syncAllFromServer(force){
+  const now = Date.now();
+  if(!force && now - _lastSyncTime < 10000) return;
+  _lastSyncTime = now;
+
+  try {
+    // 1. 성적서
+    const rows = await getReportsAsync();
+    if(rows && rows.length >= 0){
+      localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
+      if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
+    }
+
+    // 2. 의뢰서
+    const reqs = await getRequestsAsync();
+    if(reqs && reqs.length >= 0){
+      localStorage.setItem('iloom_requests_v1', JSON.stringify(reqs));
+      if(document.getElementById('tab-request')?.classList.contains('active')) renderReqList();
+    }
+
+    // 3. 계정
+    const accRows = await supaFetch('accounts', 'GET');
+    if(accRows && accRows.length > 0){
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accRows.map(function(r){ return r.data; })));
+    }
+
+    // 4. 규격 + 의뢰항목
+    const settingRows = await supaFetch('settings', 'GET');
+    if(settingRows && settingRows.length){
+      const stdRow = settingRows.find(function(r){ return r.id==='standards'; });
+      if(stdRow && Array.isArray(stdRow.data) && stdRow.data.length > 0){
+        localStorage.setItem(standardsKey, JSON.stringify(stdRow.data));
+        if(document.getElementById('tab-standard')?.classList.contains('active')){ renderStandards(); renderStandardSelect(); }
       }
-      const reqs = await getRequestsAsync();
-      if(reqs && reqs.length >= 0){
-        localStorage.setItem('iloom_requests_v1', JSON.stringify(reqs));
-        if(document.getElementById('tab-request')?.classList.contains('active')) renderReqList();
+      const reqRow = settingRows.find(function(r){ return r.id==='req_items'; });
+      if(reqRow && Array.isArray(reqRow.data) && reqRow.data.length > 0){
+        localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(reqRow.data));
+        if(document.getElementById('tab-request')?.classList.contains('active')) renderReqItemCheckboxes();
       }
-      console.log('✅ 자동 동기화 완료');
-    } catch(e){ console.warn('자동 동기화 실패:', e); }
+    }
+
+    // 동기화 상태 표시
+    const dot = document.getElementById('syncDot');
+    const lbl = document.getElementById('syncLabel');
+    if(dot) dot.style.background='#22c55e';
+    if(lbl) lbl.textContent='동기화 완료 '+new Date().toLocaleTimeString();
+    console.log('✅ 전체 동기화 완료', new Date().toLocaleTimeString());
+  } catch(e){
+    const dot = document.getElementById('syncDot');
+    const lbl = document.getElementById('syncLabel');
+    if(dot) dot.style.background='#ef4444';
+    if(lbl) lbl.textContent='동기화 실패';
+    console.warn('동기화 실패:', e);
   }
+}
+
+// 10초마다 자동 동기화
+function startSyncTimer(){
+  if(_syncTimer) clearInterval(_syncTimer);
+  _syncTimer = setInterval(function(){ syncAllFromServer(false); }, 10000);
+}
+
+// 포커스 복귀 시 즉시 동기화 (모바일 앱 전환 등)
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible') syncAllFromServer(true);
 });
 
 function getReports() { return JSON.parse(localStorage.getItem(storeKey)||'[]'); }
