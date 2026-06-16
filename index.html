@@ -1423,6 +1423,7 @@ async function init(){
   await renderListAsync();
   // Supabase에서 공유 데이터 불러오기 (병합)
   loadSharedFromSupabase();
+  startAutoSave(); // 5초 자동저장 시작
   // 로컬 데이터를 Supabase에 업로드
   migrateLocalToSupabase();
   // 로그인 사용자 표시 + 관리자 탭 제어
@@ -1503,16 +1504,18 @@ function updateTopbar(tab){
   }
 }
 function markUnsaved(){
+  _hasUnsaved = true;
   const btn = document.getElementById('saveBtn');
   const status = document.getElementById('autoSaveStatus');
   if(btn){ btn.style.background='#e60012'; btn.style.color='#fff'; btn.style.borderColor='#e60012'; }
-  if(status) status.style.display='';
+  if(status){ status.style.display=''; status.textContent='● 저장 안됨 (5초 후 자동저장)'; }
 }
 function clearUnsaved(){
+  _hasUnsaved = false;
   const btn = document.getElementById('saveBtn');
   const status = document.getElementById('autoSaveStatus');
   if(btn){ btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
-  if(status) status.style.display='none';
+  if(status){ status.textContent='✅ 자동저장 완료'; status.style.display=''; setTimeout(function(){ status.style.display='none'; }, 2000); }
 }
 
 function bindInputs(){
@@ -3141,7 +3144,26 @@ async function saveReport(silent=false){
     alert('저장 중 오류: ' + e.message);
   }
 }
-function autoSave(){} // 자동저장 비활성화
+// ── 5초 자동저장 ──
+let _autoSaveTimer = null;
+let _hasUnsaved = false;
+
+function autoSave(){
+  // 변경사항 없으면 건너뜀
+  if(!_hasUnsaved) return;
+  // 현재 성적서 작성 탭이 활성화된 경우만
+  if(!document.getElementById('tab-write')?.classList.contains('active')) return;
+  // currentId 없으면 (새 성적서 빈칸) 건너뜀
+  const tbody = document.querySelector('#testTable tbody');
+  const hasTests = tbody && tbody.querySelectorAll('tr:not(.t-detail-row)').length > 0;
+  if(!hasTests) return;
+  saveReport(true); // silent=true (토스트 없이 저장)
+}
+
+function startAutoSave(){
+  if(_autoSaveTimer) clearInterval(_autoSaveTimer);
+  _autoSaveTimer = setInterval(autoSave, 5000);
+}
 function showSaveToast(){
   const existing = document.getElementById('saveToastModal');
   if(existing) existing.remove();
