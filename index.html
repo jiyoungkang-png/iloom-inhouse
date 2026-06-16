@@ -1749,7 +1749,7 @@ function newReport(){
   });
   const tbody=$('testTable').querySelector('tbody'); tbody.innerHTML='';
   // 시험 항목은 의뢰서에서 불러오거나 직접 추가
-  renderImage(); renderPreview();
+  renderDetailSection(); renderImage(); renderPreview();
 }
 function addTest(item){
   const tbody=$('testTable').querySelector('tbody'); const tr=document.createElement('tr');
