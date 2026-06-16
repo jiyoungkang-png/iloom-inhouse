@@ -2954,6 +2954,30 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
 
 async function saveAndPreviewRequest(){
   var v = function(id){ return (document.getElementById(id)||{}).value||''; };
+
+  // ── 필수 항목 검증 ──
+  var chk_kolas = document.getElementById('req_chk_kolas')?.checked||false;
+  var chk_internal = document.getElementById('req_chk_internal')?.checked||false;
+  var checkedItems = getCheckedReqItems();
+
+  var missing = [];
+  if(!chk_kolas && !chk_internal) missing.push('성적서 구분 (KOLAS 또는 내부 품질용)');
+  if(!v('req_company').trim()) missing.push('회사명');
+  if(!v('req_person').trim()) missing.push('의뢰자');
+  if(!v('req_hp').trim()) missing.push('핸드폰번호');
+  if(!v('req_email').trim()) missing.push('이메일');
+  if(!v('req_product').trim()) missing.push('시료명');
+  var hasMat = ['fabric','sponge','antibac','padding'].some(function(m){ return document.getElementById('req_mat_'+m)?.checked; });
+  if(!hasMat) missing.push('시료 체크 (원단/스펀지/항균/패딩)');
+  if(!v('req_brand').trim()) missing.push('브랜드');
+  if(!v('req_color').trim()) missing.push('색상');
+  if(!checkedItems.length) missing.push('의뢰 시험 항목 (1개 이상 선택)');
+
+  if(missing.length > 0){
+    alert('다음 항목을 입력해주세요:\n\n• ' + missing.join('\n• '));
+    return;
+  }
+
   var data = {
     no:v('req_no'), date:v('req_date'), company:v('req_company'),
     materials: ['fabric','sponge','antibac','padding'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
