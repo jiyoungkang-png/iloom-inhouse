@@ -1066,10 +1066,18 @@ function applyRequestToReport(req){
     matEl.dataset.materials = JSON.stringify(req.materials||[]);
   }
 
+  // 이미 같은 의뢰번호 성적서가 있으면 currentId 연결 (중복 방지)
+  const existingReport = getReports().find(function(r){ return r.receiptNo === (req.no||''); });
+  if(existingReport){
+    currentId = existingReport.id;
+    showToast('📋 기존 성적서 [' + req.no + '] 를 불러왔습니다. 저장 시 덮어씁니다.');
+  } else {
+    currentId = null; // 새 성적서
+    showToast('✅ 의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다.');
+  }
   markUnsaved();
   renderPreview();
   renderDetailSection();
-  showToast('✅ 의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다.');
 }
 
 async function showRequestPickerModal(callback){
@@ -1829,7 +1837,7 @@ function collectTests(){
     };
   });
 }
-function collectReport(){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); const me=document.getElementById('sampleMaterials'); data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[]; return data;}
+function collectReport(autoSaved){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); const me=document.getElementById('sampleMaterials'); data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[]; return data;}
 
 function renderImage(){const el=$('imagePreview'); if(!el) return; el.innerHTML=sampleImageData?`<img src="${sampleImageData}" style="max-width:100%;max-height:200px">`:'<span style="color:#aaa">이미지 없음</span>';}
 
@@ -2503,7 +2511,20 @@ function renderList(page){
     chk.style.cssText='width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0';
     chk.onclick = updateListActionBar;
     const info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
-    info.innerHTML='<div style="font-weight:800;font-size:14px">'+esc(r.receiptNo||'접수번호 없음')+'</div><div style="font-size:12px;color:#6b7280;margin-top:2px">'+esc(r.sampleName||'')+' · '+fmt(r.issuedDate)+'</div>';
+    // 저장 시각 포맷
+    function fmtSaved(s){
+      if(!s) return '저장시각 없음';
+      const d = new Date(s);
+      if(isNaN(d)) return s;
+      const pad = n => String(n).padStart(2,'0');
+      return d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+    }
+    const savedAt = r.savedAt || r.updated_at || '';
+    const savedStr = fmtSaved(savedAt);
+    const isAutoSave = r.autoSaved ? ' <span style="font-size:10px;background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 5px;font-weight:700">자동</span>' : '';
+    info.innerHTML='<div style="font-weight:800;font-size:14px">'+esc(r.receiptNo||'접수번호 없음')+'</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-top:2px">'+esc(r.sampleName||'')+' · '+fmt(r.issuedDate)+'</div>'
+      +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">🕐 '+savedStr+isAutoSave+'</div>';
     const btn=document.createElement('button'); btn.className='btn ghost'; btn.textContent='불러오기';
     btn.style.cssText='font-size:12px;padding:6px 14px;flex-shrink:0';
     btn.onclick=(e)=>{e.stopPropagation();loadReport(r);document.querySelector('.nav-btn[data-tab="write"]').click();};
@@ -3127,7 +3148,32 @@ async function saveReport(silent=false){
     }
   }
   try {
-    const r=collectReport();
+    // 의뢰번호로 기존 성적서 찾기 (중복 방지)
+    // currentId가 없을 때(새 성적서)만 체크
+    if(!currentId){
+      const receiptNo = val('receiptNo');
+      if(receiptNo){
+        // 로컬에서 먼저 확인
+        const localMatch = getReports().find(x => x.receiptNo === receiptNo);
+        if(localMatch){
+          if(!silent && !confirm('의뢰번호 ['+receiptNo+']의 성적서가 이미 있습니다.
+덮어쓰시겠습니까?')) return;
+          currentId = localMatch.id;
+        } else {
+          // Supabase에서도 확인
+          try {
+            const rows = await supaFetch('reports','GET');
+            const supaMatch = (rows||[]).find(x => x.data && x.data.receiptNo === receiptNo);
+            if(supaMatch){
+              if(!silent && !confirm('의뢰번호 ['+receiptNo+']의 성적서가 서버에 이미 있습니다.
+덮어쓰시겠습니까?')) return;
+              currentId = supaMatch.id;
+            }
+          } catch(e){}
+        }
+      }
+    }
+    const r=collectReport(silent);
     currentId=r.id;
     // Supabase에 저장
     await setReportAsync(r);
