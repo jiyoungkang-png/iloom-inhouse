@@ -1953,47 +1953,57 @@ function renderDetailSection(externalData){
     critWrap.appendChild(critEdit);
     sec.appendChild(critWrap);
 
-    // ── 수정/저장/취소 동작 ──
-    let _origName = nameEdit.value;
-    let _origCrit = critEdit.value;
+    // ── 수정/저장/취소 동작 (클로저로 각 항목 독립 보장) ──
+    (function(idx, _editBtn, _saveBtn, _cancelBtn, _nameWrap, _nameEdit, _critView, _critEdit, _sec, _titleEl, _t){
+      let origName = _nameEdit.value;
+      let origCrit = _critEdit.value;
 
-    function enterEditMode(){
-      editBtn.style.display='none'; saveBtn2.style.display=''; cancelBtn2.style.display='';
-      nameWrap.style.display=''; critView.style.display='none'; critEdit.style.display='';
-      sec.style.border='2px solid #2563eb'; sec.style.background='#f0f9ff';
-      nameEdit.focus();
-    }
-    function exitEditMode(){
-      editBtn.style.display=''; saveBtn2.style.display='none'; cancelBtn2.style.display='none';
-      nameWrap.style.display='none'; critView.style.display=''; critEdit.style.display='none';
-      sec.style.border='1px solid #e5e7eb'; sec.style.background='#fafbfc';
-    }
-
-    editBtn.onclick = enterEditMode;
-
-    saveBtn2.onclick = function(){
-      const newName = nameEdit.value;
-      const newCrit = critEdit.value;
-      // 제목 업데이트
-      titleEl.textContent = (i+1) + '. ' + (newName||'항목 '+(i+1)) + (t.spec ? '  ('+t.spec+')' : '');
-      // 기준 뷰 업데이트
-      critView.textContent = newCrit || '기준 없음';
-      // 시험항목 테이블 동기화
-      const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
-      if(trows[i]){
-        const ni = trows[i].querySelector('.t-name'); if(ni && newName) ni.value = newName;
-        const ci = trows[i].querySelector('.t-crit'); if(ci) ci.value = newCrit;
+      function doEnter(){
+        _editBtn.style.display='none';
+        _saveBtn.style.display='inline-block';
+        _cancelBtn.style.display='inline-block';
+        _nameWrap.style.display='block';
+        _critView.style.display='none';
+        _critEdit.style.display='block';
+        _sec.style.border='2px solid #2563eb';
+        _sec.style.background='#f0f9ff';
+        _nameEdit.focus();
       }
-      _origName = newName; _origCrit = newCrit;
-      exitEditMode();
-      saveReport(true);
-      showToast('✅ 저장되었습니다.');
-    };
+      function doExit(){
+        _editBtn.style.display='inline-block';
+        _saveBtn.style.display='none';
+        _cancelBtn.style.display='none';
+        _nameWrap.style.display='none';
+        _critView.style.display='block';
+        _critEdit.style.display='none';
+        _sec.style.border='1px solid #e5e7eb';
+        _sec.style.background='#fafbfc';
+      }
 
-    cancelBtn2.onclick = function(){
-      nameEdit.value = _origName; critEdit.value = _origCrit;
-      exitEditMode();
-    };
+      _editBtn.onclick = doEnter;
+
+      _saveBtn.onclick = function(){
+        const newName = _nameEdit.value;
+        const newCrit = _critEdit.value;
+        _titleEl.textContent = (idx+1) + '. ' + (newName||'항목 '+(idx+1)) + (_t.spec ? '  ('+_t.spec+')' : '');
+        _critView.textContent = newCrit || '기준 없음';
+        const trows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
+        if(trows[idx]){
+          const ni = trows[idx].querySelector('.t-name'); if(ni && newName) ni.value = newName;
+          const ci = trows[idx].querySelector('.t-crit'); if(ci) ci.value = newCrit;
+        }
+        origName = newName; origCrit = newCrit;
+        doExit();
+        saveReport(true);
+        showToast('✅ 저장되었습니다.');
+      };
+
+      _cancelBtn.onclick = function(){
+        _nameEdit.value = origName;
+        _critEdit.value = origCrit;
+        doExit();
+      };
+    })(i, editBtn, saveBtn2, cancelBtn2, nameWrap, nameEdit, critView, critEdit, sec, titleEl, t);
 
     const name = (t.name||'').toLowerCase();
     const cat  = (t.category||'').toLowerCase();
@@ -2077,7 +2087,7 @@ function renderDetailSection(externalData){
       const inp2 = document.createElement('input'); inp2.type='text'; inp2.dataset.key='cs_pct_'+i; inp2.placeholder='자동계산'; inp2.value=saved['cs_pct_'+i]||''; inp2.readOnly=true; inp2.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
       function calcCs(){ const t0=parseFloat(inp0.value||''); const t1=parseFloat(inp1.value||''); if(!isNaN(t0)&&!isNaN(t1)&&t0!==0) inp2.value=((t0-t1)/t0*100).toFixed(2)+'%'; else inp2.value=''; renderPreview(); }
       inp0.addEventListener('input',calcCs); inp1.addEventListener('input',calcCs);
-      function makeRow(label,inp,crit){ const tr=document.createElement('tr'); const ta=document.createElement('td'); ta.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;font-weight:700'; ta.textContent=label; const tb=document.createElement('td'); tb.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center'; if(inp.tagName==='SELECT'||inp.tagName==='INPUT') inp.style.width='100%'; tb.appendChild(inp); const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; tc.textContent=crit||''; tr.appendChild(ta); tr.appendChild(tb); tr.appendChild(tc); return tr; }
+      function makeRow(label,inp,crit){ const tr=document.createElement('tr'); const ta=document.createElement('td'); ta.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;font-weight:700'; ta.textContent=label; const tb=document.createElement('td'); tb.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center'; if(inp.tagName==='SELECT'){ inp.style.width='100%'; inp.style.textAlign='center'; inp.style.textAlignLast='center'; } else if(inp.tagName==='INPUT'){ inp.style.width='100%'; inp.style.textAlign='center'; } tb.appendChild(inp); const tc=document.createElement('td'); tc.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555'; tc.textContent=crit||''; tr.appendChild(ta); tr.appendChild(tb); tr.appendChild(tc); return tr; }
       tbody.appendChild(makeRow('시험 전 두께 (t₀)',inp0,'mm'));
       tbody.appendChild(makeRow('시험 후 두께 (t₁)',inp1,'mm'));
       tbody.appendChild(makeRow('영구압축 줄음률',inp2,'%'));
