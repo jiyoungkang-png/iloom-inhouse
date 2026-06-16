@@ -3868,7 +3868,7 @@ async function syncAllFromServer(force){
 // 10초마다 자동 동기화
 function startSyncTimer(){
   if(_syncTimer) clearInterval(_syncTimer);
-  _syncTimer = setInterval(function(){ syncAllFromServer(false); }, 10000);
+  _syncTimer = setInterval(function(){ syncAllFromServer(false); }, 30000);
 }
 
 // 포커스 복귀 시 즉시 동기화 (모바일 앱 전환 등)
