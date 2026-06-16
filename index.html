@@ -1545,7 +1545,7 @@ function bindInputs(){
     const tests=r.tests||[];
     const det=r.detailData||{};
     const ksrc=document.getElementById('kolas-logo-src')?.src||'';
-    const showKolas=r.chk_kolas||false;
+    const showKolas=(r.purpose||'').trim()==='KOLAS용';
     const ml={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'};
     const mt=(r.materials&&r.materials.length)?' ['+r.materials.map(m=>ml[m]||m).join(', ')+']':'';
     let blocks='';
