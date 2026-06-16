@@ -1748,6 +1748,9 @@ function newReport(){
     else setVal(id, base[id]||'');
   });
   const tbody=$('testTable').querySelector('tbody'); tbody.innerHTML='';
+  // 세부데이터 섹션 강제 초기화
+  const dBox = document.getElementById('detailDataSection'); if(dBox) dBox.innerHTML='';
+  const dCard = document.getElementById('detailDataCard'); if(dCard) dCard.style.display='none';
   // 시험 항목은 의뢰서에서 불러오거나 직접 추가
   renderDetailSection(); renderImage(); renderPreview();
 }
