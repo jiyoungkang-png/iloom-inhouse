@@ -2806,11 +2806,20 @@ function initRequestTab(){
   }
   const dateEl = document.getElementById('req_date');
   if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
-  // 의뢰서 정보 항상 빈칸으로
-  ['company','person','hp','email','dept','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
-    const el = document.getElementById('req_'+k); if(el) el.value = '';
+  // 의뢰서 정보 항상 빈칸으로 (단, 이미 작성 중이면 건드리지 않음)
+  const isWriting = ['req_product','req_person','req_company'].some(function(k){
+    const el = document.getElementById(k); return el && el.value.trim();
   });
-  renderReqItemCheckboxes();
+  if(!isWriting){
+    ['company','person','hp','email','dept','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
+      const el = document.getElementById('req_'+k); if(el) el.value = '';
+    });
+  }
+  // 체크박스가 이미 렌더링돼 있으면 재렌더링 안 함 (체크 날림 방지)
+  const checkboxContainer = document.getElementById('req_items_checkboxes');
+  if(!checkboxContainer || !checkboxContainer.children.length){
+    renderReqItemCheckboxes();
+  }
   renderReqListAsync(); // Supabase에서 불러오기
 
   const selectAll = document.getElementById('reqSelectAll');
@@ -3763,7 +3772,7 @@ async function syncAllFromServer(force){
     const reqs = await getRequestsAsync();
     if(reqs && reqs.length >= 0){
       localStorage.setItem('iloom_requests_v1', JSON.stringify(reqs));
-      if(document.getElementById('tab-request')?.classList.contains('active')) renderReqList();
+      // 의뢰서 탭 작성 중일 수 있으므로 자동 렌더링 안 함
     }
 
     // 3. 계정
@@ -3783,7 +3792,7 @@ async function syncAllFromServer(force){
       const reqRow = settingRows.find(function(r){ return r.id==='req_items'; });
       if(reqRow && Array.isArray(reqRow.data) && reqRow.data.length > 0){
         localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(reqRow.data));
-        if(document.getElementById('tab-request')?.classList.contains('active')) renderReqItemCheckboxes();
+        // 의뢰서 탭에서 작성 중일 수 있으므로 체크박스 재렌더링 안 함 (체크 날림 방지)
       }
     }
 
