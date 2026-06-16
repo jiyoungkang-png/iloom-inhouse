@@ -1797,9 +1797,14 @@ function addTest(item){
   tr.querySelector('.icon-btn').onclick=()=>{tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();};
   renumber();
   renderPreview();
-  // 로딩 중이 아닐 때만 세부데이터 즉시 갱신 (규격 추가 시 자동으로 착착 표시)
+  // 로딩 중이 아닐 때만 세부데이터 갱신
+  // debounce: 여러 항목 연속 추가 시 마지막에 한 번만 실행
   if(!window._loadingReport){
-    renderDetailSection();
+    if(window._detailRenderTimer) clearTimeout(window._detailRenderTimer);
+    window._detailRenderTimer = setTimeout(function(){
+      renderDetailSection();
+      window._detailRenderTimer = null;
+    }, 50);
   }
   markUnsaved();
 }
