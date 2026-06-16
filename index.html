@@ -984,8 +984,28 @@ async function importFromRequest(){
   }, reqList);
 }
 
-function applyRequestToReport(req){
-  // items가 객체 배열이면 그대로, 문자열 배열이면 파싱, 문자열이면 줄 분리
+async function applyRequestToReport(req){
+  // ── 1. 기존 성적서가 있으면 loadReport로 완전 복원 ──
+  let existingReport = getReports().find(function(r){ return r.receiptNo === (req.no||''); });
+  if(!existingReport){
+    // Supabase에서도 확인
+    try {
+      const rows = await supaFetch('reports','GET');
+      const supaMatch = (rows||[]).find(function(x){ return x.data && x.data.receiptNo === req.no; });
+      if(supaMatch && supaMatch.data) existingReport = supaMatch.data;
+    } catch(e){}
+  }
+  if(existingReport){
+    await loadReport(existingReport);
+    showToast('📋 기존 성적서 [' + req.no + '] 를 불러왔습니다.');
+    return;
+  }
+
+  // ── 2. 새 성적서 — 의뢰서 정보로 채우기 ──
+  currentId = null;
+  _hasUnsaved = false;
+
+  // 시험 항목 채우기
   let itemList = [];
   if(Array.isArray(req.items)){
     itemList = req.items;
@@ -993,85 +1013,65 @@ function applyRequestToReport(req){
     itemList = req.items.split('\n').filter(function(l){return l.trim();});
   }
 
-  // 시험 항목 채우기 (없어도 기본 정보는 채움)
   if(itemList.length > 0){
     const tbody = document.querySelector('#testTable tbody');
     if(tbody && tbody.children.length > 0){
       if(!confirm('기존 시험 항목을 모두 지우고 의뢰서 항목으로 교체할까요?')) return;
     }
     if(tbody) tbody.innerHTML = '';
-
+    window._loadingReport = true;
     const stdLib = getStandards();
     itemList.forEach(function(item){
       var name, specFromItem;
-      // 객체인 경우 (신규 형식)
       if(typeof item === 'object' && item !== null){
         name = item.label || '';
         specFromItem = item.spec || '';
       } else {
-        // 문자열인 경우 (구형식: "항목명 - 규격")
         const parts = String(item).split(' - ');
         name = parts[0].trim();
         specFromItem = parts.slice(1).join(' - ').trim();
       }
       const stdMatch = stdLib.find(function(s){ return s.name === name; }) || {};
-      const spec = specFromItem || stdMatch.spec || '';
-      const crit = stdMatch.crit || '';
-      const category = stdMatch.category || '물성시험';
-      addTest({name:name, spec:spec, crit:crit, result:'', category:category});
+      addTest({name:name, spec:specFromItem||stdMatch.spec||'', crit:stdMatch.crit||'', result:'', category:stdMatch.category||'물성시험'});
     });
+    window._loadingReport = false;
+    renderDetailSection();
   }
-  const items = itemList; // alert용
 
-  // 기본 정보 전부 덮어쓰기 (항목 없어도 무조건 채움)
+  // 기본 정보 채우기
   setVal('receiptNo',    req.no      || '');
-  // 의뢰번호가 바뀌면 currentId 초기화 → saveReport에서 새로 매칭
-  currentId = null;
   setVal('receivedDate', req.date    || '');
   setVal('requestDept',  req.person  || req.dept || '');
   setVal('sampleName',   req.product || '');
   setVal('brand',        req.brand   || '');
   setVal('colorInfo',    req.color   || '');
-  // KOLAS/내부 체크박스 → 성적서 용도 자동 설정
+
+  // 용도 자동 설정
   var purposeEl = document.getElementById('purpose');
   if(purposeEl){
     if(req.chk_kolas) purposeEl.value = 'KOLAS용';
     else if(req.chk_internal) purposeEl.value = '내부 품질 관리용';
   }
-  // 재질 체크박스 복원 (의뢰서 탭)
+
+  // 재질 체크박스
   ['fabric','sponge','antibac','padding'].forEach(function(m){
-    const el = document.getElementById('req_mat_'+m);
-    if(el) el.checked = false;
+    const el = document.getElementById('req_mat_'+m); if(el) el.checked = false;
   });
   if(Array.isArray(req.materials)){
     req.materials.forEach(function(m){
-      const el = document.getElementById('req_mat_'+m);
-      if(el) el.checked = true;
+      const el = document.getElementById('req_mat_'+m); if(el) el.checked = true;
     });
   }
-  // 성적서 탭 시료명 옆 재질 표시
   const matEl = document.getElementById('sampleMaterials');
   if(matEl){
     const matMap = {fabric:'원단', sponge:'스펀지', antibac:'항균', padding:'패딩'};
-    const matText = Array.isArray(req.materials) && req.materials.length
-      ? '[' + req.materials.map(function(m){ return matMap[m]||m; }).join(', ') + ']'
-      : '';
-    matEl.textContent = matText;
+    matEl.textContent = Array.isArray(req.materials) && req.materials.length
+      ? '[' + req.materials.map(function(m){ return matMap[m]||m; }).join(', ') + ']' : '';
     matEl.dataset.materials = JSON.stringify(req.materials||[]);
   }
 
-  // 이미 같은 의뢰번호 성적서가 있으면 currentId 연결 (중복 방지)
-  const existingReport = getReports().find(function(r){ return r.receiptNo === (req.no||''); });
-  if(existingReport){
-    currentId = existingReport.id;
-    showToast('📋 기존 성적서 [' + req.no + '] 를 불러왔습니다. 저장 시 덮어씁니다.');
-  } else {
-    currentId = null; // 새 성적서
-    showToast('✅ 의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다.');
-  }
-  markUnsaved();
   renderPreview();
-  renderDetailSection();
+  showToast('✅ 의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다. 작성 후 저장하세요.');
 }
 
 async function showRequestPickerModal(callback){
