@@ -444,7 +444,7 @@ button,input,select{font:inherit}
             <div class="form-grid">
               <label>의뢰번호
                 <div style="display:flex;gap:6px;align-items:center">
-                  <input id="receiptNo" placeholder="의뢰번호 입력 (예: IM_2026001)" style="flex:1" onblur="autoImportFromRequest(this.value)">
+                  <input id="receiptNo" placeholder="의뢰서 불러오기로 자동 입력됩니다" style="flex:1;background:#f5f5f5;color:#555;cursor:default" readonly>
                   <button type="button" onclick="importFromRequest()" style="background:#e60012;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap">📋 의뢰서 불러오기</button>
                 </div>
               </label>
@@ -1039,6 +1039,8 @@ function applyRequestToReport(req){
 
   // 기본 정보 전부 덮어쓰기 (항목 없어도 무조건 채움)
   setVal('receiptNo',    req.no      || '');
+  // 의뢰번호가 바뀌면 currentId 초기화 → saveReport에서 새로 매칭
+  currentId = null;
   setVal('receivedDate', req.date    || '');
   setVal('requestDept',  req.person  || req.dept || '');
   setVal('sampleName',   req.product || '');
@@ -1837,7 +1839,16 @@ function collectTests(){
     };
   });
 }
-function collectReport(autoSaved){const data={id:currentId||crypto.randomUUID(),savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,tests:collectTests(),detailData:getDetailData()}; fields.forEach(id=>data[id]=val(id)); const me=document.getElementById('sampleMaterials'); data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[]; return data;}
+function collectReport(autoSaved){
+  // ID 우선순위: currentId > receiptNo > 새 UUID
+  const receiptNo = val('receiptNo');
+  const id = currentId || (receiptNo ? receiptNo : crypto.randomUUID());
+  const data={id:id,savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,tests:collectTests(),detailData:getDetailData()};
+  fields.forEach(function(fid){data[fid]=val(fid);});
+  const me=document.getElementById('sampleMaterials');
+  data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[];
+  return data;
+}
 
 function renderImage(){const el=$('imagePreview'); if(!el) return; el.innerHTML=sampleImageData?`<img src="${sampleImageData}" style="max-width:100%;max-height:200px">`:'<span style="color:#aaa">이미지 없음</span>';}
 
@@ -3137,8 +3148,32 @@ async function loadReport(r){
   const matEl3=document.getElementById('sampleMaterials'); if(matEl3){ const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'}; matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':''; matEl3.dataset.materials=JSON.stringify(r.materials||[]); } $('testTable').querySelector('tbody').innerHTML=''; window._loadingReport=true; (r.tests||[]).forEach(addTest); window._loadingReport=false; renderImage(); renderDetailSection(r.detailData); setTimeout(function(){ renderPreview(); }, 100); document.querySelector('[data-tab="write"]').click();
 }
 async function saveReport(silent=false){
+  const receiptNo = val('receiptNo');
+
+  // ── 의뢰번호 기준으로 항상 같은 ID 고정 ──
+  // 1) currentId가 없으면 → receiptNo로 기존 성적서 ID 찾기
+  if(!currentId && receiptNo){
+    // 로컬에서 먼저
+    const localMatch = getReports().find(x => x.receiptNo === receiptNo);
+    if(localMatch){
+      currentId = localMatch.id;
+    } else {
+      // Supabase에서 확인
+      try {
+        const rows = await supaFetch('reports','GET');
+        const supaMatch = (rows||[]).find(x => x.data && x.data.receiptNo === receiptNo);
+        if(supaMatch) currentId = supaMatch.id;
+      } catch(e){}
+    }
+  }
+
+  // 2) 그래도 currentId 없으면 receiptNo를 ID로 사용 (완전 신규)
+  if(!currentId && receiptNo){
+    currentId = receiptNo;
+  }
+
+  // 권한 체크
   if(!isAdmin()){
-    // 비관리자는 본인이 작성한 성적서만 저장 가능 (새 성적서는 허용)
     const existing = getReports().find(x=>x.id===currentId);
     if(existing){
       const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
@@ -3147,40 +3182,16 @@ async function saveReport(silent=false){
       }
     }
   }
+
   try {
-    // 의뢰번호로 기존 성적서 찾기 (중복 방지)
-    // currentId가 없을 때(새 성적서)만 체크
-    if(!currentId){
-      const receiptNo = val('receiptNo');
-      if(receiptNo){
-        // 로컬에서 먼저 확인
-        const localMatch = getReports().find(x => x.receiptNo === receiptNo);
-        if(localMatch){
-          if(!silent && !confirm('의뢰번호 ['+receiptNo+']의 성적서가 이미 있습니다.
-덮어쓰시겠습니까?')) return;
-          currentId = localMatch.id;
-        } else {
-          // Supabase에서도 확인
-          try {
-            const rows = await supaFetch('reports','GET');
-            const supaMatch = (rows||[]).find(x => x.data && x.data.receiptNo === receiptNo);
-            if(supaMatch){
-              if(!silent && !confirm('의뢰번호 ['+receiptNo+']의 성적서가 서버에 이미 있습니다.
-덮어쓰시겠습니까?')) return;
-              currentId = supaMatch.id;
-            }
-          } catch(e){}
-        }
-      }
-    }
-    const r=collectReport(silent);
-    currentId=r.id;
-    // Supabase에 저장
+    const r = collectReport(silent);
+    currentId = r.id;
+    // Supabase에 저장 (같은 id면 항상 UPDATE)
     await setReportAsync(r);
-    // 로컬 캐시도 업데이트
-    const list=getReports();
-    const idx=list.findIndex(x=>x.id===r.id);
-    if(idx>=0) list[idx]=r; else list.unshift(r);
+    // 로컬 캐시 업데이트
+    const list = getReports();
+    const idx = list.findIndex(x => x.id === r.id);
+    if(idx >= 0) list[idx] = r; else list.unshift(r);
     setReports(list);
     await renderListAsync();
     clearUnsaved();
