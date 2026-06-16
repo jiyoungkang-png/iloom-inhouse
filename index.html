@@ -1518,7 +1518,7 @@ function clearUnsaved(){
   const btn = document.getElementById('saveBtn');
   const status = document.getElementById('autoSaveStatus');
   if(btn){ btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
-  if(status){ status.textContent='✅ 자동저장 완료'; status.style.display=''; setTimeout(function(){ status.style.display='none'; }, 2000); }
+  if(status){ status.textContent='✅ 저장 완료'; status.style.display=''; setTimeout(function(){ status.style.display='none'; }, 2000); }
 }
 
 function bindInputs(){
@@ -1534,6 +1534,11 @@ function bindInputs(){
   $('newBtn').onclick=newReport; $('saveBtn').onclick=()=>saveReport(false); $('deleteBtn').onclick=deleteCurrent;
   $('printBtn').onclick=()=>{
     const r=collectReport();
+    // 의뢰번호 없으면 출력 불가
+    if(!r.receiptNo || !r.receiptNo.trim()){
+      alert('의뢰서 번호가 없습니다.\n의뢰서를 먼저 불러온 후 출력해주세요.');
+      return;
+    }
     const e2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const f2=s=>s?String(s).replace(/-/g,'.') :'';
     const tests=r.tests||[];
