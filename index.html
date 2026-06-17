@@ -366,6 +366,7 @@ button,input,select{font:inherit}
                   </label>
                   <label style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:#374151;cursor:pointer;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:6px 12px">
                     <input type="checkbox" id="req_mat_padding" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer"> 패딩
+                    <input type="checkbox" id="req_mat_mattress" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer;margin-left:8px"> 매트리스
                   </label>
                 </div>
               </div>
@@ -1053,7 +1054,7 @@ async function applyRequestToReport(req){
   }
 
   // 재질 체크박스
-  ['fabric','sponge','antibac','padding'].forEach(function(m){
+  ['fabric','sponge','antibac','padding','mattress'].forEach(function(m){
     const el = document.getElementById('req_mat_'+m); if(el) el.checked = false;
   });
   if(Array.isArray(req.materials)){
@@ -1063,7 +1064,7 @@ async function applyRequestToReport(req){
   }
   const matEl = document.getElementById('sampleMaterials');
   if(matEl){
-    const matMap = {fabric:'원단', sponge:'스펀지', antibac:'항균', padding:'패딩'};
+    const matMap = {fabric:'원단', sponge:'스펀지', antibac:'항균', padding:'패딩', mattress:'매트리스'};
     matEl.textContent = Array.isArray(req.materials) && req.materials.length
       ? '[' + req.materials.map(function(m){ return matMap[m]||m; }).join(', ') + ']' : '';
     matEl.dataset.materials = JSON.stringify(req.materials||[]);
@@ -1554,7 +1555,7 @@ function bindInputs(){
     const det=r.detailData||{};
     const ksrc=document.getElementById('kolas-logo-src')?.src||'';
     const showKolas=(r.purpose||'').trim()==='KOLAS용';
-    const ml={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'};
+    const ml={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩',mattress:'매트리스'};
     const mt=(r.materials&&r.materials.length)?' ['+r.materials.map(m=>ml[m]||m).join(', ')+']':'';
     let blocks='';
     tests.forEach(function(t,i){
@@ -2209,7 +2210,7 @@ function renderPreview(){
     $('reportPreview').innerHTML=`
     <section class="page page-1">
       <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
-      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
+      <table class="meta-table"><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩",mattress:"매트리스"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr></table>
       <div class="red-title">■ 의뢰 시험 항목</div>
       <table class="report-table"><thead><tr><th style="width:8%">No.</th><th>시험 항목 (Test Item)</th><th style="width:35%">시험 규격</th></tr></thead>
         <tbody>${tests.length ? tests.map((t,i)=>'<tr><td>'+(i+1)+'</td><td class="left bold">'+esc(t.name||'')+'</td><td class="left">'+esc(t.spec||'')+'</td></tr>').join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>
@@ -2691,7 +2692,7 @@ function previewRequestOnly(){
   var v = function(id){ return (document.getElementById(id)||{}).value||''; };
   var data = {
     no:v('req_no'), date:v('req_date'), company:v('req_company'),
-    materials: ['fabric','sponge','antibac','padding'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
+    materials: ['fabric','sponge','antibac','padding','mattress'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
     person:v('req_person'), dept:v('req_dept'), hp:v('req_hp'), email:v('req_email'),
     product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
     style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
@@ -2798,7 +2799,7 @@ function renderReqList(){
           var iEl = document.getElementById('req_chk_internal'); if(iEl) iEl.checked = r.chk_internal;
         }
         // 재질 체크박스 복원
-        ['fabric','sponge','antibac','padding'].forEach(function(m){
+        ['fabric','sponge','antibac','padding','mattress'].forEach(function(m){
           var el = document.getElementById('req_mat_'+m); if(el) el.checked = false;
         });
         if(Array.isArray(r.materials)){
@@ -2948,7 +2949,7 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
     +'<tr><th '+th+'>색 상</th><td '+td+'>'+data.color+'</td>'
     +'<th '+th+'>브 랜 드</th><td '+td+'>'+data.brand+'</td></tr>'
-    +'<tr><th '+th+'>시 료 명</th><td '+td+' colspan="3" style="font-weight:700">'+data.product+(data.materials&&data.materials.length?' <span style="font-weight:900;color:#e60012;font-size:11px">['+data.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩"}[m]||m;}).join(", ")+']</span>':'')+'</td></tr>'
+    +'<tr><th '+th+'>시 료 명</th><td '+td+' colspan="3" style="font-weight:700">'+data.product+(data.materials&&data.materials.length?' <span style="font-weight:900;color:#e60012;font-size:11px">['+data.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩",mattress:"매트리스"}[m]||m;}).join(", ")+']</span>':'')+'</td></tr>'
     
     +'</table>'
     +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px;letter-spacing:.3px">■ 의뢰 시험 항목</div>'
@@ -2998,8 +2999,8 @@ async function saveAndPreviewRequest(){
   if(!v('req_hp').trim()) missing.push('핸드폰번호');
   if(!v('req_email').trim()) missing.push('이메일');
   if(!v('req_product').trim()) missing.push('시료명');
-  var hasMat = ['fabric','sponge','antibac','padding'].some(function(m){ return document.getElementById('req_mat_'+m)?.checked; });
-  if(!hasMat) missing.push('시료 체크 (원단/스펀지/항균/패딩)');
+  var hasMat = ['fabric','sponge','antibac','padding','mattress'].some(function(m){ return document.getElementById('req_mat_'+m)?.checked; });
+  if(!hasMat) missing.push('시료 체크 (원단/스펀지/항균/패딩/매트리스)');
   if(!v('req_brand').trim()) missing.push('브랜드');
   if(!v('req_color').trim()) missing.push('색상');
   if(!checkedItems.length) missing.push('의뢰 시험 항목 (1개 이상 선택)');
@@ -3011,7 +3012,7 @@ async function saveAndPreviewRequest(){
 
   var data = {
     no:v('req_no'), date:v('req_date'), company:v('req_company'),
-    materials: ['fabric','sponge','antibac','padding'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
+    materials: ['fabric','sponge','antibac','padding','mattress'].filter(function(m){ return document.getElementById('req_mat_'+m)?.checked; }),
     person:v('req_person'), dept:v('req_dept'), hp:v('req_hp'), email:v('req_email'),
     product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
     style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
@@ -3068,7 +3069,7 @@ function clearRequest(){
   const nameEl2=document.getElementById('req_items_custom_name'); if(nameEl2) nameEl2.value='';
   const specEl2=document.getElementById('req_items_custom_spec'); if(specEl2) specEl2.value='';
   // 재질 체크박스 초기화
-  ['req_mat_fabric','req_mat_sponge','req_mat_antibac','req_mat_padding'].forEach(function(id){ const el=document.getElementById(id); if(el) el.checked=false; });
+  ['req_mat_fabric','req_mat_sponge','req_mat_antibac','req_mat_padding','req_mat_mattress'].forEach(function(id){ const el=document.getElementById(id); if(el) el.checked=false; });
   // KOLAS/내부 체크박스 초기화
   ['req_chk_kolas','req_chk_internal'].forEach(function(id){ const el=document.getElementById(id); if(el) el.checked=false; });
   // 시험항목 체크박스 초기화
@@ -3142,7 +3143,7 @@ async function loadReport(r){
   // 재질 표시
   const matEl3=document.getElementById('sampleMaterials');
   if(matEl3){
-    const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩'};
+    const matMap={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩',mattress:'매트리스'};
     matEl3.textContent=Array.isArray(r.materials)&&r.materials.length?'['+r.materials.map(function(m){return matMap[m]||m;}).join(', ')+']':'';
     matEl3.dataset.materials=JSON.stringify(r.materials||[]);
   }
