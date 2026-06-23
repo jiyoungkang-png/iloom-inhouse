@@ -3446,13 +3446,22 @@ function renderAccounts(){
       editBtn.onclick = (function(a, row, nameCell, roleCell){
         return function(){
           // 인라인 편집 모드 전환
+          const origId   = a.id||'';
           const origName = a.name||'';
           const origRole = a.role||'의뢰자';
-          nameCell.innerHTML = '';
-          roleCell.innerHTML = '';
+          const isProtected = (a.id === ADMIN_ID);
+          tdId.innerHTML = ''; nameCell.innerHTML = ''; roleCell.innerHTML = '';
+
+          const idInp = document.createElement('input');
+          idInp.value = origId;
+          idInp.disabled = isProtected;
+          idInp.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:12px;width:100px;outline:none'+(isProtected?';background:#f3f4f6;color:#9ca3af':'');
+          tdId.appendChild(idInp);
+
           const nameInp = document.createElement('input');
           nameInp.value = origName;
           nameInp.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:12px;width:80px;outline:none';
+
           const rolesSel = document.createElement('select');
           rolesSel.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:4px 6px;font-size:12px;outline:none;background:#fff';
           ['의뢰자','시험원','관리자'].forEach(function(r){
@@ -3469,18 +3478,25 @@ function renderAccounts(){
           saveBtn.textContent='저장';
           saveBtn.style.cssText='background:#e60012;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap;margin-right:4px';
           saveBtn.onclick = async function(){
+            var newId   = idInp.value.trim();
             var newName = nameInp.value.trim();
             var newRole = rolesSel.value;
+            if(!newId){ alert('아이디를 입력하세요.'); return; }
+            var list2 = getAccounts();
+            // ID 중복 체크 (본인 제외)
+            if(newId !== origId && list2.some(function(x){ return x.id===newId; })){
+              alert('"'+newId+'" 아이디가 이미 존재합니다.'); return;
+            }
             var newPwRaw = '';
-            var changePw = confirm('"'+a.id+'" 비밀번호도 변경하시겠습니까?\n(아니오 선택 시 기존 비밀번호 유지)');
+            var changePw = confirm('"'+origId+'" 비밀번호도 변경하시겠습니까?\n(아니오 선택 시 기존 비밀번호 유지)');
             if(changePw){
               newPwRaw = prompt('새 비밀번호를 입력하세요 (4자 이상):', '');
               if(newPwRaw===null) return;
               if(newPwRaw.length < 4){ alert('비밀번호는 4자 이상이어야 합니다.'); return; }
             }
-            var list2 = getAccounts();
-            var idx = list2.findIndex(function(x){ return x.id===a.id; });
+            var idx = list2.findIndex(function(x){ return x.id===origId; });
             if(idx > -1){
+              list2[idx].id   = newId;
               list2[idx].name = newName;
               list2[idx].role = newRole;
               if(newPwRaw) list2[idx].pw = await hashPassword(newPwRaw);
