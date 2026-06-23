@@ -269,12 +269,12 @@ button,input,select{font:inherit}
           <span id="syncDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#facc15;flex-shrink:0" title="동기화 중..."></span>
           <span style="font-size:11px;color:#aab2c0" id="syncLabel">동기화 중...</span>
         </div>
-        <button class="nav-btn active" data-tab="request">의뢰서 작성</button>
-        <button class="nav-btn" data-tab="write">성적서 작성</button>
-        <button class="nav-btn" data-tab="list">성적서 조회</button>
-        <button class="nav-btn" data-tab="standard">시험 규격 관리</button>
-        <button class="nav-btn" data-tab="setting">회사/결재 설정</button>
-        <button class="nav-btn" data-tab="admin" id="adminNavBtn">관리자 등록</button>
+        <button class="nav-btn active" data-tab="request"><span class="nav-icon">📋</span> 의뢰서 작성</button>
+        <button class="nav-btn" data-tab="write"><span class="nav-icon">📝</span> 성적서 작성</button>
+        <button class="nav-btn" data-tab="list"><span class="nav-icon">🔍</span> 성적서 조회</button>
+        <button class="nav-btn" data-tab="standard"><span class="nav-icon">📐</span> 시험 규격 관리</button>
+        <button class="nav-btn" data-tab="setting"><span class="nav-icon">⚙️</span> 회사/결재 설정</button>
+        <button class="nav-btn" data-tab="admin" id="adminNavBtn"><span class="nav-icon">🔑</span> 관리자 등록</button>
       </nav>
 
       <div class="side-card">
@@ -1451,7 +1451,7 @@ async function init(){
     const el = document.getElementById('sidebarUsername');
     if(el && u.id){
       const isAdmin = u.role==='관리자' || u.id===ADMIN_ID;
-      const crown = isAdmin ? '<span title="관리자" style="margin-right:5px;font-size:11px;background:#e60012;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700">관리자</span>' : '';
+      const crown = isAdmin ? '<span title="관리자" style="margin-right:5px;font-size:15px" aria-label="관리자">👑</span>' : '';
       const nameText = u.name ? u.name+' ('+u.id+')' : u.id;
       el.innerHTML = crown + nameText;
     }
