@@ -658,7 +658,7 @@ button,input,select{font:inherit}
                 <th style="padding:11px 13px;text-align:center;width:40px"><input type="checkbox" id="adminSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer"></th>
                 <th style="padding:11px 13px;text-align:left;font-weight:700">아이디</th>
                 <th style="padding:11px 13px;text-align:left;font-weight:700">이름</th>
-                <th style="padding:11px 13px;text-align:left;font-weight:700">그룹</th><th style="padding:11px 13px;text-align:center;font-weight:700">비밀번호</th>
+                <th style="padding:11px 13px;text-align:left;font-weight:700">그룹</th><th style="padding:11px 13px;text-align:center;font-weight:700">수정</th><th style="padding:11px 13px;text-align:center;font-weight:700">비밀번호</th>
               </tr>
             </thead>
             <tbody id="adminRegTableBody"></tbody>
@@ -3438,6 +3438,66 @@ function renderAccounts(){
       span.style.cssText='border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;background:'+(roleColors[acc.role]||'#f3f4f6')+';color:'+(roleTextColors[acc.role]||'#374151');
       span.textContent=acc.role||'-'; tdRole.appendChild(span);
 
+      // 수정 버튼
+      const tdEdit = document.createElement('td'); tdEdit.style.cssText='padding:10px 12px;text-align:center';
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '수정';
+      editBtn.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;color:#16a34a;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap';
+      editBtn.onclick = (function(a, row, nameCell, roleCell){
+        return function(){
+          // 인라인 편집 모드 전환
+          const origName = a.name||'';
+          const origRole = a.role||'의뢰자';
+          nameCell.innerHTML = '';
+          roleCell.innerHTML = '';
+          const nameInp = document.createElement('input');
+          nameInp.value = origName;
+          nameInp.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:12px;width:80px;outline:none';
+          const rolesSel = document.createElement('select');
+          rolesSel.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:4px 6px;font-size:12px;outline:none;background:#fff';
+          ['의뢰자','시험원','관리자'].forEach(function(r){
+            var op = document.createElement('option'); op.value=r; op.textContent=r;
+            if(r===origRole) op.selected=true;
+            rolesSel.appendChild(op);
+          });
+          nameCell.appendChild(nameInp);
+          roleCell.appendChild(rolesSel);
+
+          // 저장/취소 버튼
+          tdEdit.innerHTML = '';
+          const saveBtn = document.createElement('button');
+          saveBtn.textContent='저장';
+          saveBtn.style.cssText='background:#e60012;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap;margin-right:4px';
+          saveBtn.onclick = async function(){
+            var newName = nameInp.value.trim();
+            var newRole = rolesSel.value;
+            var newPwRaw = '';
+            var changePw = confirm('"'+a.id+'" 비밀번호도 변경하시겠습니까?\n(아니오 선택 시 기존 비밀번호 유지)');
+            if(changePw){
+              newPwRaw = prompt('새 비밀번호를 입력하세요 (4자 이상):', '');
+              if(newPwRaw===null) return;
+              if(newPwRaw.length < 4){ alert('비밀번호는 4자 이상이어야 합니다.'); return; }
+            }
+            var list2 = getAccounts();
+            var idx = list2.findIndex(function(x){ return x.id===a.id; });
+            if(idx > -1){
+              list2[idx].name = newName;
+              list2[idx].role = newRole;
+              if(newPwRaw) list2[idx].pw = await hashPassword(newPwRaw);
+              setAccounts(list2);
+              await setAccountsAsync(list2);
+            }
+            renderAccounts(); renderSideMemberList();
+          };
+          const cancelBtn = document.createElement('button');
+          cancelBtn.textContent='취소';
+          cancelBtn.style.cssText='background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;color:#374151;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap';
+          cancelBtn.onclick = function(){ renderAccounts(); renderSideMemberList(); };
+          tdEdit.appendChild(saveBtn); tdEdit.appendChild(cancelBtn);
+        };
+      })(acc, tr, tdName, tdRole);
+      tdEdit.appendChild(editBtn);
+
       // 비밀번호 초기화 버튼
       const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
       const resetBtn = document.createElement('button');
@@ -3452,6 +3512,7 @@ function renderAccounts(){
         if(idx > -1){
           list2[idx].pw = await hashPassword(newPw);
           setAccounts(list2);
+          await setAccountsAsync(list2);
           alert('"'+a.id+'" 비밀번호가 초기화되었습니다.');
         }
       };})(acc);
@@ -3470,7 +3531,7 @@ function renderAccounts(){
         delBtn2.onclick=(function(a){ return function(){ deleteAccount(a.id); renderAccounts(); renderSideMemberList(); }; })(acc);
         tdDel.appendChild(delBtn2);
       }
-      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdAct); tr.appendChild(tdDel);
+      tr.appendChild(tdChk); tr.appendChild(tdId); tr.appendChild(tdName); tr.appendChild(tdRole); tr.appendChild(tdEdit); tr.appendChild(tdAct); tr.appendChild(tdDel);
       tbody.appendChild(tr);
     });
   }
