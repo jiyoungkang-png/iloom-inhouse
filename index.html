@@ -1210,7 +1210,7 @@ function applyRoleTabControl(user){
     'request':  true,                        // 모두 보임
     'write':    isTester || isAdminUser,     // 시험원 + 관리자
     'list':     isTester || isAdminUser,     // 시험원 + 관리자
-    'standard': isOwner,                     // jiyoung_kang만
+    'standard': isOwner || isAdminUser,       // jiyoung_kang + 관리자
     'setting':  isOwner,                     // jiyoung_kang만
     'admin':    isOwner,                     // jiyoung_kang만
     'accounts': isOwner,                     // jiyoung_kang만
