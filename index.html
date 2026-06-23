@@ -536,7 +536,13 @@ button,input,select{font:inherit}
           </div>
         </div>
 
-        <div id="reportPreview" style="display:none"></div>
+        <div class="preview-wrap">
+          <div class="preview-header no-print">
+            <h2>출력 미리보기</h2>
+            <span>A4 기준 / 인쇄 시 좌측 입력 패널은 제외됩니다.</span>
+          </div>
+          <div id="reportPreview" class="report-preview"></div>
+        </div>
       </section>
 
       <section class="tab-panel" id="tab-list">
