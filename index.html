@@ -3724,11 +3724,29 @@ window.addEventListener('DOMContentLoaded', function(){
   if(loginBtnEl) loginBtnEl.onclick = doLogin;
   if(loginIdEl) loginIdEl.onkeydown = function(e){ if(e.key==='Enter' && loginPwEl) loginPwEl.focus(); };
   if(loginPwEl) loginPwEl.onkeydown = function(e){ if(e.key==='Enter') doLogin(); };
-  if(logoutBtnEl) logoutBtnEl.onclick = function(){
+  function doLogout(){
     sessionStorage.removeItem('iloom_auth');
     sessionStorage.removeItem('iloom_user');
     location.reload();
-  };
+  }
+
+  if(logoutBtnEl) logoutBtnEl.onclick = doLogout;
+
+  // 1시간 비활동 시 자동 로그아웃
+  var _inactiveTimer = null;
+  var INACTIVE_MS = 60 * 60 * 1000; // 1시간
+  function resetInactiveTimer(){
+    if(!sessionStorage.getItem('iloom_auth')) return;
+    clearTimeout(_inactiveTimer);
+    _inactiveTimer = setTimeout(function(){
+      alert('1시간 동안 활동이 없어 자동 로그아웃됩니다.');
+      doLogout();
+    }, INACTIVE_MS);
+  }
+  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(function(evt){
+    document.addEventListener(evt, resetInactiveTimer, { passive: true });
+  });
+  resetInactiveTimer();
 
   // 세션 유지: script 전체 로딩 후 실행되므로 Supabase const 초기화 전 오류 방지
   if(sessionStorage.getItem('iloom_auth') === 'ok'){
