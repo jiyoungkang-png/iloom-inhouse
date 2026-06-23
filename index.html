@@ -238,7 +238,7 @@ button,input,select{font:inherit}
   <div class="login-card">
     <div class="login-logo">iloom</div>
     <div class="login-sub">품질보증팀 (일룸시험연구소)</div>
-    <div class="login-badge">🔒 관리자 전용</div>
+    <div class="login-badge">관리자 전용</div>
     <label class="login-label">아이디</label>
     <input id="loginId" class="login-input" type="text" placeholder="아이디를 입력하세요" autocomplete="username">
     <label class="login-label">비밀번호</label>
@@ -291,7 +291,7 @@ button,input,select{font:inherit}
           </div>
           <button id="logoutBtn" style="background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap">로그아웃</button>
         </div>
-        <button id="myPageBtn" onclick="openMyPage()" style="margin-top:8px;width:100%;background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;text-align:left">👤 내 정보 / 비밀번호 변경</button>
+        <button id="myPageBtn" onclick="openMyPage()" style="margin-top:8px;width:100%;background:#374151;border:none;color:#aab2c0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;text-align:left">내 정보 / 비밀번호 변경</button>
       </div>
 
       
@@ -302,10 +302,10 @@ button,input,select{font:inherit}
         <div><span id="topbarTitle" style="font-size:18px;font-weight:800;color:#1f2937"></span></div>
         <div class="actions">
           <button class="btn ghost" id="newBtn">신규</button>
-          <button class="btn" id="saveBtn">💾 저장</button>
+          <button class="btn" id="saveBtn">저장</button>
           <span id="autoSaveStatus" style="font-size:11px;color:#e60012;font-weight:700;align-self:center;margin-left:4px;display:none">● 미저장 변경사항 있음</span>
           <button class="btn danger" id="deleteBtn">삭제</button>
-          <button class="btn primary" id="printBtn" style="background:var(--red);border-color:var(--red);font-size:14px;padding:10px 20px">📄 PDF 출력</button>
+          <button class="btn primary" id="printBtn" style="background:var(--red);border-color:var(--red);font-size:14px;padding:10px 20px">PDF 출력</button>
         </div>
       </section>
 
@@ -387,7 +387,7 @@ button,input,select{font:inherit}
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
               <span>의뢰 시험 항목 (시험방법 포함)</span>
               <div style="display:flex;gap:6px">
-                <button type="button" onclick="if(requireAdmin())saveReqItemList();" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">💾 목록 저장</button>
+                <button type="button" onclick="if(requireAdmin())saveReqItemList();" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">목록 저장</button>
                 <button type="button" onclick="if(requireAdmin())resetReqItemList();" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">↺ 기본값 복원</button>
               </div>
             </div>
@@ -400,14 +400,14 @@ button,input,select{font:inherit}
                 onkeydown="if(event.key==='Enter')addCustomReqItem()">
               <button type="button" onclick="addCustomReqItem()" style="background:#1f2937;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">+ 추가</button>
             </div>
-            <div id="reqItemSaveMsg" style="display:none;font-size:11px;color:#008a3d;font-weight:700;padding:4px 0">✅ 항목 목록이 저장되었습니다.</div>
+            <div id="reqItemSaveMsg" style="display:none;font-size:11px;color:#008a3d;font-weight:700;padding:4px 0">항목 목록이 저장되었습니다.</div>
           </div>
           <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;margin-bottom:16px">
             비고
             <textarea id="req_note" rows="2" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;resize:vertical" placeholder="기타 요청사항"></textarea>
           </label>
           <div style="display:flex;gap:10px">
-            <button onclick="saveAndPreviewRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">💾 저장 &amp; 미리보기</button>
+            <button onclick="saveAndPreviewRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">저장 &amp; 미리보기</button>
             <button onclick="clearRequest()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer">초기화</button>
           </div>
         </div>
@@ -416,7 +416,7 @@ button,input,select{font:inherit}
         <div class="card no-print" id="reqListSection" style="max-width:860px;margin-bottom:16px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <h2 style="margin:0">저장된 의뢰서</h2>
-            <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">🗑 선택 삭제</button>
+            <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">선택 삭제</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb">
             <input type="checkbox" id="reqSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer">
@@ -428,8 +428,8 @@ button,input,select{font:inherit}
         <!-- A4 미리보기 -->
         <div style="background:#e5e7eb;padding:20px;border-radius:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-            <div style="font-size:14px;font-weight:800;color:#1f2937">📄 의뢰서 미리보기 (A4)</div>
-            <button onclick="printReqPreview()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">🖨️ PDF 출력</button>
+            <div style="font-size:14px;font-weight:800;color:#1f2937">의뢰서 미리보기 (A4)</div>
+            <button onclick="printReqPreview()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">PDF 출력</button>
           </div>
           <div style="display:flex;justify-content:center">
             <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box">
@@ -447,7 +447,7 @@ button,input,select{font:inherit}
               <label>의뢰번호
                 <div style="display:flex;gap:6px;align-items:center">
                   <input id="receiptNo" placeholder="의뢰서 불러오기로 자동 입력됩니다" style="flex:1;background:#f5f5f5;color:#555;cursor:default" readonly>
-                  <button type="button" onclick="importFromRequest()" style="background:#e60012;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap">📋 의뢰서 불러오기</button>
+                  <button type="button" onclick="importFromRequest()" style="background:#e60012;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap">의뢰서 불러오기</button>
                 </div>
               </label>
               <label>용도
@@ -553,11 +553,11 @@ button,input,select{font:inherit}
             <span id="listSelectedCount" style="font-size:12px;color:#e60012;font-weight:700;display:none"></span>
             <div style="flex:1"></div>
             <button id="listPdfBtn" class="btn primary" style="background:var(--red);border-color:var(--red);font-size:12px;padding:7px 16px;opacity:0.4;cursor:not-allowed"
-              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listPrintSelected();">📄 PDF 출력</button>
+              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listPrintSelected();">PDF 출력</button>
             <button id="listDeleteBtn" class="btn danger" style="font-size:12px;padding:7px 16px;opacity:0.4;cursor:not-allowed"
-              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listDeleteSelected();">🗑 삭제하기</button>
+              onclick="if(document.querySelectorAll('#reportList .list-chk:checked').length>0)listDeleteSelected();">삭제하기</button>
             <button id="listCancelBtn" class="btn ghost" style="font-size:12px;padding:7px 16px;display:none"
-              onclick="document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=false;});document.getElementById('listSelectAll').checked=false;updateListActionBar();">✕ 선택 해제</button>
+              onclick="document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=false;});document.getElementById('listSelectAll').checked=false;updateListActionBar();">선택 해제</button>
           </div>
           <div id="reportList" class="list"></div>
         </div>
@@ -585,28 +585,28 @@ button,input,select{font:inherit}
         <div class="card no-print">
           <h2>운영 설정</h2>
           <div class="info-box" style="background:#f0fdf4;border-color:#bbf7d0">
-            <b>☁️ 저장 방식</b>
+            <b>저장 방식</b>
             <p style="color:#166534">성적서·의뢰서는 저장 시 자동으로 Supabase 서버에 동기화됩니다. 앱을 열 때도 서버에서 최신 데이터를 자동으로 불러옵니다.</p>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn primary" style="background:#008a3d;border-color:#008a3d" onclick="forceSyncFromServer()">🔄 서버에서 최신 데이터 불러오기</button>
-              <button class="btn primary" onclick="forceUploadAll()">☁️ 이 컴퓨터 데이터 서버에 올리기</button>
+              <button class="btn primary" style="background:#008a3d;border-color:#008a3d" onclick="forceSyncFromServer()">서버에서 최신 데이터 불러오기</button>
+              <button class="btn primary" onclick="forceUploadAll()">서버 업로드</button>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn" id="exportBtn">💾 전체 데이터 백업(JSON)</button>
-              <label class="btn ghost file-btn">📂 백업 불러오기<input type="file" id="importFile" accept="application/json"></label>
+              <button class="btn" id="exportBtn">전체 데이터 백업(JSON)</button>
+              <label class="btn ghost file-btn">백업 불러오기<input type="file" id="importFile" accept="application/json"></label>
               <button class="btn danger" id="clearAllBtn">전체 데이터 초기화</button>
             </div>
             <div id="syncStatusMsg" style="display:none;font-size:13px;padding:10px 14px;border-radius:8px;font-weight:700"></div>
           </div>
         </div>
         <div class="card no-print" style="margin-top:16px">
-          <h2>🔗 Supabase 연결 진단</h2>
+          <h2>Supabase 연결 진단</h2>
           <p style="font-size:13px;color:#6b7280;margin-bottom:14px">저장이 다른 컴퓨터에서 보이지 않을 때 여기서 확인하세요.</p>
           <div class="setting-actions" style="margin-bottom:12px">
-            <button class="btn" id="diagCheckBtn" onclick="runSupaDiag()">🔍 Supabase 연결 및 데이터 확인</button>
-            <button class="btn primary" id="diagForceUploadBtn" onclick="forceUploadAll()">☁️ 로컬 데이터 강제 서버 업로드</button>
+            <button class="btn" id="diagCheckBtn" onclick="runSupaDiag()">Supabase 연결 및 데이터 확인</button>
+            <button class="btn primary" id="diagForceUploadBtn" onclick="forceUploadAll()">로컬 데이터 강제 업로드</button>
           </div>
           <div id="diagResult" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;font-size:12px;font-family:monospace;line-height:1.9;display:none;white-space:pre-wrap;word-break:break-all"></div>
         </div>
@@ -620,7 +620,7 @@ button,input,select{font:inherit}
 
           <!-- 등록 폼 -->
           <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:20px 22px;margin-bottom:24px">
-            <div style="font-size:14px;font-weight:800;color:#1f2937;margin-bottom:16px">➕ 새 계정 등록</div>
+            <div style="font-size:14px;font-weight:800;color:#1f2937;margin-bottom:16px">새 계정 등록</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
               <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#374151">
                 아이디
@@ -649,8 +649,8 @@ button,input,select{font:inherit}
 
           <!-- 계정 목록 + 선택 삭제 -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div style="font-size:14px;font-weight:800;color:#1f2937">👥 등록된 계정</div>
-            <button id="adminDelSelectedBtn" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;display:none">🗑 선택 삭제</button>
+            <div style="font-size:14px;font-weight:800;color:#1f2937">등록된 계정</div>
+            <button id="adminDelSelectedBtn" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;display:none">선택 삭제</button>
           </div>
           <table style="width:100%;border-collapse:collapse;font-size:13px">
             <thead>
@@ -674,7 +674,7 @@ button,input,select{font:inherit}
 
           <!-- 계정 추가 폼 -->
           <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;margin-bottom:20px">
-            <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:#1f2937">➕ 새 계정 추가</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:#1f2937">새 계정 추가</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
               <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;flex:1;min-width:140px">
                 아이디
@@ -694,7 +694,7 @@ button,input,select{font:inherit}
           </div>
 
           <!-- 계정 목록 -->
-          <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:#1f2937">👥 등록된 계정</div>
+          <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:#1f2937">등록된 계정</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px">
             <thead>
               <tr style="background:#f3f4f6;border-bottom:2px solid #e5e7eb">
@@ -810,7 +810,7 @@ function makeReqItemRow(item, isCustom){
 
   const txt = document.createElement('span');
   txt.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap';
-  txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">✚</span> ' : '')
+  txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">+</span> ' : '')
     + '<span style="font-weight:700;color:#1f2937">'+item.label+'</span>'
     + (item.spec ? '<span style="color:#9ca3af;font-size:10px;margin-left:2px">'+item.spec+'</span>' : '');
 
@@ -867,7 +867,7 @@ function makeReqItemRow(item, isCustom){
       row.innerHTML = '';
       row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;transition:background .15s;font-size:12px;color:#374151;cursor:default'
         + (isCustom ? ';grid-column:1/-1;background:#fff9f9;border:1px dashed #fca5a5;margin-top:4px' : '');
-      txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">✚</span> ' : '')
+      txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">+</span> ' : '')
         + '<span style="font-weight:700;color:#1f2937">'+newLabel+'</span>'
         + (newSpec ? '<span style="color:#9ca3af;font-size:10px;margin-left:2px">'+newSpec+'</span>' : '');
       lbl.innerHTML=''; lbl.appendChild(chk); lbl.appendChild(txt);
@@ -997,7 +997,7 @@ async function applyRequestToReport(req){
   }
   if(existingReport){
     await loadReport(existingReport);
-    showToast('📋 기존 성적서 [' + req.no + '] 를 불러왔습니다.');
+    showToast('기존 성적서 [' + req.no + '] 를 불러왔습니다.');
     return;
   }
 
@@ -1071,7 +1071,7 @@ async function applyRequestToReport(req){
   }
 
   renderPreview();
-  showToast('✅ 의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다. 작성 후 저장하세요.');
+  showToast('의뢰서 [' + (req.no||'-') + '] 정보를 불러왔습니다. 작성 후 저장하세요.');
 }
 
 async function showRequestPickerModal(callback){
@@ -1094,7 +1094,7 @@ async function showRequestPickerModal(callback){
 
   const title = document.createElement('div');
   title.style.cssText = 'font-size:17px;font-weight:900;color:#1f2937;margin-bottom:6px';
-  title.textContent = '📋 의뢰서 선택';
+  title.textContent = '의뢰서 선택';
 
   const sub = document.createElement('div');
   sub.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:16px';
@@ -1259,8 +1259,8 @@ function openMyPage(){
   overlay.innerHTML = `
     <div style="background:#fff;border-radius:20px;padding:32px 28px;width:420px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.3)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-        <div style="font-size:18px;font-weight:900;color:#1f2937">👤 내 정보</div>
-        <button onclick="document.getElementById('myPageModal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af">✕</button>
+        <div style="font-size:18px;font-weight:900;color:#1f2937">내 정보</div>
+        <button onclick="document.getElementById('myPageModal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af">×</button>
       </div>
 
       <!-- 현재 정보 -->
@@ -1273,7 +1273,7 @@ function openMyPage(){
       </div>
 
       <!-- 비밀번호 변경 -->
-      <div style="font-size:14px;font-weight:900;color:#1f2937;margin-bottom:12px">🔒 비밀번호 변경</div>
+      <div style="font-size:14px;font-weight:900;color:#1f2937;margin-bottom:12px">비밀번호 변경</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:#374151">현재 비밀번호
           <input type="password" id="myPageCurPw" style="border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;font-size:13px;outline:none" placeholder="현재 비밀번호 입력">
@@ -1327,7 +1327,7 @@ async function changeMyPassword(){
   sessionStorage.setItem('iloom_user', JSON.stringify(updated));
 
   document.getElementById('myPageModal').remove();
-  showToast('✅ 비밀번호가 변경되었습니다!');
+  showToast('비밀번호가 변경되었습니다.');
 }
 
 // ── Supabase 공유 데이터 저장/로드 ──
@@ -1445,7 +1445,7 @@ async function init(){
     const el = document.getElementById('sidebarUsername');
     if(el && u.id){
       const isAdmin = u.role==='관리자' || u.id===ADMIN_ID;
-      const crown = isAdmin ? '<span title="관리자" style="margin-right:5px;font-size:15px">👑</span>' : '';
+      const crown = isAdmin ? '<span title="관리자" style="margin-right:5px;font-size:11px;background:#e60012;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700">관리자</span>' : '';
       const nameText = u.name ? u.name+' ('+u.id+')' : u.id;
       el.innerHTML = crown + nameText;
     }
@@ -1528,7 +1528,7 @@ function clearUnsaved(){
   const btn = document.getElementById('saveBtn');
   const status = document.getElementById('autoSaveStatus');
   if(btn){ btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
-  if(status){ status.textContent='✅ 저장 완료'; status.style.display=''; setTimeout(function(){ status.style.display='none'; }, 2000); }
+  if(status){ status.textContent='저장 완료'; status.style.display=''; setTimeout(function(){ status.style.display='none'; }, 2000); }
 }
 
 function bindInputs(){
@@ -1959,14 +1959,14 @@ function renderDetailSection(externalData){
       const secBtnWrap = document.createElement('div');
       secBtnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
       const secEditBtn = document.createElement('button');
-      secEditBtn.type='button'; secEditBtn.textContent='✏️ 수정';
+      secEditBtn.type='button'; secEditBtn.textContent='수정';
       try{ if(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id!==ADMIN_ID) secEditBtn.style.display='none'; }catch(e){}
       secEditBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
       const secSaveBtn = document.createElement('button');
-      secSaveBtn.type='button'; secSaveBtn.textContent='💾 저장';
+      secSaveBtn.type='button'; secSaveBtn.textContent='저장';
       secSaveBtn.style.cssText='background:#e60012;border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
       const secCancelBtn = document.createElement('button');
-      secCancelBtn.type='button'; secCancelBtn.textContent='✕ 취소';
+      secCancelBtn.type='button'; secCancelBtn.textContent='취소';
       secCancelBtn.style.cssText='background:#f3f4f6;border:1px solid #d1d5db;color:#374151;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
       secBtnWrap.appendChild(secEditBtn); secBtnWrap.appendChild(secSaveBtn); secBtnWrap.appendChild(secCancelBtn);
       header.appendChild(secBtnWrap);
@@ -2023,7 +2023,7 @@ function renderDetailSection(externalData){
         secEditBtn.style.display='inline-block'; secSaveBtn.style.display='none'; secCancelBtn.style.display='none';
         nameWrap.style.display='none'; critView.style.display='block'; critEdit.style.display='none';
         sec.style.border='1px solid #e5e7eb'; sec.style.background='#fafbfc';
-        saveReport(true); showToast('✅ 저장되었습니다.');
+        saveReport(true); showToast('저장되었습니다.');
       };
       secCancelBtn.onclick = function(){
         nameEdit.value=origName; critEdit.value=origCrit;
@@ -2052,7 +2052,7 @@ function renderDetailSection(externalData){
           const resInp=document.createElement('input'); resInp.type='text'; resInp.dataset.key='dim_result_'+i+'_'+idx; resInp.placeholder='자동계산'; resInp.value=saved['dim_result_'+i+'_'+idx]||''; resInp.readOnly=true; resInp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center;background:#f3f4f6;color:#2563eb;font-weight:900';
           tdB.appendChild(resInp);
           const tdC=document.createElement('td'); tdC.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
-          const delBtn2=document.createElement('button'); delBtn2.textContent='✕'; delBtn2.type='button'; delBtn2.style.cssText='background:#fee2e2;border:none;border-radius:6px;color:#dc2626;padding:5px 10px;cursor:pointer;font-weight:900';
+          const delBtn2=document.createElement('button'); delBtn2.textContent='삭제'; delBtn2.type='button'; delBtn2.style.cssText='background:#fee2e2;border:none;border-radius:6px;color:#dc2626;padding:5px 10px;cursor:pointer;font-weight:900';
           delBtn2.onclick=function(){ row.remove(); renderPreview(); };
           tdC.appendChild(delBtn2);
           function calcDim(){ var lv=parseFloat(lInp.value||''); var wv=parseFloat(wInp.value||''); if(!isNaN(lv)&&!isNaN(wv)&&lv>0){ var h=Math.round(wv/10); var r=wv/lv; var g=r<0.6?'-A':r<0.8?'-B':'-C'; resInp.value=h+g; } else resInp.value=''; renderPreview(); }
@@ -2420,7 +2420,7 @@ async function renderListAsync(page){
   // 로딩 중 표시
   const box = $('reportList');
   if(box && !box.dataset.loaded){
-    box.innerHTML = '<p class="note" style="color:#6b7280;padding:24px 0;text-align:center">⏳ 서버에서 데이터를 불러오는 중...</p>';
+    box.innerHTML = '<p class="note" style="color:#6b7280;padding:24px 0;text-align:center">서버에서 데이터를 불러오는 중...</p>';
   }
   // Supabase에서 최신 목록 가져와서 로컬 캐시 완전 갱신
   try {
@@ -2706,7 +2706,7 @@ function previewRequestOnly(){
   var iloomSrc = iloomEl ? iloomEl.src : '';
   var kolasSrc = kolasEl ? kolasEl.src : '';
   renderReqPreviewHTML(data, iloomSrc, kolasSrc);
-  showToast('✅ 의뢰서를 불러왔습니다!');
+  showToast('의뢰서를 불러왔습니다.');
 }
 
 async function generateReqNo(){
@@ -3260,7 +3260,7 @@ function showSaveToast(){
   box.style.cssText = 'background:#fff;border-radius:16px;padding:36px 48px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);min-width:240px';
   const icon = document.createElement('div');
   icon.style.cssText = 'font-size:44px;margin-bottom:12px';
-  icon.textContent = '✅';
+  icon.textContent = '▪';
   const title = document.createElement('div');
   title.style.cssText = 'font-size:20px;font-weight:900;color:#1f2937;margin-bottom:8px';
   title.textContent = '저장 완료!';
@@ -3436,7 +3436,7 @@ function renderAccounts(){
       // 비밀번호 초기화 버튼
       const tdAct = document.createElement('td'); tdAct.style.cssText='padding:10px 12px;text-align:center';
       const resetBtn = document.createElement('button');
-      resetBtn.textContent = '🔑 비번 초기화';
+      resetBtn.textContent = '비번 초기화';
       resetBtn.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;white-space:nowrap';
       resetBtn.onclick = (function(a){ return async function(){
         var newPw = prompt('"'+a.id+'" 계정의 새 비밀번호를 입력하세요 (4자 이상):', '');
@@ -3750,7 +3750,7 @@ async function setAccountsAsync(list) {
 // ── 수동 동기화 ──
 async function forceSyncFromServer(){
   const msg = document.getElementById('syncStatusMsg');
-  if(msg){ msg.style.display='block'; msg.style.background='#eff6ff'; msg.style.color='#1d4ed8'; msg.textContent='⏳ 서버에서 데이터를 불러오는 중...'; }
+  if(msg){ msg.style.display='block'; msg.style.background='#eff6ff'; msg.style.color='#1d4ed8'; msg.textContent='서버에서 데이터를 불러오는 중...'; }
   try {
     // 성적서
     const rows = await getReportsAsync();
@@ -3769,9 +3769,9 @@ async function forceSyncFromServer(){
       renderAccounts(); renderSideMemberList();
     }
     renderList(); renderReqList();
-    if(msg){ msg.style.background='#f0fdf4'; msg.style.color='#166534'; msg.textContent='✅ 완료! 성적서 '+rows.length+'개, 의뢰서 '+reqs.length+'개 불러왔습니다.'; }
+    if(msg){ msg.style.background='#f0fdf4'; msg.style.color='#166534'; msg.textContent='완료! 성적서 '+rows.length+'개, 의뢰서 '+reqs.length+'개 불러왔습니다.'; }
   } catch(e){
-    if(msg){ msg.style.background='#fef2f2'; msg.style.color='#dc2626'; msg.textContent='❌ 실패: '+e.message; }
+    if(msg){ msg.style.background='#fef2f2'; msg.style.color='#dc2626'; msg.textContent='실패: '+e.message; }
   }
 }
 
@@ -3780,7 +3780,7 @@ async function runSupaDiag(){
   const box = document.getElementById('diagResult');
   box.style.display = 'block';
   box.style.color = '#374151';
-  box.textContent = '🔄 확인 중...';
+  box.textContent = '확인 중...';
   let log = '';
   function add(msg){ log += msg + '\n'; box.textContent = log; }
 
@@ -3789,47 +3789,47 @@ async function runSupaDiag(){
     const res = await fetch(SUPA_URL + '/rest/v1/', {
       headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
     });
-    add('✅ Supabase 서버 연결: 성공 (HTTP ' + res.status + ')');
+    add('[성공] Supabase 서버 연결: HTTP ' + res.status);
   } catch(e) {
-    add('❌ Supabase 서버 연결 실패: ' + e.message);
+    add('[실패] Supabase 서버 연결 실패: ' + e.message);
     return;
   }
 
   // 2. reports 테이블
   try {
     const rows = await supaFetch('reports', 'GET');
-    if(!rows) { add('❌ reports 테이블: 응답 없음 (테이블이 없거나 권한 오류)'); }
-    else { add('✅ reports 테이블: ' + rows.length + '개 저장됨'); }
-  } catch(e) { add('❌ reports 테이블 조회 실패: ' + e.message); }
+    if(!rows) { add('[오류] reports 테이블: 응답 없음 (테이블이 없거나 권한 오류)'); }
+    else { add('[확인] reports 테이블: ' + rows.length + '개 저장됨'); }
+  } catch(e) { add('[오류] reports 테이블 조회 실패: ' + e.message); }
 
   // 3. requests 테이블
   try {
     const rows = await supaFetch('requests', 'GET');
-    if(!rows) { add('❌ requests 테이블: 응답 없음 (테이블이 없거나 권한 오류)'); }
-    else { add('✅ requests 테이블: ' + rows.length + '개 저장됨'); }
-  } catch(e) { add('❌ requests 테이블 조회 실패: ' + e.message); }
+    if(!rows) { add('[오류] requests 테이블: 응답 없음 (테이블이 없거나 권한 오류)'); }
+    else { add('[확인] requests 테이블: ' + rows.length + '개 저장됨'); }
+  } catch(e) { add('[오류] requests 테이블 조회 실패: ' + e.message); }
 
   // 4. 로컬 vs 서버 비교
   const localReports = getReports();
-  add('📦 이 컴퓨터 로컬 성적서: ' + localReports.length + '개');
+  add('[로컬] 이 컴퓨터 성적서: ' + localReports.length + '개');
   const localReqs = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
-  add('📦 이 컴퓨터 로컬 의뢰서: ' + localReqs.length + '개');
+  add('[로컬] 이 컴퓨터 의뢰서: ' + localReqs.length + '개');
 
   // 5. 테스트 저장 시도
   try {
     const testId = '_diag_test_' + Date.now();
     const ok = await supaFetch('reports', 'POST', {id: testId, data: {test: true}, updated_at: new Date().toISOString()});
     if(ok) {
-      add('✅ 저장(POST) 테스트: 성공');
+      add('[성공] 저장(POST) 테스트: 성공');
       // 테스트 데이터 삭제
       await fetch(SUPA_URL + '/rest/v1/reports?id=eq.' + testId, {
         method: 'DELETE',
         headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
       });
     } else {
-      add('❌ 저장(POST) 테스트: 실패 — RLS 정책이나 테이블 설정 확인 필요');
+      add('[실패] 저장(POST) 테스트: 실패 — RLS 정책이나 테이블 설정 확인 필요');
     }
-  } catch(e) { add('❌ 저장 테스트 오류: ' + e.message); }
+  } catch(e) { add('[오류] 저장 테스트 오류: ' + e.message); }
 
   add('\n--- 진단 완료 ---');
 }
@@ -3837,7 +3837,7 @@ async function runSupaDiag(){
 async function forceUploadAll(){
   const msg = document.getElementById('syncStatusMsg');
   if(!confirm('이 컴퓨터의 로컬 데이터를 서버에 강제 업로드합니다. 계속할까요?')) return;
-  if(msg){ msg.style.display='block'; msg.style.background='#eff6ff'; msg.style.color='#1d4ed8'; msg.textContent='⏳ 업로드 중...'; }
+  if(msg){ msg.style.display='block'; msg.style.background='#eff6ff'; msg.style.color='#1d4ed8'; msg.textContent='업로드 중...'; }
   const box = document.getElementById('diagResult');
   if(box) box.style.display = 'none';
   let log = '';
@@ -3860,7 +3860,7 @@ async function forceUploadAll(){
   add('의뢰서: ' + ok + '개 성공, ' + fail + '개 실패');
 
   if(msg){ msg.style.background='#f0fdf4'; msg.style.color='#166534'; }
-  add('✅ 완료! 다른 컴퓨터에서 새로고침 후 확인해보세요.');
+  add('완료! 다른 컴퓨터에서 새로고침 후 확인해보세요.');
 }
 
 // ── 전체 실시간 동기화 (10초마다 + 포커스 시) ──
