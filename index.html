@@ -1,4 +1,4 @@
-
+﻿
 <!doctype html>
 <html lang="ko">
 <head>
@@ -145,6 +145,67 @@ button,input,select{font:inherit}
   .page{transform:none;transform-origin:top center}
   .report-preview{overflow-x:auto}
 }
+/* ── 모바일 공통 ── */
+.mobile-bar{display:none}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:8999}
+.sidebar-overlay.show{display:block}
+.sidebar-close-btn{display:none}
+/* ── 모바일 (≤ 768px) ── */
+@media(max-width:768px){
+  .mobile-bar{
+    display:flex;align-items:center;gap:10px;
+    background:#101827;padding:13px 16px;
+    position:sticky;top:0;z-index:8000;
+  }
+  .mobile-bar-title{color:#fff;font-weight:800;font-size:14px;flex:1;letter-spacing:.3px}
+  .hamburger-btn{background:none;border:none;color:#fff;cursor:pointer;padding:4px;line-height:1;display:flex;align-items:center;flex-shrink:0}
+  .sidebar-close-btn{
+    display:flex!important;width:100%;background:none;border:none;border-bottom:1px solid #2b3648;
+    color:#aab2c0;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;
+    align-items:center;gap:8px;margin-bottom:8px;
+  }
+  .app-shell{display:block}
+  .sidebar{
+    position:fixed!important;left:-280px;top:0;
+    width:270px!important;height:100vh!important;
+    z-index:9000;transition:left .28s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+  }
+  .sidebar.open{left:0!important}
+  .workspace{padding:12px!important;overflow-x:hidden}
+  .topbar{flex-wrap:wrap!important;display:flex!important;gap:8px!important;margin-bottom:12px!important}
+  .topbar>div:first-child{width:100%}
+  .topbar h1{font-size:20px!important}
+  .actions{width:100%;gap:6px!important;flex-wrap:wrap}
+  .actions .btn{flex:1;min-width:56px;font-size:12px!important;padding:9px 6px!important;text-align:center;white-space:nowrap}
+  .grid-layout{grid-template-columns:1fr!important}
+  .form-grid{grid-template-columns:1fr!important}
+  .detail-grid{grid-template-columns:1fr 1fr!important}
+  .card{padding:12px!important}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .input-table{min-width:580px}
+  .login-card{width:92vw!important;max-width:360px!important;padding:32px 20px!important}
+  .report-preview{overflow-x:auto!important;-webkit-overflow-scrolling:touch;align-items:flex-start!important;padding:0!important}
+  .detail-row{flex-direction:column}
+  .detail-row label{min-width:0!important}
+  .image-row{flex-direction:column;align-items:flex-start!important}
+  .section-title{flex-wrap:wrap;gap:8px}
+  .list-item,.standard-item{flex-direction:column;align-items:flex-start!important;gap:8px}
+  .setting-actions{flex-direction:column}
+  .info-box{padding:12px}
+  #loginScreen .login-card{padding:32px 20px!important}
+  /* ── 인라인 style 그리드 오버라이드 ── */
+  [style*="grid-template-columns:1fr 1fr 1fr"],[style*="grid-template-columns: 1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  [style*="grid-template-columns:repeat(4"]{grid-template-columns:1fr 1fr!important}
+  [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr 1fr!important}
+  /* 시험 항목 체크박스 → 1열 */
+  #req_items_checkboxes{grid-template-columns:1fr!important}
+  /* 가로 스크롤 방지 */
+  body{overflow-x:hidden}
+  .workspace{max-width:100vw!important}
+  /* 카드 max-width 해제 */
+  .card[style*="max-width"]{max-width:100%!important;width:100%!important}
+}
 @page{size:A4;margin:0}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -254,8 +315,23 @@ button,input,select{font:inherit}
 </div>
 <!-- ══════════════════════════════════════════════════ -->
 
+  <!-- 모바일 상단 바 -->
+  <div class="mobile-bar no-print">
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="메뉴 열기">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span class="mobile-bar-title">IN HOUSE TEST LAB</span>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
   <div class="app-shell">
     <aside class="sidebar no-print">
+      <button class="sidebar-close-btn" onclick="closeSidebar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        닫기
+      </button>
       <div class="brand" style="cursor:pointer" onclick="(function(){ var b=document.querySelector('.nav-btn[data-tab=request]'); if(b)b.click(); if(typeof clearRequest==='function')clearRequest(); if(typeof initRequestTab==='function')initRequestTab(); })()">
         <div class="brand-mark" style="background:none;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center">
           <img src="" id="sidebar-iloom-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;cursor:pointer" alt="iloom" onclick="(function(){ var b=document.querySelector('.nav-btn[data-tab=request]'); if(b)b.click(); if(typeof clearRequest==='function')clearRequest(); if(typeof initRequestTab==='function')initRequestTab(); })()">
@@ -727,7 +803,7 @@ const defaultStandards = [
 ];
 
 const fields = ['receiptNo','purpose','receivedDate','issuedDate','requestDept','sampleName','colorInfo','brand','tester','techManager','qualityManager','companyName','companyAddress','companyTel','companyFax','companyWeb','reportTitle','colorChange','staining','lengthBefore','lengthAfter','widthBefore','widthAfter','pillingResult','appearanceResult','remarkNote'];
-const today = () => new Date().toISOString().slice(0,10);
+const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const fmt = (d) => d ? d.replaceAll('-','.') : '';
 const num = (v) => Number.parseFloat(v || 0);
 const pct = (before, after) => before ? (((after-before)/before)*100).toFixed(1) + ' %' : '-';
@@ -1465,6 +1541,19 @@ async function init(){
     }
   }catch(e){}
 }
+function toggleSidebar(){
+  var s=document.querySelector('.sidebar');
+  var o=document.getElementById('sidebarOverlay');
+  if(!s||!o) return;
+  s.classList.toggle('open');
+  o.classList.toggle('show');
+}
+function closeSidebar(){
+  var s=document.querySelector('.sidebar');
+  var o=document.getElementById('sidebarOverlay');
+  if(s) s.classList.remove('open');
+  if(o) o.classList.remove('show');
+}
 function navInit(){
   document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>{
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -1477,6 +1566,7 @@ function navInit(){
     if(btn.dataset.tab === 'request'){ initRequestTab(); renderReqListAsync(); }
     if(btn.dataset.tab === 'list') renderListAsync();
     if(btn.dataset.tab === 'write') renderStandardSelect();
+    if(window.innerWidth <= 768) closeSidebar();
   }));
 }
 
@@ -2794,9 +2884,11 @@ function renderReqList(){
       // 탭 이동 후 DOM 준비되면 값 채우기
       setTimeout(function(){
         // 기본 텍스트 필드 복원
-        ['no','date','company','person','dept','hp','email','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
+        ['no','company','person','dept','hp','email','product','brand','color','style','fiber','buyer','note'].forEach(function(k){
+
           var el = document.getElementById('req_'+k); if(el) el.value = r[k]||'';
         });
+          var dateEl2=document.getElementById('req_date'); if(dateEl2) dateEl2.value=(function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
         // KOLAS/내부 체크박스
         if(r.chk_kolas !== undefined){
           var kEl = document.getElementById('req_chk_kolas'); if(kEl) kEl.checked = r.chk_kolas;
@@ -2852,7 +2944,7 @@ function initRequestTab(){
     generateReqNo().then(function(no){ noEl.value = no; });
   }
   const dateEl = document.getElementById('req_date');
-  if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  if(dateEl) dateEl.value = (function(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
   // 의뢰서 정보 항상 빈칸으로 (단, 이미 작성 중이면 건드리지 않음)
   const isWriting = ['req_product','req_person','req_company'].some(function(k){
     const el = document.getElementById(k); return el && el.value.trim();
@@ -3067,9 +3159,10 @@ function printReqPreview(){
 }
 
 function clearRequest(){
-  ['req_date','req_dept','req_person','req_product','req_brand','req_color','req_note',
+  ['req_dept','req_person','req_product','req_brand','req_color','req_note',
    'req_company','req_hp','req_email','req_style','req_fiber','req_buyer']
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const reqDEl=document.getElementById('req_date'); if(reqDEl) reqDEl.value=(function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
   const noEl=document.getElementById('req_no');
   if(noEl) generateReqNo().then(function(no){ noEl.value = no; });
   const nameEl2=document.getElementById('req_items_custom_name'); if(nameEl2) nameEl2.value='';
