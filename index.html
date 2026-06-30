@@ -3578,6 +3578,7 @@ function reqMgmtSetStatus(no, status){
   if(fi < 0) return;
   list[fi].status = status;
   localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+  setRequestAsync(list[fi]).catch(function(e){ console.warn('상태 Supabase 저장 실패:', e); });
   renderReqMgmt();
   updateReqBadge();
 }
