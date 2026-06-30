@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>품질보증팀 (일룸시험연구소) · IN HOUSE TEST REPORT</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
   <style>
 /* 시험 항목 체크박스 체크 시 빨간 강조 */
 .req-item-chk:checked + span span:first-child{color:#e60012!important;font-weight:900!important}
@@ -500,8 +500,18 @@ button,input,select{font:inherit}
           <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;margin-bottom:16px">
             <textarea id="req_note" rows="2" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;resize:vertical" placeholder="기타 요청사항"></textarea>
           </label>
+          <!-- 3단계 흐름 안내 -->
+          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:800;color:#92400e">의뢰 절차:</span>
+            <span style="font-size:12px;background:#e60012;color:#fff;border-radius:6px;padding:3px 10px;font-weight:700">① 저장</span>
+            <span style="font-size:12px;color:#92400e;font-weight:700">→</span>
+            <span style="font-size:12px;background:#1f2937;color:#fff;border-radius:6px;padding:3px 10px;font-weight:700">② 서명하기</span>
+            <span style="font-size:12px;color:#92400e;font-weight:700">→</span>
+            <span style="font-size:12px;background:#e60012;color:#fff;border-radius:6px;padding:3px 10px;font-weight:700">③ 제출하기</span>
+            <span style="font-size:11px;color:#78350f;margin-left:4px">저장 후 미리보기에서 서명하고 제출하세요</span>
+          </div>
           <div style="display:flex;gap:10px">
-            <button onclick="submitRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">제출하기</button>
+            <button onclick="saveRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">① 저장</button>
             <button onclick="clearRequest()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer">초기화</button>
           </div>
         </div>
@@ -523,11 +533,14 @@ button,input,select{font:inherit}
         <div style="background:#e5e7eb;padding:20px;border-radius:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
             <div style="font-size:14px;font-weight:800;color:#1f2937">의뢰서 미리보기 (A4)</div>
-            <button onclick="printReqPreview()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">PDF 출력</button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button onclick="submitFinal()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-weight:800;cursor:pointer">③ 제출하기</button>
+              <button onclick="printReqPreview()" style="background:#1f2937;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">PDF 출력</button>
+            </div>
           </div>
           <div style="display:flex;justify-content:center">
             <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box">
-              <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">제출하기 버튼을 눌러주세요</div>
+              <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">① 저장 버튼을 눌러 미리보기를 생성하세요</div>
             </div>
           </div>
         </div>
@@ -725,53 +738,6 @@ button,input,select{font:inherit}
             <div id="syncStatusMsg" style="display:none;font-size:13px;padding:10px 14px;border-radius:8px;font-weight:700"></div>
           </div>
         </div>
-        <!-- EmailJS 이메일 발송 설정 -->
-        <div class="card no-print" style="margin-top:16px">
-          <h2>자동 이메일 발송 설정</h2>
-          <p style="font-size:13px;color:#6b7280;margin-bottom:16px">의뢰 제출 시 의뢰자 이메일로 의뢰 내용이 자동 발송됩니다. <a href="https://www.emailjs.com" target="_blank" style="color:#e60012;font-weight:700">EmailJS</a> 무료 계정이 필요합니다 (월 200건 무료).</p>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
-              Service ID
-              <input id="ej_service_id" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="service_xxxxxxx">
-            </label>
-            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151">
-              Template ID
-              <input id="ej_template_id" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="template_xxxxxxx">
-            </label>
-            <label style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;grid-column:1/-1">
-              Public Key
-              <input id="ej_public_key" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none" placeholder="EmailJS Public Key (Account > API Keys)">
-            </label>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-            <button onclick="saveEmailJSConfig()" style="background:#e60012;color:#fff;border:none;border-radius:9px;padding:9px 22px;font-size:13px;font-weight:800;cursor:pointer">저장</button>
-            <button onclick="testEmailJSSend()" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;color:#374151">테스트 발송</button>
-          </div>
-          <div id="ejStatusMsg" style="display:none;font-size:13px;padding:10px 14px;border-radius:8px;font-weight:700;margin-bottom:14px"></div>
-
-          <details style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px">
-            <summary style="font-size:13px;font-weight:800;color:#374151;cursor:pointer">EmailJS 설정 방법 (클릭하여 펼치기)</summary>
-            <div style="margin-top:14px;font-size:12.5px;color:#374151;line-height:2">
-              <b>1단계:</b> <a href="https://www.emailjs.com" target="_blank" style="color:#e60012">emailjs.com</a> 에 가입 (무료)<br>
-              <b>2단계:</b> Email Services 메뉴 → Add New Service → Gmail(또는 사용 메일) 연결 → <b>Service ID</b> 복사<br>
-              <b>3단계:</b> Email Templates 메뉴 → Create New Template → 아래 내용 붙여넣기 후 저장 → <b>Template ID</b> 복사<br>
-              <b>4단계:</b> Account 메뉴 → API Keys → <b>Public Key</b> 복사 후 위에 입력 후 저장<br>
-              <br>
-              <b>템플릿 설정값 (EmailJS Template 화면에서 입력):</b><br>
-              <div style="background:#1f2937;color:#e2e8f0;border-radius:8px;padding:12px 16px;font-family:monospace;font-size:11.5px;line-height:1.9;margin-top:8px;overflow-x:auto">
-To: <span style="color:#f9a8d4">&#123;&#123;to_email&#125;&#125;</span><br>
-Subject: [일룸 시험연구소] 시험 의뢰 접수 확인 - <span style="color:#f9a8d4">&#123;&#123;req_no&#125;&#125;</span><br><br>
-Reply To: jiyoung_kang@fursys.com<br><br>
-Content(HTML 탭 선택):<br>
-&lt;!-- 아래 HTML을 Content 란에 붙여넣기 --&gt;
-              </div>
-              <button onclick="copyEmailTemplate()" style="margin-top:10px;background:#1f2937;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer">📋 이메일 HTML 템플릿 복사</button>
-              <span id="copyTemplateOk" style="display:none;color:#16a34a;font-size:12px;font-weight:700;margin-left:8px">✓ 복사됨!</span>
-            </div>
-          </details>
-        </div>
-
         <div class="card no-print" style="margin-top:16px">
           <h2>Supabase 연결 진단</h2>
           <p style="font-size:13px;color:#6b7280;margin-bottom:14px">저장이 다른 컴퓨터에서 보이지 않을 때 여기서 확인하세요.</p>
@@ -1663,7 +1629,6 @@ function navInit(){
     if(btn.dataset.tab === 'admin'){ renderAccounts(); initAdminRegTab(); }
     if(btn.dataset.tab === 'request'){ initRequestTab(); renderReqListAsync(); }
     if(btn.dataset.tab === 'reqview'){ renderReqMgmt(); updateReqBadge(); }
-    if(btn.dataset.tab === 'setting'){ loadEmailJSConfigToUI(); }
     if(btn.dataset.tab === 'list') renderListAsync();
     if(btn.dataset.tab === 'write') renderStandardSelect();
     if(window.innerWidth <= 768) closeSidebar();
@@ -3292,16 +3257,24 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'<tr>'
     +'<td style="border:1px solid #bbb;padding:10px;text-align:center;font-size:12px;width:50%;vertical-align:top">'
     +'<div style="font-size:10px;color:#6b7280;margin-bottom:5px;font-weight:600">의 뢰 자</div>'
-    +'<canvas id="reqSigCanvas" width="220" height="80" style="border:1.5px dashed #cbd5e1;border-radius:6px;cursor:crosshair;background:#f8fafc;touch-action:none;display:block;margin:0 auto"></canvas>'
-    +'<img id="reqSigImg" src="" alt="서명" style="max-width:220px;max-height:80px;display:none;margin:0 auto;border-radius:4px;display:none">'
-    +'<div style="margin-top:5px;display:flex;gap:5px;justify-content:center">'
-    +'<button type="button" id="reqSigClearBtn" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">지우기</button>'
-    +'<button type="button" id="reqSigSaveBtn" style="background:#e60012;border:none;border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#fff">완료</button>'
-    +'<button type="button" id="reqSigResetBtn" style="display:none;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">다시 서명</button>'
+    +'<div id="reqSigInputArea">'
+    +'<input id="reqSigInput" type="text" placeholder="성명을 입력하세요" style="width:160px;border:1.5px dashed #cbd5e1;border-radius:6px;padding:6px 10px;font-size:13px;text-align:center;outline:none;background:#f8fafc;font-family:inherit">'
+    +'<div style="margin-top:6px"><button type="button" id="reqSigConfirmBtn" style="background:#e60012;border:none;border-radius:6px;padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;color:#fff">② 서명 확인</button></div>'
     +'</div>'
+    +'<div id="reqSigDisplay" style="display:none;font-family:\'Caveat\',cursive;font-size:28px;color:#111;padding:8px 0;min-height:52px;text-align:center;line-height:1.2"><span id="reqSigText"></span></div>'
+    +'<div id="reqSigEditArea" style="display:none;margin-top:4px"><button type="button" id="reqSigEditBtn" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">다시 입력</button></div>'
     +'<div id="reqSigStatus" style="font-size:9.5px;color:#22c55e;margin-top:3px;min-height:12px"></div>'
     +'</td>'
-    +'<td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px;width:50%">담 당 자</td>'
+    +'<td style="border:1px solid #bbb;padding:10px;text-align:center;font-size:12px;width:50%;vertical-align:top">'
+    +'<div style="font-size:10px;color:#6b7280;margin-bottom:5px;font-weight:600">담 당 자</div>'
+    +'<div id="mgSigInputArea">'
+    +'<input id="mgSigInput" type="text" placeholder="담당자 성명" style="width:160px;border:1.5px dashed #cbd5e1;border-radius:6px;padding:6px 10px;font-size:13px;text-align:center;outline:none;background:#f8fafc;font-family:inherit">'
+    +'<div style="margin-top:6px"><button type="button" id="mgSigConfirmBtn" style="background:#1f2937;border:none;border-radius:6px;padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;color:#fff">서명 확인</button></div>'
+    +'</div>'
+    +'<div id="mgSigDisplay" style="display:none;font-family:\'Caveat\',cursive;font-size:28px;color:#111;padding:8px 0;min-height:52px;text-align:center;line-height:1.2"><span id="mgSigText"></span></div>'
+    +'<div id="mgSigEditArea" style="display:none;margin-top:4px"><button type="button" id="mgSigEditBtn" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">다시 입력</button></div>'
+    +'<div id="mgSigStatus" style="font-size:9.5px;color:#22c55e;margin-top:3px;min-height:12px"></div>'
+    +'</td>'
     +'</tr>'
     +'</table>'
     +'<div style="background:#e60012;color:#fff;text-align:center;padding:5px;font-size:8.5px;font-weight:700;margin-bottom:4px">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>'
@@ -3316,172 +3289,107 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'</div></div>'
     +'</div>';
 
+  window._currentReqData = data;
   _initReqSigPad(data.signature||window._reqSignatureData||'');
+  _initMgSigPad(data.manager_signature||window._mgSignatureData||'');
 }
 
-// 현재 의뢰서 서명 이미지 (base64)
 window._reqSignatureData = window._reqSignatureData || '';
+window._mgSignatureData  = window._mgSignatureData  || '';
 
 function _initReqSigPad(existingSig){
-  var canvas = document.getElementById('reqSigCanvas');
-  var img    = document.getElementById('reqSigImg');
-  var status = document.getElementById('reqSigStatus');
-  var clearBtn = document.getElementById('reqSigClearBtn');
-  var saveBtn  = document.getElementById('reqSigSaveBtn');
-  var resetBtn = document.getElementById('reqSigResetBtn');
-  if(!canvas) return;
-  var ctx = canvas.getContext('2d');
+  var input      = document.getElementById('reqSigInput');
+  var inputArea  = document.getElementById('reqSigInputArea');
+  var display    = document.getElementById('reqSigDisplay');
+  var sigText    = document.getElementById('reqSigText');
+  var confirmBtn = document.getElementById('reqSigConfirmBtn');
+  var editBtn    = document.getElementById('reqSigEditBtn');
+  var editArea   = document.getElementById('reqSigEditArea');
+  var status     = document.getElementById('reqSigStatus');
+  if(!input) return;
 
-  function showSigned(src){
-    img.src = src;
-    img.style.display = 'block';
-    canvas.style.display = 'none';
-    clearBtn.style.display = 'none';
-    saveBtn.style.display  = 'none';
-    resetBtn.style.display = 'inline-block';
-    if(status) status.textContent = '✓ 서명 저장됨';
-    window._reqSignatureData = src;
+  function showSigned(text){
+    if(sigText)   sigText.textContent = text;
+    if(inputArea) inputArea.style.display = 'none';
+    if(display)   display.style.display  = 'block';
+    if(editArea)  editArea.style.display  = 'block';
+    if(status){   status.textContent = '✓ 서명 완료'; status.style.color = '#22c55e'; }
+    window._reqSignatureData = text;
   }
-
-  function showPad(){
-    img.style.display = 'none';
-    canvas.style.display = 'block';
-    clearBtn.style.display = 'inline-block';
-    saveBtn.style.display  = 'inline-block';
-    resetBtn.style.display = 'none';
-    if(status) status.textContent = '';
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function showInput(){
+    if(input)     input.value = '';
+    if(inputArea) inputArea.style.display = 'block';
+    if(display)   display.style.display  = 'none';
+    if(editArea)  editArea.style.display  = 'none';
+    if(status)    status.textContent = '';
     window._reqSignatureData = '';
   }
 
-  if(existingSig){ showSigned(existingSig); } else { showPad(); }
+  if(existingSig){ showSigned(existingSig); } else { showInput(); }
 
-  var drawing = false, lx = 0, ly = 0;
-  function coords(e){
-    var r = canvas.getBoundingClientRect();
-    var sx = canvas.width / r.width, sy = canvas.height / r.height;
-    if(e.touches) return { x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy };
-    return { x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy };
-  }
-  canvas.addEventListener('mousedown', function(e){
-    drawing=true; var p=coords(e); lx=p.x; ly=p.y;
-    ctx.beginPath(); ctx.arc(lx,ly,0.8,0,Math.PI*2); ctx.fillStyle='#111'; ctx.fill();
-  });
-  canvas.addEventListener('mousemove', function(e){
-    if(!drawing) return; var p=coords(e);
-    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
-    ctx.strokeStyle='#111'; ctx.lineWidth=1.6; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
-    lx=p.x; ly=p.y;
-  });
-  canvas.addEventListener('mouseup',    function(){ drawing=false; });
-  canvas.addEventListener('mouseleave', function(){ drawing=false; });
-  canvas.addEventListener('touchstart', function(e){ e.preventDefault(); drawing=true; var p=coords(e); lx=p.x; ly=p.y; },{passive:false});
-  canvas.addEventListener('touchmove',  function(e){ e.preventDefault(); if(!drawing) return; var p=coords(e);
-    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
-    ctx.strokeStyle='#111'; ctx.lineWidth=1.6; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
-    lx=p.x; ly=p.y; },{passive:false});
-  canvas.addEventListener('touchend', function(){ drawing=false; });
-
-  if(clearBtn) clearBtn.onclick = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(status) status.textContent=''; window._reqSignatureData=''; };
-  if(saveBtn)  saveBtn.onclick  = function(){
-    var isEmpty = !ctx.getImageData(0,0,canvas.width,canvas.height).data.some(function(v,i){ return i%4===3&&v>0; });
-    if(isEmpty){ if(status) status.textContent='서명을 먼저 그려주세요.'; status.style.color='#ef4444'; return; }
-    showSigned(canvas.toDataURL('image/png'));
-    showToast('서명이 저장되었습니다.');
+  if(confirmBtn) confirmBtn.onclick = function(){
+    var text = (input ? input.value : '').trim();
+    if(!text){ if(status){ status.textContent='성명을 입력하세요.'; status.style.color='#ef4444'; } return; }
+    showSigned(text);
+    showToast('서명이 완료되었습니다.');
   };
-  if(resetBtn) resetBtn.onclick = function(){ showPad(); };
+  if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter' && confirmBtn) confirmBtn.onclick(); });
+  if(editBtn) editBtn.onclick = function(){ showInput(); };
 }
 
-// ── EmailJS 이메일 자동 발송 ──
-function loadEmailJSConfigToUI(){
-  var s=localStorage.getItem('ej_service_id')||'';
-  var t=localStorage.getItem('ej_template_id')||'';
-  var p=localStorage.getItem('ej_public_key')||'';
-  var se=document.getElementById('ej_service_id'); if(se) se.value=s;
-  var te=document.getElementById('ej_template_id'); if(te) te.value=t;
-  var pe=document.getElementById('ej_public_key'); if(pe) pe.value=p;
-}
+function _initMgSigPad(existingSig){
+  var input      = document.getElementById('mgSigInput');
+  var inputArea  = document.getElementById('mgSigInputArea');
+  var display    = document.getElementById('mgSigDisplay');
+  var sigText    = document.getElementById('mgSigText');
+  var confirmBtn = document.getElementById('mgSigConfirmBtn');
+  var editBtn    = document.getElementById('mgSigEditBtn');
+  var editArea   = document.getElementById('mgSigEditArea');
+  var status     = document.getElementById('mgSigStatus');
+  if(!input) return;
 
-function saveEmailJSConfig(){
-  var s=(document.getElementById('ej_service_id')||{}).value||'';
-  var t=(document.getElementById('ej_template_id')||{}).value||'';
-  var p=(document.getElementById('ej_public_key')||{}).value||'';
-  localStorage.setItem('ej_service_id', s.trim());
-  localStorage.setItem('ej_template_id', t.trim());
-  localStorage.setItem('ej_public_key', p.trim());
-  initEmailJS();
-  var msg=document.getElementById('ejStatusMsg');
-  if(msg){ msg.style.display='block'; msg.style.background='#f0fdf4'; msg.style.color='#166534'; msg.textContent='✓ EmailJS 설정이 저장되었습니다.'; setTimeout(function(){ msg.style.display='none'; },3000); }
-}
-
-function initEmailJS(){
-  var p=localStorage.getItem('ej_public_key')||'';
-  if(p && window.emailjs){ try{ emailjs.init({publicKey:p}); }catch(e){ console.warn('EmailJS init 실패:', e); } }
-}
-
-var _EMAIL_TEMPLATE_HTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;background:#f3f5f8;margin:0;padding:24px}.wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)}.header{background:#e60012;padding:22px 30px;color:#fff}.header h1{margin:0;font-size:20px;font-weight:900;letter-spacing:0.5px}.header p{margin:4px 0 0;font-size:12px;opacity:.85}.body{padding:28px 30px}.greeting{font-size:15px;color:#1f2937;margin-bottom:20px;line-height:1.7}.table-wrap table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}.table-wrap th{background:#f4f5f7;color:#374151;font-weight:700;padding:9px 12px;text-align:left;border:1px solid #e5e7eb;width:32%}.table-wrap td{color:#1f2937;padding:9px 12px;border:1px solid #e5e7eb}.items-box{background:#fff5f5;border:1px solid #fecaca;border-radius:10px;padding:14px 18px;margin-bottom:20px}.items-box h3{margin:0 0 10px;font-size:13px;color:#dc2626;font-weight:800}.items-box ul{margin:0;padding-left:18px;font-size:13px;color:#374151;line-height:2}.footer{background:#f9fafb;padding:16px 30px;font-size:11.5px;color:#9ca3af;text-align:center;line-height:1.8;border-top:1px solid #e5e7eb}</style></head><body><div class="wrap"><div class="header"><h1>시험 의뢰 접수 확인</h1><p>일룸시험연구소 · IN HOUSE TEST REPORT</p></div><div class="body"><div class="greeting">안녕하세요, <b>{{to_name}}</b>님.<br>아래와 같이 시험 의뢰가 정상적으로 접수되었습니다.<br>담당자 검토 후 순차적으로 진행드리겠습니다.</div><div class="table-wrap"><table><tr><th>의뢰번호</th><td><b>{{req_no}}</b></td></tr><tr><th>접수일</th><td>{{submitted_date}}</td></tr><tr><th>회사명</th><td>{{company}}</td></tr><tr><th>시료명</th><td>{{product}}</td></tr><tr><th>색상</th><td>{{color}}</td></tr><tr><th>브랜드</th><td>{{brand}}</td></tr><tr><th>시료반환</th><td>{{return_type}}</td></tr><tr><th>비고</th><td>{{note}}</td></tr></table></div><div class="items-box"><h3>의뢰 시험 항목</h3><ul>{{items_html}}</ul></div></div><div class="footer">일룸시험연구소 &nbsp;|&nbsp; 경기도 안성시 공도읍 서동대로 4279<br>T 02-1577-5670 &nbsp;|&nbsp; 기술책임자 010-9422-5518 &nbsp;|&nbsp; www.iloom.com<br><br>본 메일은 시험 의뢰 접수 시 자동 발송됩니다.</div></div></body></html>';
-
-function copyEmailTemplate(){
-  if(navigator.clipboard){ navigator.clipboard.writeText(_EMAIL_TEMPLATE_HTML).then(function(){ var ok=document.getElementById('copyTemplateOk'); if(ok){ ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },2500); } }); }
-}
-
-async function sendRequestEmail(data){
-  var serviceId  = localStorage.getItem('ej_service_id')||'';
-  var templateId = localStorage.getItem('ej_template_id')||'';
-  var publicKey  = localStorage.getItem('ej_public_key')||'';
-  if(!serviceId||!templateId||!publicKey){ return; } // 미설정
-  if(!data.email){ return; }
-  if(!window.emailjs){ console.warn('EmailJS 로드 안됨'); return; }
-
-  var itemsArr = (data.items||[]).map(function(i){ return typeof i==='object'?(i.label||''):String(i).split(' - ')[0].trim(); });
-  var itemsHtml = itemsArr.map(function(s){ return '<li>'+s+'</li>'; }).join('');
-
-  try {
-    await emailjs.send(serviceId, templateId, {
-      to_email:       data.email,
-      to_name:        data.person || data.company || '의뢰자',
-      req_no:         data.no || '-',
-      company:        data.company || '-',
-      product:        data.product || '-',
-      color:          data.color || '-',
-      brand:          data.brand || '-',
-      return_type:    data.return_type || '-',
-      note:           data.note || '-',
-      submitted_date: (data.savedAt||'').slice(0,10) || '-',
-      items_html:     itemsHtml
-    });
-    showToast('✉️ 확인 이메일이 발송되었습니다.');
-  } catch(err){
-    console.warn('이메일 발송 실패:', err);
-    showToast('이메일 발송 실패: ' + (err.text||err.message||'설정을 확인하세요'));
+  function showSigned(text){
+    if(sigText)   sigText.textContent = text;
+    if(inputArea) inputArea.style.display = 'none';
+    if(display)   display.style.display  = 'block';
+    if(editArea)  editArea.style.display  = 'block';
+    if(status){   status.textContent = '✓ 서명 완료'; status.style.color = '#22c55e'; }
+    window._mgSignatureData = text;
   }
-}
-
-async function testEmailJSSend(){
-  var serviceId  = localStorage.getItem('ej_service_id')||'';
-  var templateId = localStorage.getItem('ej_template_id')||'';
-  var publicKey  = localStorage.getItem('ej_public_key')||'';
-  var msg=document.getElementById('ejStatusMsg');
-  if(!serviceId||!templateId||!publicKey){
-    if(msg){ msg.style.display='block'; msg.style.background='#fef2f2'; msg.style.color='#dc2626'; msg.textContent='Service ID, Template ID, Public Key를 모두 입력하고 저장하세요.'; }
-    return;
+  function showInput(){
+    if(input)     input.value = '';
+    if(inputArea) inputArea.style.display = 'block';
+    if(display)   display.style.display  = 'none';
+    if(editArea)  editArea.style.display  = 'none';
+    if(status)    status.textContent = '';
+    window._mgSignatureData = '';
   }
-  if(msg){ msg.style.display='block'; msg.style.background='#fffbeb'; msg.style.color='#92400e'; msg.textContent='테스트 이메일 발송 중...'; }
-  var u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
-  var testData = {
-    email:'jiyoung_kang@fursys.com', person:'관리자', company:'일룸', no:'TEST-001',
-    product:'테스트 시료', color:'흰색', brand:'ILOOM', return_type:'-', note:'테스트 발송',
-    savedAt: new Date().toISOString(), items:[{label:'내마모성 시험'},{label:'필링 시험'}]
+
+  if(existingSig){ showSigned(existingSig); } else { showInput(); }
+
+  if(confirmBtn) confirmBtn.onclick = function(){
+    var text = (input ? input.value : '').trim();
+    if(!text){ if(status){ status.textContent='성명을 입력하세요.'; status.style.color='#ef4444'; } return; }
+    showSigned(text);
+    saveMgrSignature(text);
+    showToast('담당자 서명이 저장되었습니다.');
   };
-  try {
-    await sendRequestEmail(testData);
-    if(msg){ msg.style.background='#f0fdf4'; msg.style.color='#166534'; msg.textContent='✓ 테스트 이메일이 jiyoung_kang@fursys.com 으로 발송되었습니다.'; }
-  } catch(e){
-    if(msg){ msg.style.background='#fef2f2'; msg.style.color='#dc2626'; msg.textContent='발송 실패: '+(e.text||e.message||'알 수 없는 오류'); }
-  }
+  if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter' && confirmBtn) confirmBtn.onclick(); });
+  if(editBtn) editBtn.onclick = function(){ showInput(); };
 }
 
-async function submitRequest(){
+function saveMgrSignature(text){
+  var d = window._currentReqData;
+  if(!d) return;
+  d.manager_signature = text;
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var fi = list.findIndex(function(r){ return r.no === d.no; });
+  if(fi >= 0) list[fi].manager_signature = text;
+  localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+}
+
+
+async function saveRequest(){
   var v = function(id){ return (document.getElementById(id)||{}).value||''; };
 
   // ── 필수 항목 검증 ──
@@ -3516,7 +3424,7 @@ async function submitRequest(){
     return_type:v('req_return'), qty:v('req_qty'), material_desc:v('req_material_desc'),
     signature: window._reqSignatureData||'',
     items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
-    status: 'submitted',
+    status: 'draft',
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
     chk_internal: document.getElementById('req_chk_internal')?.checked||false
   };
@@ -3535,8 +3443,27 @@ async function submitRequest(){
   renderReqList();
   renderReqMgmt();
   updateReqBadge();
+  showToast('저장 완료! 미리보기에서 서명 후 제출하세요.');
+}
+
+async function submitFinal(){
+  var d = window._currentReqData;
+  if(!d){ showToast('먼저 ① 저장을 눌러주세요.'); return; }
+  var sig = window._reqSignatureData || d.signature || '';
+  if(!sig){ showToast('② 서명을 완료한 후 제출하세요.'); return; }
+  d.signature = sig;
+  d.status = 'submitted';
+  d.savedAt = new Date().toISOString();
+  try { await setRequestAsync(d); } catch(e){ console.warn('Supabase 저장 실패:', e); }
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var fi = list.findIndex(function(r){ return r.no === d.no; });
+  if(fi>=0) list[fi]=d; else list.unshift(d);
+  localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+  window._currentReqData = d;
+  renderReqList();
+  renderReqMgmt();
+  updateReqBadge();
   showToast('제출 완료! 담당자가 확인 후 진행합니다.');
-  sendRequestEmail(data);
 }
 
 
@@ -3638,7 +3565,7 @@ function reqMgmtSetStatus(no, status){
 
 function printReqPreview(){
   const preview = document.getElementById('reqPreview');
-  if(!preview || preview.innerHTML.includes('입력 후')){ alert('먼저 제출하기 버튼을 눌러주세요.'); return; }
+  if(!preview || preview.innerHTML.includes('저장 버튼')){ alert('먼저 ① 저장 버튼을 눌러주세요.'); return; }
   const win = window.open('','_blank','width=794,height=1123');
   const css = `
     :root{--red:#e60012;--dark:#1f2937;--muted:#6b7280;--line:#e5e7eb}
@@ -3650,9 +3577,8 @@ function printReqPreview(){
     .req-red-bar,[style*="background:#e60012"],[style*="background:var(--red)"]{background:#e60012!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     table{border-collapse:collapse;width:100%}
     td,th{border:1px solid #ccc;padding:6px 8px;font-size:10px}
-    #reqSigClearBtn,#reqSigSaveBtn,#reqSigResetBtn,#reqSigStatus{display:none!important}
-    #reqSigCanvas{display:none!important}
-    #reqSigImg{display:block!important;max-width:200px;max-height:70px;margin:4px auto}
+    #reqSigInputArea,#reqSigEditArea,#mgSigInputArea,#mgSigEditArea,#reqSigStatus,#mgSigStatus{display:none!important}
+    #reqSigDisplay,#mgSigDisplay{display:block!important;font-family:'Caveat',cursive;font-size:28px;color:#111}
   `;
   win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>시험 의뢰서</title>'
     +'<style>'+css+'</style>'
@@ -4225,9 +4151,6 @@ function initAdminRegTab(){
 // ── 로그인 ──────────────────────────────────────────
 // 중요: Supabase 설정/함수 선언이 모두 끝난 뒤 실행되도록 DOMContentLoaded에서 로그인 초기화
 window.addEventListener('DOMContentLoaded', function(){
-  // EmailJS 초기화 (저장된 Public Key 있으면 자동 init)
-  setTimeout(initEmailJS, 500);
-
   var LS = document.getElementById('loginScreen');
   if(!LS) return;
 
