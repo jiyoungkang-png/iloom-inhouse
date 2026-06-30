@@ -3388,7 +3388,7 @@ function _initMgSigPad(existingSig){
     window._mgSignatureData = '';
   }
 
-  if(existingSig){ showSigned(existingSig); } else { showInput(); }
+  if(existingSig){ showSigned(existingSig); } else { showSigned('이용희'); }
 
   if(confirmBtn) confirmBtn.onclick = function(){
     var text = (input ? input.value : '').trim();
