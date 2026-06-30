@@ -2935,6 +2935,7 @@ function previewRequestOnly(){
     product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
     style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
     return_type:v('req_return'), qty:v('req_qty'), material_desc:v('req_material_desc'),
+    signature: window._reqSignatureData||'',
     items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
     chk_internal: document.getElementById('req_chk_internal')?.checked||false
@@ -3058,6 +3059,8 @@ function renderReqList(){
             });
           });
         }
+        // 서명 복원
+        window._reqSignatureData = r.signature||'';
         // 미리보기 갱신
         previewRequestOnly();
       }, 200);
@@ -3212,8 +3215,20 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'<div style="position:absolute;bottom:0;left:10mm;right:10mm">'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px">'
     +'<tr><th style="background:#f4f5f7;border:1px solid #bbb;padding:7px;text-align:center;font-size:12px" colspan="2">확인 (서명)</th></tr>'
-    +'<tr><td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px">의 뢰 자</td>'
-    +'<td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px">담 당 자</td></tr>'
+    +'<tr>'
+    +'<td style="border:1px solid #bbb;padding:10px;text-align:center;font-size:12px;width:50%;vertical-align:top">'
+    +'<div style="font-size:10px;color:#6b7280;margin-bottom:5px;font-weight:600">의 뢰 자</div>'
+    +'<canvas id="reqSigCanvas" width="220" height="80" style="border:1.5px dashed #cbd5e1;border-radius:6px;cursor:crosshair;background:#f8fafc;touch-action:none;display:block;margin:0 auto"></canvas>'
+    +'<img id="reqSigImg" src="" alt="서명" style="max-width:220px;max-height:80px;display:none;margin:0 auto;border-radius:4px;display:none">'
+    +'<div style="margin-top:5px;display:flex;gap:5px;justify-content:center">'
+    +'<button type="button" id="reqSigClearBtn" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">지우기</button>'
+    +'<button type="button" id="reqSigSaveBtn" style="background:#e60012;border:none;border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#fff">완료</button>'
+    +'<button type="button" id="reqSigResetBtn" style="display:none;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;color:#374151">다시 서명</button>'
+    +'</div>'
+    +'<div id="reqSigStatus" style="font-size:9.5px;color:#22c55e;margin-top:3px;min-height:12px"></div>'
+    +'</td>'
+    +'<td style="border:1px solid #bbb;padding:22px 10px;text-align:center;color:#888;font-size:12px;width:50%">담 당 자</td>'
+    +'</tr>'
     +'</table>'
     +'<div style="background:#e60012;color:#fff;text-align:center;padding:5px;font-size:8.5px;font-weight:700;margin-bottom:4px">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">'
@@ -3227,6 +3242,80 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'</div></div>'
     +'</div>';
 
+  _initReqSigPad(data.signature||window._reqSignatureData||'');
+}
+
+// 현재 의뢰서 서명 이미지 (base64)
+window._reqSignatureData = window._reqSignatureData || '';
+
+function _initReqSigPad(existingSig){
+  var canvas = document.getElementById('reqSigCanvas');
+  var img    = document.getElementById('reqSigImg');
+  var status = document.getElementById('reqSigStatus');
+  var clearBtn = document.getElementById('reqSigClearBtn');
+  var saveBtn  = document.getElementById('reqSigSaveBtn');
+  var resetBtn = document.getElementById('reqSigResetBtn');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  function showSigned(src){
+    img.src = src;
+    img.style.display = 'block';
+    canvas.style.display = 'none';
+    clearBtn.style.display = 'none';
+    saveBtn.style.display  = 'none';
+    resetBtn.style.display = 'inline-block';
+    if(status) status.textContent = '✓ 서명 저장됨';
+    window._reqSignatureData = src;
+  }
+
+  function showPad(){
+    img.style.display = 'none';
+    canvas.style.display = 'block';
+    clearBtn.style.display = 'inline-block';
+    saveBtn.style.display  = 'inline-block';
+    resetBtn.style.display = 'none';
+    if(status) status.textContent = '';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    window._reqSignatureData = '';
+  }
+
+  if(existingSig){ showSigned(existingSig); } else { showPad(); }
+
+  var drawing = false, lx = 0, ly = 0;
+  function coords(e){
+    var r = canvas.getBoundingClientRect();
+    var sx = canvas.width / r.width, sy = canvas.height / r.height;
+    if(e.touches) return { x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy };
+    return { x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy };
+  }
+  canvas.addEventListener('mousedown', function(e){
+    drawing=true; var p=coords(e); lx=p.x; ly=p.y;
+    ctx.beginPath(); ctx.arc(lx,ly,0.8,0,Math.PI*2); ctx.fillStyle='#111'; ctx.fill();
+  });
+  canvas.addEventListener('mousemove', function(e){
+    if(!drawing) return; var p=coords(e);
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle='#111'; ctx.lineWidth=1.6; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
+    lx=p.x; ly=p.y;
+  });
+  canvas.addEventListener('mouseup',    function(){ drawing=false; });
+  canvas.addEventListener('mouseleave', function(){ drawing=false; });
+  canvas.addEventListener('touchstart', function(e){ e.preventDefault(); drawing=true; var p=coords(e); lx=p.x; ly=p.y; },{passive:false});
+  canvas.addEventListener('touchmove',  function(e){ e.preventDefault(); if(!drawing) return; var p=coords(e);
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle='#111'; ctx.lineWidth=1.6; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
+    lx=p.x; ly=p.y; },{passive:false});
+  canvas.addEventListener('touchend', function(){ drawing=false; });
+
+  if(clearBtn) clearBtn.onclick = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(status) status.textContent=''; window._reqSignatureData=''; };
+  if(saveBtn)  saveBtn.onclick  = function(){
+    var isEmpty = !ctx.getImageData(0,0,canvas.width,canvas.height).data.some(function(v,i){ return i%4===3&&v>0; });
+    if(isEmpty){ if(status) status.textContent='서명을 먼저 그려주세요.'; status.style.color='#ef4444'; return; }
+    showSigned(canvas.toDataURL('image/png'));
+    showToast('서명이 저장되었습니다.');
+  };
+  if(resetBtn) resetBtn.onclick = function(){ showPad(); };
 }
 
 async function saveAndPreviewRequest(){
@@ -3262,6 +3351,7 @@ async function saveAndPreviewRequest(){
     product:v('req_product'), brand:v('req_brand'), color:v('req_color'),
     style:v('req_style'), fiber:v('req_fiber'), buyer:v('req_buyer'),
     return_type:v('req_return'), qty:v('req_qty'), material_desc:v('req_material_desc'),
+    signature: window._reqSignatureData||'',
     items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
     chk_internal: document.getElementById('req_chk_internal')?.checked||false
@@ -3297,6 +3387,9 @@ function printReqPreview(){
     .req-red-bar,[style*="background:#e60012"],[style*="background:var(--red)"]{background:#e60012!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     table{border-collapse:collapse;width:100%}
     td,th{border:1px solid #ccc;padding:6px 8px;font-size:10px}
+    #reqSigClearBtn,#reqSigSaveBtn,#reqSigResetBtn,#reqSigStatus{display:none!important}
+    #reqSigCanvas{display:none!important}
+    #reqSigImg{display:block!important;max-width:200px;max-height:70px;margin:4px auto}
   `;
   win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>시험 의뢰서</title>'
     +'<style>'+css+'</style>'
@@ -3325,6 +3418,7 @@ function clearRequest(){
   document.querySelectorAll('.req-item-chk').forEach(c=>c.checked=false);
   // 커스텀 항목 제거
   document.querySelectorAll('.req-item-custom').forEach(el=>el.remove());
+  window._reqSignatureData = '';
   const preview=document.getElementById('reqPreview');
   if(preview) preview.innerHTML='<div style="text-align:center;color:#aaa;margin-top:60px;font-size:13px">입력 후 저장 &amp; 미리보기를 눌러주세요</div>';
 }
