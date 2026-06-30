@@ -347,6 +347,7 @@ button,input,select{font:inherit}
           <span style="font-size:11px;color:#aab2c0" id="syncLabel">동기화 중...</span>
         </div>
         <button class="nav-btn active" data-tab="request"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>의뢰서 작성</button>
+        <button class="nav-btn" data-tab="reqview" id="reqViewNavBtn" style="display:flex;align-items:center;justify-content:space-between"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>의뢰 관리</span><span id="reqViewBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6">0</span></button>
         <button class="nav-btn" data-tab="write"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>성적서 작성</button>
         <button class="nav-btn" data-tab="list"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>성적서 조회</button>
         <button class="nav-btn" data-tab="standard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>시험 규격 관리</button>
@@ -499,7 +500,7 @@ button,input,select{font:inherit}
             <textarea id="req_note" rows="2" style="border:1px solid #d1d5db;border-radius:9px;padding:9px 13px;font-size:13px;outline:none;resize:vertical" placeholder="기타 요청사항"></textarea>
           </label>
           <div style="display:flex;gap:10px">
-            <button onclick="saveAndPreviewRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">저장 &amp; 미리보기</button>
+            <button onclick="submitRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">제출하기</button>
             <button onclick="clearRequest()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer">초기화</button>
           </div>
         </div>
@@ -525,8 +526,29 @@ button,input,select{font:inherit}
           </div>
           <div style="display:flex;justify-content:center">
             <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box">
-              <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">저장 &amp; 미리보기 버튼을 눌러주세요</div>
+              <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">제출하기 버튼을 눌러주세요</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 의뢰 관리 탭 ── -->
+      <section class="tab-panel" id="tab-reqview">
+        <div class="card" style="max-width:1000px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <h2 style="margin:0">접수된 의뢰</h2>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="reqviewFilter" onchange="renderReqMgmt()" style="border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;font-size:13px;color:#374151;outline:none">
+                <option value="">전체</option>
+                <option value="submitted">제출됨</option>
+                <option value="processing">처리중</option>
+                <option value="completed">완료</option>
+              </select>
+              <button onclick="renderReqMgmt()" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#374151">새로고침</button>
+            </div>
+          </div>
+          <div id="reqMgmtList" style="display:flex;flex-direction:column;gap:12px">
+            <div style="text-align:center;color:#9ca3af;padding:40px 0;font-size:13px">로딩 중...</div>
           </div>
         </div>
       </section>
@@ -1311,13 +1333,14 @@ function applyRoleTabControl(user){
   // 탭 버튼 제어
   const isOwner = user.id === ADMIN_ID; // jiyoung_kang만
   const tabRules = {
-    'request':  true,                        // 모두 보임
-    'write':    isTester || isAdminUser,     // 시험원 + 관리자
-    'list':     isTester || isAdminUser,     // 시험원 + 관리자
-    'standard': isOwner || isAdminUser,       // jiyoung_kang + 관리자
-    'setting':  isOwner,                     // jiyoung_kang만
-    'admin':    isOwner,                     // jiyoung_kang만
-    'accounts': isOwner,                     // jiyoung_kang만
+    'request':  true,                            // 모두 보임
+    'reqview':  isAdminUser || isTester,         // 관리자 + 시험원
+    'write':    isTester || isAdminUser,         // 시험원 + 관리자
+    'list':     isTester || isAdminUser,         // 시험원 + 관리자
+    'standard': isOwner || isAdminUser,          // jiyoung_kang + 관리자
+    'setting':  isOwner,                         // jiyoung_kang만
+    'admin':    isOwner,                         // jiyoung_kang만
+    'accounts': isOwner,                         // jiyoung_kang만
   };
 
   document.querySelectorAll('.nav-btn[data-tab]').forEach(function(btn){
@@ -1591,6 +1614,7 @@ function navInit(){
     if(btn.dataset.tab === 'accounts') renderAccounts();
     if(btn.dataset.tab === 'admin'){ renderAccounts(); initAdminRegTab(); }
     if(btn.dataset.tab === 'request'){ initRequestTab(); renderReqListAsync(); }
+    if(btn.dataset.tab === 'reqview'){ renderReqMgmt(); updateReqBadge(); }
     if(btn.dataset.tab === 'list') renderListAsync();
     if(btn.dataset.tab === 'write') renderStandardSelect();
     if(window.innerWidth <= 768) closeSidebar();
@@ -2986,6 +3010,7 @@ async function renderReqListAsync(){
     }
   } catch(e){ console.warn('의뢰서 Supabase 로드 실패:', e); }
   renderReqList(); // renderReqListAsync 아닌 renderReqList 호출!
+  updateReqBadge();
 }
 
 function renderReqList(){
@@ -3318,7 +3343,7 @@ function _initReqSigPad(existingSig){
   if(resetBtn) resetBtn.onclick = function(){ showPad(); };
 }
 
-async function saveAndPreviewRequest(){
+async function submitRequest(){
   var v = function(id){ return (document.getElementById(id)||{}).value||''; };
 
   // ── 필수 항목 검증 ──
@@ -3353,6 +3378,7 @@ async function saveAndPreviewRequest(){
     return_type:v('req_return'), qty:v('req_qty'), material_desc:v('req_material_desc'),
     signature: window._reqSignatureData||'',
     items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
+    status: 'submitted',
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
     chk_internal: document.getElementById('req_chk_internal')?.checked||false
   };
@@ -3369,13 +3395,111 @@ async function saveAndPreviewRequest(){
   var kolasSrc2 = kolasEl ? kolasEl.src : '';
   renderReqPreviewHTML(data, iloomSrc2, kolasSrc2);
   renderReqList();
-  alert('저장 완료! 미리보기를 확인하세요.');
+  renderReqMgmt();
+  updateReqBadge();
+  showToast('제출 완료! 담당자가 확인 후 진행합니다.');
 }
 
 
+// ── 의뢰 관리 탭 렌더링 ──
+function updateReqBadge(){
+  var badge = document.getElementById('reqViewBadge');
+  if(!badge) return;
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var count = list.filter(function(r){ return r.status === 'submitted'; }).length;
+  if(count > 0){ badge.textContent = count > 99 ? '99+' : count; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+}
+
+function renderReqMgmt(){
+  var container = document.getElementById('reqMgmtList');
+  if(!container) return;
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var filterEl = document.getElementById('reqviewFilter');
+  var filter = filterEl ? filterEl.value : '';
+  var items = filter ? list.filter(function(r){ return r.status === filter; }) : list;
+  items = items.slice().sort(function(a,b){ return (b.savedAt||'').localeCompare(a.savedAt||''); });
+
+  if(!items.length){
+    container.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:40px 0;font-size:13px">'+(filter ? '해당 상태의 의뢰가 없습니다.' : '접수된 의뢰가 없습니다.')+'</div>';
+    return;
+  }
+
+  var ST = {
+    submitted:  {label:'제출됨',  color:'#dc2626', bg:'#fef2f2', border:'#fecaca'},
+    processing: {label:'처리중',  color:'#d97706', bg:'#fffbeb', border:'#fde68a'},
+    completed:  {label:'완료',    color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0'}
+  };
+
+  container.innerHTML = items.map(function(r){
+    var st = ST[r.status] || ST['submitted'];
+    var reqItems = (r.items||[]).map(function(i){ return typeof i==='object'?(i.label||''):String(i).split(' - ')[0].trim(); });
+    var itemText = reqItems.slice(0,4).join(' · ') + (reqItems.length > 4 ? ' 외 '+(reqItems.length-4)+'건' : '');
+    var dateStr = r.savedAt ? r.savedAt.slice(0,10)+' '+r.savedAt.slice(11,16) : '';
+    return '<div style="border:1px solid #e5e7eb;border-radius:14px;padding:18px 20px;background:#fff;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">'
+      +'<div style="flex:1;min-width:220px">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
+      +'<span style="background:'+st.bg+';color:'+st.color+';border:1px solid '+st.border+';border-radius:9999px;padding:2px 10px;font-size:11px;font-weight:800">'+st.label+'</span>'
+      +'<span style="font-size:12px;color:#9ca3af">'+r.no+'</span>'
+      +'<span style="font-size:11px;color:#9ca3af">'+dateStr+'</span>'
+      +'</div>'
+      +'<div style="font-size:17px;font-weight:900;color:#1f2937;margin-bottom:4px">'+escHtml(r.company||'-')+' <span style="font-size:14px;font-weight:600;color:#4b5563">/ '+escHtml(r.person||'-')+'</span></div>'
+      +'<div style="font-size:13px;color:#374151;margin-bottom:4px"><b>시료명:</b> '+escHtml(r.product||'-')+(r.color?' &nbsp;<span style="color:#6b7280">'+escHtml(r.color)+'</span>':'')+'</div>'
+      +(itemText?'<div style="font-size:12px;color:#6b7280;line-height:1.7"><b style="color:#374151">시험항목:</b> '+escHtml(itemText)+'</div>':'')
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
+      +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
+      +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
+      +'<select onchange="reqMgmtSetStatus(\''+escAttr(r.no)+'\',this.value);this.value=\'\'" style="border:1px solid #d1d5db;border-radius:9px;padding:7px 6px;font-size:11px;color:#374151;cursor:pointer;outline:none;width:128px;background:#fff">'
+      +'<option value="">상태 변경 ▾</option>'
+      +'<option value="submitted">제출됨으로</option>'
+      +'<option value="processing">처리중으로</option>'
+      +'<option value="completed">완료로</option>'
+      +'</select>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
+
+function reqMgmtPreview(no){
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var r = list.find(function(x){ return x.no === no; });
+  if(!r) return;
+  window._reqSignatureData = r.signature||'';
+  var iloomEl = document.getElementById('iloom-logo-src');
+  var kolasEl = document.getElementById('kolas-logo-src');
+  renderReqPreviewHTML(r, iloomEl?iloomEl.src:'', kolasEl?kolasEl.src:'');
+  var btn = document.querySelector('.nav-btn[data-tab="request"]');
+  if(btn) btn.click();
+}
+
+function reqMgmtToReport(no){
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var r = list.find(function(x){ return x.no === no; });
+  if(!r) return;
+  applyRequestToReport(r);
+  var btn = document.querySelector('.nav-btn[data-tab="write"]');
+  if(btn) btn.click();
+  if(r.status === 'submitted') reqMgmtSetStatus(no, 'processing');
+}
+
+function reqMgmtSetStatus(no, status){
+  if(!status) return;
+  var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var fi = list.findIndex(function(x){ return x.no === no; });
+  if(fi < 0) return;
+  list[fi].status = status;
+  localStorage.setItem('iloom_requests_v1', JSON.stringify(list));
+  renderReqMgmt();
+  updateReqBadge();
+}
+
 function printReqPreview(){
   const preview = document.getElementById('reqPreview');
-  if(!preview || preview.innerHTML.includes('입력 후')){ alert('먼저 저장 & 미리보기를 눌러주세요.'); return; }
+  if(!preview || preview.innerHTML.includes('입력 후')){ alert('먼저 제출하기 버튼을 눌러주세요.'); return; }
   const win = window.open('','_blank','width=794,height=1123');
   const css = `
     :root{--red:#e60012;--dark:#1f2937;--muted:#6b7280;--line:#e5e7eb}
