@@ -3530,8 +3530,7 @@ function renderReqMgmt(){
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
       +(r.status==='submitted'
-        ? '<button onclick="reqMgmtConfirmToggle(this)" style="background:#dcfce7;border:1px solid #86efac;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#166534;width:128px">제출 확인</button>'
-         +'<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" class="req-save-btn" style="display:none;background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">저장</button>'
+        ? '<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" style="background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">제출 확인 · 저장</button>'
         : '')
       +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
       +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
@@ -3549,14 +3548,6 @@ function renderReqMgmt(){
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
 
-function reqMgmtConfirmToggle(btn){
-  btn.style.background = '#166534';
-  btn.style.color = '#fff';
-  btn.textContent = '✓ 확인됨';
-  btn.onclick = null;
-  var saveBtn = btn.parentElement.querySelector('.req-save-btn');
-  if(saveBtn) saveBtn.style.display = 'block';
-}
 
 function reqMgmtPreview(no){
   var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
