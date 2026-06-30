@@ -3550,6 +3550,7 @@ function reqMgmtPreview(no){
   var r = list.find(function(x){ return x.no === no; });
   if(!r) return;
   window._reqSignatureData = r.signature||'';
+  if(r.status === 'submitted') reqMgmtSetStatus(no, 'processing');
   var iloomEl = document.getElementById('iloom-logo-src');
   var kolasEl = document.getElementById('kolas-logo-src');
   renderReqPreviewHTML(r, iloomEl?iloomEl.src:'', kolasEl?kolasEl.src:'');
