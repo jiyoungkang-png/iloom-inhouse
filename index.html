@@ -3030,10 +3030,18 @@ async function renderReqListAsync(){
     if(supaReqs && supaReqs.length > 0){
       const localList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
       const merged = [...localList];
+      const statusRank = {draft:0, submitted:1, processing:2, completed:3};
       supaReqs.forEach(function(sr){
         const idx = merged.findIndex(function(lr){ return lr.no===sr.no; });
-        if(idx === -1) merged.push(sr);
-        else merged[idx] = sr; // 최신 데이터로 업데이트
+        if(idx === -1){ merged.push(sr); }
+        else {
+          const localStatus = merged[idx].status;
+          merged[idx] = sr;
+          // 로컬 상태가 Supabase보다 앞서 있으면 로컬 상태 유지 (관리자 확인 등)
+          if((statusRank[localStatus]||0) > (statusRank[sr.status]||0)){
+            merged[idx].status = localStatus;
+          }
+        }
       });
       localStorage.setItem('iloom_requests_v1', JSON.stringify(merged));
     }
