@@ -3529,6 +3529,10 @@ function renderReqMgmt(){
       +(itemText?'<div style="font-size:12px;color:#6b7280;line-height:1.7"><b style="color:#374151">시험항목:</b> '+escHtml(itemText)+'</div>':'')
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
+      +(r.status==='submitted'
+        ? '<button onclick="reqMgmtConfirmToggle(this)" style="background:#dcfce7;border:1px solid #86efac;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#166534;width:128px">제출 확인</button>'
+         +'<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" class="req-save-btn" style="display:none;background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">저장</button>'
+        : '')
       +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
       +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
       +'<select onchange="reqMgmtSetStatus(\''+escAttr(r.no)+'\',this.value);this.value=\'\'" style="border:1px solid #d1d5db;border-radius:9px;padding:7px 6px;font-size:11px;color:#374151;cursor:pointer;outline:none;width:128px;background:#fff">'
@@ -3545,12 +3549,20 @@ function renderReqMgmt(){
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
 
+function reqMgmtConfirmToggle(btn){
+  btn.style.background = '#166534';
+  btn.style.color = '#fff';
+  btn.textContent = '✓ 확인됨';
+  btn.onclick = null;
+  var saveBtn = btn.parentElement.querySelector('.req-save-btn');
+  if(saveBtn) saveBtn.style.display = 'block';
+}
+
 function reqMgmtPreview(no){
   var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
   var r = list.find(function(x){ return x.no === no; });
   if(!r) return;
   window._reqSignatureData = r.signature||'';
-  if(r.status === 'submitted') reqMgmtSetStatus(no, 'processing');
   var iloomEl = document.getElementById('iloom-logo-src');
   var kolasEl = document.getElementById('kolas-logo-src');
   renderReqPreviewHTML(r, iloomEl?iloomEl.src:'', kolasEl?kolasEl.src:'');
