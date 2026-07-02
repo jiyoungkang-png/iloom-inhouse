@@ -515,19 +515,21 @@ button,input,select{font:inherit}
             <button onclick="saveRequest()" style="background:#e60012;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;cursor:pointer">① 저장</button>
             <button onclick="clearRequest()" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer">초기화</button>
           </div>
-        </div>
 
-        <!-- 의뢰서 목록 -->
-        <div class="card no-print" id="reqListSection" style="max-width:860px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;gap:3px;margin-bottom:12px">
-            <h2 style="margin:0">저장된 의뢰서</h2>
-            <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">선택 삭제</button>
+          <!-- 저장된 의뢰서 목록 (버튼 바로 아래) -->
+          <div id="reqListSection" style="margin-top:16px;border-top:1px solid #e5e7eb;padding-top:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:800;color:#374151">저장된 의뢰서</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div id="reqSelectAllRow" style="display:flex;align-items:center;gap:6px">
+                  <input type="checkbox" id="reqSelectAll" style="width:14px;height:14px;accent-color:#e60012;cursor:pointer">
+                  <label for="reqSelectAll" style="font-size:12px;color:#6b7280;cursor:pointer">전체선택</label>
+                </div>
+                <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer">선택 삭제</button>
+              </div>
+            </div>
+            <div id="reqList"></div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb">
-            <input type="checkbox" id="reqSelectAll" style="width:15px;height:15px;accent-color:#e60012;cursor:pointer">
-            <label for="reqSelectAll" style="font-size:13px;font-weight:700;color:#374151;cursor:pointer">전체 선택</label>
-          </div>
-          <div id="reqList"></div>
         </div>
 
         <!-- A4 미리보기 -->
@@ -1363,9 +1365,7 @@ function applyRoleTabControl(user){
     btn.style.display = tabRules[tab] ? '' : 'none';
   });
 
-  // reqListSection 숨김 처리
-  const reqListSec = document.getElementById('reqListSection');
-  if(reqListSec) reqListSec.style.display = isRequester ? 'none' : '';
+  // reqListSection: 관리자/시험원은 항상 표시, 의뢰자는 renderReqList()가 목록 기준으로 제어
 
   // 의뢰자는 기본 정보 빈칸으로
   if(isRequester){
@@ -3037,11 +3037,14 @@ async function renderReqListAsync(){
         if(idx === -1){ merged.push(sr); }
         else {
           const localStatus = merged[idx].status;
+          const localSavedBy = merged[idx].savedBy;  // 로컬의 savedBy 보존
           merged[idx] = sr;
-          // 로컬 상태가 Supabase보다 앞서 있으면 로컬 상태 유지 (관리자 확인 등)
+          // 로컬 상태가 Supabase보다 앞서 있으면 로컬 상태 유지
           if((statusRank[localStatus]||0) > (statusRank[sr.status]||0)){
             merged[idx].status = localStatus;
           }
+          // Supabase에 savedBy가 없으면 로컬 값 유지
+          if(!merged[idx].savedBy && localSavedBy) merged[idx].savedBy = localSavedBy;
         }
       });
       localStorage.setItem('iloom_requests_v1', JSON.stringify(merged));
@@ -3056,18 +3059,20 @@ function renderReqList(){
   const role = u.role||'시험원';
   const isAdminOrTester = role==='관리자' || u.id===ADMIN_ID || role==='시험원';
   const allList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
-  // 의뢰자는 본인이 저장한 것만 표시 (savedBy 또는 person으로 매칭)
+  // 의뢰자는 본인이 저장한 것만 표시
   const list = isAdminOrTester ? allList : allList.filter(function(r){
-    return r.savedBy === u.id || r.person === (u.name||u.id) || (r.no && r.no.indexOf(u.id) > -1);
+    if(r.savedBy) return r.savedBy === u.id;          // savedBy 있으면 정확히 매칭
+    return r.person === (u.name||u.id);               // 구버전 데이터: person 이름으로 fallback
   });
   const box = document.getElementById('reqList');
   if(!box) return;
 
-  // 의뢰자도 본인 의뢰서 섹션 표시 (목록이 있을 때만)
+  // 섹션 표시: 항상 보임
   const reqListSection = document.getElementById('reqListSection');
-  if(reqListSection){
-    reqListSection.style.display = (isAdminOrTester || list.length > 0) ? '' : 'none';
-  }
+  if(reqListSection) reqListSection.style.display = '';
+  // 전체선택은 관리자/시험원만 표시
+  const selectAllRow = document.getElementById('reqSelectAllRow');
+  if(selectAllRow) selectAllRow.style.display = isAdminOrTester ? '' : 'none';
 
   box.innerHTML = list.length ? '' : '<p class="note">저장된 의뢰서가 없습니다.</p>';
   list.forEach(function(r){
