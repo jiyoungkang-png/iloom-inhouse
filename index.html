@@ -287,17 +287,7 @@ button,input,select{font:inherit}
   padding-left: 7px !important;
 }
 
-/* ── 사이트 QR 코드 ── */
-.qr-site-wrap{margin-top:22px;text-align:center;padding-top:20px;border-top:1px solid #f3f4f6}
-.qr-access-line{font-size:12px;color:#374151;margin:0 0 14px;font-weight:600}
-.qr-access-line a{color:var(--red);text-decoration:none;font-weight:800}
-.qr-access-line a:hover{text-decoration:underline}
-.qr-site-logo{font-size:22px;font-weight:900;color:var(--red);letter-spacing:2px;margin-bottom:4px}
-.qr-site-title{font-size:13px;font-weight:800;color:#1f2937;margin-bottom:4px;letter-spacing:.3px}
-.qr-site-sub{font-size:11px;color:#9ca3af;margin:0 0 14px}
-.qr-site-wrap canvas,.qr-site-wrap img{border-radius:6px;display:inline-block}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <!-- 로고 이미지 저장소 -->
@@ -323,14 +313,6 @@ button,input,select{font:inherit}
     </div>
     <button class="login-btn" id="loginBtn">로그인</button>
 
-    <!-- 사이트 QR 코드 -->
-    <div class="qr-site-wrap">
-      <p class="qr-access-line">QR 또는 <a id="qrAccessLink" href="." target="_blank">접속</a> ◀ 클릭</p>
-      <div class="qr-site-logo">iloom</div>
-      <div class="qr-site-title">IN HOUSE TEST REPORT 플랫폼</div>
-      <p class="qr-site-sub">아래 QR코드를 스캔하여 접속하세요</p>
-      <div id="qrSiteCanvas"></div>
-    </div>
   </div>
 </div>
 <!-- ══════════════════════════════════════════════════ -->
@@ -4320,21 +4302,6 @@ window.addEventListener('DOMContentLoaded', function(){
 
   if(logoutBtnEl) logoutBtnEl.onclick = doLogout;
 
-  // ── 사이트 QR 코드 (URL 표시용) ──
-  var qrSiteCanvas = document.getElementById('qrSiteCanvas');
-  var qrAccessLink = document.getElementById('qrAccessLink');
-  var siteUrl = window.location.href.split('?')[0].split('#')[0];
-  if(qrAccessLink) qrAccessLink.href = siteUrl;
-  if(qrSiteCanvas && typeof QRCode !== 'undefined'){
-    new QRCode(qrSiteCanvas, {
-      text: siteUrl,
-      width: 160,
-      height: 160,
-      colorDark: '#1f2937',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }
 
   // 1시간 비활동 시 자동 로그아웃
   var _inactiveTimer = null;
