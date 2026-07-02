@@ -3325,10 +3325,12 @@ function updateSubmitBtn(){
   var btn = document.getElementById('submitFinalBtn');
   if(!btn) return;
   var ok = !!(window._currentReqData && window._reqSignatureData);
+  var alreadySubmitted = !!(window._currentReqData && window._currentReqData.status === 'submitted');
   btn.disabled = !ok;
   btn.style.background = ok ? '#e60012' : '#d1d5db';
   btn.style.color = ok ? '#fff' : '#9ca3af';
   btn.style.cursor = ok ? 'pointer' : 'not-allowed';
+  btn.textContent = alreadySubmitted ? '③ 수정제출하기' : '③ 제출하기';
 }
 
 function _initReqSigPad(existingSig){
