@@ -540,7 +540,7 @@ button,input,select{font:inherit}
             </div>
           </div>
           <div style="display:flex;justify-content:center">
-            <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box">
+            <div id="reqPreview" style="width:210mm;min-height:297mm;background:#fff;padding:10mm 12mm 2mm;box-shadow:0 8px 28px rgba(0,0,0,.2);font-size:9px;font-family:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Segoe UI',sans-serif;color:#111;position:relative;box-sizing:border-box;display:flex;flex-direction:column">
               <div style="text-align:center;color:#aaa;padding-top:80px;font-size:13px">① 저장 버튼을 눌러 미리보기를 생성하세요</div>
             </div>
           </div>
@@ -3275,7 +3275,7 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'<div style="font-weight:900;font-size:13px;color:#e60012;border-bottom:2px solid #e60012;padding-bottom:4px;margin-bottom:6px">■ 비고</div>'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">'
     +'<tr><td style="border:1px solid #bbb;padding:12px;min-height:60px;height:auto;vertical-align:top;white-space:pre-wrap;font-size:12px">'+data.note+'</td></tr></table>'
-    +'<div style="margin-top:8mm">'
+    +'<div id="reqSigSection" style="margin-top:auto">'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px">'
     +'<tr><th style="background:#f4f5f7;border:1px solid #bbb;padding:7px;text-align:center;font-size:12px" colspan="2">확인 (서명)</th></tr>'
     +'<tr>'
@@ -3622,8 +3622,9 @@ function printReqPreview(){
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
     @page{size:A4 portrait;margin:0}
     html{background:#e5e7eb}
-    body{width:210mm;margin:0 auto;padding:20mm 18mm;font-family:'Pretendard Variable',Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:11px;color:#111;background:#fff}
-    @media print{html{background:#fff}body{margin:0;padding:20mm 18mm}}
+    body{width:210mm;min-height:275mm;margin:0 auto;padding:20mm 18mm 2mm;font-family:'Pretendard Variable',Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:11px;color:#111;background:#fff;display:flex;flex-direction:column;box-sizing:border-box}
+    #reqSigSection{margin-top:auto!important}
+    @media print{html{background:#fff}body{margin:0;padding:20mm 18mm 2mm}}
     .p1f-contact-bar{background:#e60012!important;color:#fff!important;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     .red-title{color:#e60012!important;font-weight:900;font-size:13px;margin:16px 0 6px}
     .req-red-bar,[style*="background:#e60012"],[style*="background:var(--red)"]{background:#e60012!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
