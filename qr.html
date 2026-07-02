@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iloom · IN HOUSE TEST REPORT 접속 QR</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+      background: #f3f5f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      padding: 32px 28px 28px;
+      text-align: center;
+      width: 280px;
+    }
+    .logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: #e60012;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .sub {
+      font-size: 11.5px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    #qrBox {
+      display: inline-block;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #qrBox canvas, #qrBox img {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">iloom</div>
+    <div class="title">일룸 시험연구소 로그인</div>
+    <p class="sub">아래 QR코드를 스캔하여 접속하세요</p>
+    <div id="qrBox"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    new QRCode(document.getElementById('qrBox'), {
+      text: 'https://iloom-inhouse.vercel.app/',
+      width: 200,
+      height: 200,
+      colorDark: '#1f2937',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  </script>
+</body>
+</html>
