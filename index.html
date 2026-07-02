@@ -349,7 +349,7 @@ button,input,select{font:inherit}
           <span style="font-size:11px;color:#aab2c0" id="syncLabel">동기화 중...</span>
         </div>
         <button class="nav-btn active" data-tab="request"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>의뢰서 작성</button>
-        <button class="nav-btn" data-tab="reqview" id="reqViewNavBtn" style="display:flex;align-items:center;justify-content:space-between"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>의뢰 관리</span><span id="reqViewBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6">0</span></button>
+        <button class="nav-btn" data-tab="reqview" id="reqViewNavBtn" style="display:flex;align-items:center;gap:10px"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>의뢰 관리</span><span id="reqViewBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6">0</span></button>
         <button class="nav-btn" data-tab="write"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>성적서 작성</button>
         <button class="nav-btn" data-tab="list"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>성적서 조회</button>
         <button class="nav-btn" data-tab="standard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>시험 규격 관리</button>
@@ -364,7 +364,7 @@ button,input,select{font:inherit}
 
       <!-- 로그인 계정 + 로그아웃 -->
       <div class="side-card" style="margin-top:12px;padding:12px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;gap:8px">
           <div>
             <div style="font-size:11px;color:#aab2c0;margin-bottom:2px">로그인 계정</div>
             <div style="font-size:13px;font-weight:700;color:#fff" id="sidebarUsername">jiyoung_kang</div>
@@ -479,7 +479,7 @@ button,input,select{font:inherit}
             </label>
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#374151;margin-bottom:12px">
-            <div style="background:#f1f5f9;border-left:3px solid #e60012;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;color:#374151;letter-spacing:0.3px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <div style="background:#f1f5f9;border-left:3px solid #e60012;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;color:#374151;letter-spacing:0.3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;gap:8px">
               <span>의뢰 시험 항목</span>
               <div style="display:flex;gap:6px">
                 <button type="button" onclick="if(requireAdmin())saveReqItemList();" style="background:#e60012;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">목록 저장</button>
@@ -519,7 +519,7 @@ button,input,select{font:inherit}
 
         <!-- 의뢰서 목록 -->
         <div class="card no-print" id="reqListSection" style="max-width:860px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <h2 style="margin:0">저장된 의뢰서</h2>
             <button id="reqDelSelectedBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer">선택 삭제</button>
           </div>
@@ -550,7 +550,7 @@ button,input,select{font:inherit}
       <!-- ── 의뢰 관리 탭 ── -->
       <section class="tab-panel" id="tab-reqview">
         <div class="card" style="max-width:1000px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <h2 style="margin:0">접수된 의뢰</h2>
             <div style="display:flex;gap:8px;align-items:center">
               <select id="reqviewFilter" onchange="renderReqMgmt()" style="border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;font-size:13px;color:#374151;outline:none">
@@ -786,7 +786,7 @@ button,input,select{font:inherit}
           </div>
 
           <!-- 계정 목록 + 선택 삭제 -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div style="font-size:14px;font-weight:800;color:#1f2937">등록된 계정</div>
             <button id="adminDelSelectedBtn" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;display:none">선택 삭제</button>
           </div>
@@ -1246,7 +1246,7 @@ async function showRequestPickerModal(callback){
 
   reqList.forEach(function(req){
     const item = document.createElement('div');
-    item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:background .15s';
+    item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:background .15s';
     item.onmouseover = function(){ this.style.background='#fff5f5';this.style.borderColor='#e60012'; };
     item.onmouseout  = function(){ this.style.background='';this.style.borderColor='#e5e7eb'; };
 
@@ -1400,7 +1400,7 @@ function openMyPage(){
 
   overlay.innerHTML = `
     <div style="background:#fff;border-radius:20px;padding:32px 28px;width:420px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.3)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
         <div style="font-size:18px;font-weight:900;color:#1f2937">내 정보</div>
         <button onclick="document.getElementById('myPageModal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af">×</button>
       </div>
@@ -1842,7 +1842,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
     <div class="sr">
       <div class="sc">확&nbsp;인</div>
       <div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm">성 명 : ${e2(r.tester)} &nbsp;&nbsp; (서명)</div></div>
-      <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm" style="display:flex;align-items:center;justify-content:space-between"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+      <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm" style="display:flex;align-items:center;gap:10px"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
       <div class="ss"><div class="ss-lbl">품질책임자</div><div class="ss-nm">성 명 : ${e2(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
       <div class="stamp"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
     </div>
@@ -2127,7 +2127,7 @@ function renderDetailSection(externalData){
 
       // ── 헤더 ──
       const header = document.createElement('div');
-      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
+      header.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0d0d0';
       const titleEl = document.createElement('div');
       titleEl.style.cssText = 'font-size:13px;font-weight:800;color:#e60012;letter-spacing:.3px';
       const dispName = saved['name_edit_'+i] || t.name || ('항목 '+(i+1));
@@ -2459,7 +2459,7 @@ function renderPreview(){
         <div class="p1f-sign-row">
           <div class="p1f-confirm">확&nbsp;인</div>
           <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc(r.tester)} &nbsp;&nbsp; (서명)</div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name" style="display:flex;align-items:center;justify-content:space-between"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name" style="display:flex;align-items:center;gap:10px"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
           <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
           <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
@@ -2478,7 +2478,7 @@ function renderPreview(){
         <div class="p1f-sign-row" style="margin-bottom:0">
           <div class="p1f-confirm">확&nbsp;인</div>
           <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name">성 명 : ${esc(r.tester)} &nbsp;&nbsp; (서명)</div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name" style="display:flex;align-items:center;justify-content:space-between"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name" style="display:flex;align-items:center;gap:10px"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
           <div class="p1f-signer" style="border-right:1px solid #bbb"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name">성 명 : ${esc(r.qualityManager)} &nbsp;&nbsp; (서명)</div></div>
           <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid #bbb;padding:0 12px;background:#fff5f5"><div style="width:52px;height:52px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:8px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
@@ -3964,7 +3964,7 @@ function renderSideMemberList(){
   box.innerHTML = '';
   list.forEach(function(acc){
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:#0f1923;border-radius:6px;padding:5px 8px';
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;background:#0f1923;border-radius:6px;padding:5px 8px';
     const info = document.createElement('div');
     info.innerHTML = '<div style="font-size:11px;font-weight:700;color:#fff">' + acc.id + '</div>'
       + '<div style="font-size:10px;color:#aab2c0">' + (acc.name||'-') + ' · ' + acc.role + '</div>';
