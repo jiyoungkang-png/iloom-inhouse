@@ -3056,17 +3056,17 @@ function renderReqList(){
   const role = u.role||'시험원';
   const isAdminOrTester = role==='관리자' || u.id===ADMIN_ID || role==='시험원';
   const allList = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
-  // 의뢰자는 본인이 작성한 것만 표시
+  // 의뢰자는 본인이 저장한 것만 표시 (savedBy 또는 person으로 매칭)
   const list = isAdminOrTester ? allList : allList.filter(function(r){
-    return r.person === (u.name||u.id) || r.no && r.no.indexOf(u.id) > -1;
+    return r.savedBy === u.id || r.person === (u.name||u.id) || (r.no && r.no.indexOf(u.id) > -1);
   });
   const box = document.getElementById('reqList');
   if(!box) return;
 
-  // 의뢰자는 저장된 의뢰서 섹션 완전히 숨김
+  // 의뢰자도 본인 의뢰서 섹션 표시 (목록이 있을 때만)
   const reqListSection = document.getElementById('reqListSection');
   if(reqListSection){
-    reqListSection.style.display = isAdminOrTester ? '' : 'none';
+    reqListSection.style.display = (isAdminOrTester || list.length > 0) ? '' : 'none';
   }
 
   box.innerHTML = list.length ? '' : '<p class="note">저장된 의뢰서가 없습니다.</p>';
@@ -3464,7 +3464,8 @@ async function saveRequest(){
     items:getCheckedReqItems(), note:v('req_note'), savedAt:new Date().toISOString(),
     status: 'draft',
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
-    chk_internal: document.getElementById('req_chk_internal')?.checked||false
+    chk_internal: document.getElementById('req_chk_internal')?.checked||false,
+    savedBy: (function(){ try{ return JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id||''; }catch(e){return '';} })()
   };
   // Supabase에 저장
   try { await setRequestAsync(data); } catch(e){ console.warn('의뢰서 Supabase 저장 실패:', e); }
