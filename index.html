@@ -1896,7 +1896,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
       <div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.tester)}</span>${r.testerSign?`<img src="${r.testerSign}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:''}</div></div>
       <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span><img src="${JY_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
       <div class="ss" style="border-right:none"><div class="ss-lbl">품질책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.qualityManager)}</span><img src="${SJ_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
-      <div class="stamp" style="border-left:none"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+      <div class="stamp"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
     </div>
     <div class="cb">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
     <div class="ab"><span><b>${e2(r.companyName)}</b> &nbsp; ${e2(r.companyAddress)}</span><span>T ${e2(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${e2(r.companyWeb)}</span></div>
@@ -1966,8 +1966,6 @@ function newReport(){
   currentId = null; sampleImageData=''; testerSignData='';
   techSignData=JY_SIGN_DATA; qualitySignData=SJ_SIGN_DATA;
   (function(){[{k:'tech',d:JY_SIGN_DATA},{k:'quality',d:SJ_SIGN_DATA}].forEach(function(s){const prev=document.getElementById('signPreview_'+s.k);if(prev)prev.innerHTML='<img src="'+s.d+'" style="max-height:32px;max-width:80px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">';const box=document.getElementById('signUpload'+s.k.charAt(0).toUpperCase()+s.k.slice(1));if(box){box.style.borderColor='#6b7280';box.style.background='#fff';}});})();
-  // 작성자 초기 서명 적용
-  if(window._applyTesterSign){ const tsel=document.getElementById('tester'); if(tsel) window._applyTesterSign(tsel.value); }
   // 회사정보는 현재 입력값 유지
   const companyFields=['companyName','companyAddress','companyTel','companyFax','companyWeb'];
   const savedCompany={};
@@ -1977,6 +1975,8 @@ function newReport(){
     if(companyFields.includes(id)) setVal(id, savedCompany[id]);
     else setVal(id, base[id]||'');
   });
+  // 작성자 서명 적용 — setVal로 tester 값이 확정된 뒤 호출
+  if(window._applyTesterSign){ const tsel=document.getElementById('tester'); if(tsel) window._applyTesterSign(tsel.value); }
   const tbody=$('testTable').querySelector('tbody'); tbody.innerHTML='';
   // 세부데이터 섹션 강제 초기화
   const dBox = document.getElementById('detailDataSection'); if(dBox) dBox.innerHTML='';
@@ -2517,7 +2517,7 @@ function renderPreview(){
           <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>${testerSignData?`<img src="${testerSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tester\').click()\\">서명 이미지 클릭</span>'}</div></div>
           <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span><img src="${JY_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
           <div class="p1f-signer" style="border-right:none"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span><img src="${SJ_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
-          <div style="padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+          <div style="border-left:1px solid #bbb;padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
         <div class="p1f-contact-bar">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
         <div class="p1f-addr-row"><span><b>${esc(r.companyName)}</b> &nbsp; ${esc(r.companyAddress)}</span><span>T ${esc(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${esc(r.companyWeb)}</span></div>
@@ -2536,7 +2536,7 @@ function renderPreview(){
           <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>${testerSignData?`<img src="${testerSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tester\').click()\\">서명 이미지 클릭</span>'}</div></div>
           <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span><img src="${JY_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
           <div class="p1f-signer" style="border-right:none"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span><img src="${SJ_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>
-          <div style="padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
+          <div style="border-left:1px solid #bbb;padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
         <h3 class="section-line-title" style="margin:4mm 0 4px;line-height:1.25">세부 시험 결과 데이터</h3>
       </div>
