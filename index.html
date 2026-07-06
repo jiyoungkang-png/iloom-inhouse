@@ -110,10 +110,12 @@ button,input,select{font:inherit}
 .report-table .green{color:var(--green);font-weight:900}
 .page1-footer{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}
 .p1f-sign-row{display:flex;border:1px solid #bbb;margin-bottom:0}
-.p1f-signer{flex:1;border-right:1px solid #bbb;padding:6px 10px;font-size:10px}
+.p1f-signer{flex:1;border-right:1px solid #bbb;padding:6px 10px;font-size:10px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .p1f-signer:last-child{border-right:none}
-.p1f-signer-label{color:#555;font-size:8.5px;margin-bottom:2px}
-.p1f-signer-name{font-weight:700;display:flex;align-items:center;gap:3px}
+.p1f-signer-label{color:#555;font-size:8.5px;margin-bottom:3px;align-self:flex-start}
+.p1f-signer-name{font-weight:700;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
+.sign-slot{border:1px dashed #bbb;border-radius:4px;padding:3px 14px;color:#aaa;font-size:8px;cursor:pointer;user-select:none;white-space:nowrap}
+.sign-slot:hover{border-color:#888;color:#666;background:#fafafa}
 .p1f-stamp-row{display:flex;border:1px solid #bbb;border-top:none;background:#fff5f5;align-items:center;padding:5px 10px;gap:6px;font-size:8px;color:#c00;font-weight:700}
 .p1f-contact-bar{background:var(--red);color:#fff;text-align:center;padding:5px 8px;font-size:9.5px;margin-bottom:3px;margin-top:3px}
 .p1f-addr-row{display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:#333;margin-bottom:3px}
@@ -671,6 +673,9 @@ button,input,select{font:inherit}
               <input id="sampleImage" type="file" accept="image/*">
               <span>시료 이미지 업로드</span>
             </label>
+            <input type="file" id="signFile_tester" accept="image/*" style="display:none">
+            <input type="file" id="signFile_tech" accept="image/*" style="display:none">
+            <input type="file" id="signFile_quality" accept="image/*" style="display:none">
             <div class="thumb" id="imagePreview">이미지 없음</div>
           </div>
         </div>
@@ -856,6 +861,9 @@ const storeKey = 'iloom_inhouse_reports_v1';
 const standardsKey = 'iloom_test_standards_v1';
 let currentId = null;
 let sampleImageData = '';
+let testerSignData = '';
+let techSignData = '';
+let qualitySignData = '';
 
 const defaultStandards = [
   {name:'염색견뢰도 (변퇴색 및 자체이염)', spec:'KS K ISO 105-A01:2010', result:'4 / 4-5 (급)', category:'물성시험'},
@@ -1695,6 +1703,10 @@ function bindInputs(){
     const file=e.target.files[0]; if(!file) return;
     const reader=new FileReader(); reader.onload=()=>{sampleImageData=reader.result; renderImage(); renderPreview();}; reader.readAsDataURL(file);
   });
+  [{id:'signFile_tester',ref:()=>testerSignData,set:v=>{testerSignData=v;}},{id:'signFile_tech',ref:()=>techSignData,set:v=>{techSignData=v;}},{id:'signFile_quality',ref:()=>qualitySignData,set:v=>{qualitySignData=v;}}].forEach(function(s){
+    const el=$(s.id); if(!el) return;
+    el.addEventListener('change',function(e){ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=function(){s.set(reader.result); renderPreview();}; reader.readAsDataURL(file); });
+  });
   $('addStandardBtn').onclick=()=>addTest(getStandards()[$('standardSelect').value]);
   $('addCustomBtn').onclick=()=>addTest({name:'',spec:'',result:'',category:'물성시험'});
   $('newBtn').onclick=newReport; $('saveBtn').onclick=()=>saveReport(false); $('deleteBtn').onclick=deleteCurrent;
@@ -1779,10 +1791,10 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
 .it .bold{font-weight:900}
 .ft{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}
 .sr{display:flex;border:1px solid #bbb;margin-bottom:6px}
-.ss{flex:1;border-right:1px solid #bbb;padding:6px 10px;font-size:10px}
+.ss{flex:1;border-right:1px solid #bbb;padding:6px 10px;font-size:10px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .ss:last-child{border-right:none}
-.ss-lbl{color:#555;font-size:8.5px;margin-bottom:2px}
-.ss-nm{font-weight:700;display:flex;align-items:center;gap:3px}
+.ss-lbl{color:#555;font-size:8.5px;margin-bottom:3px;align-self:flex-start}
+.ss-nm{font-weight:700;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
 .stamp{border-left:1px solid #bbb;padding:0 12px;background:#fff5f5;display:flex;align-items:center;justify-content:center}
 .cb{background:var(--red);color:#fff;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0}
 .ab{display:flex;justify-content:space-between;font-size:9.5px;color:#333;margin-bottom:3px}
@@ -1839,9 +1851,9 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
   </table>
   <div class="ft">
     <div class="sr">
-      <div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.tester)}</span>&nbsp;<span style="color:#555">(서명)</span></div></div>
-      <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
-      <div class="ss"><div class="ss-lbl">품질책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.qualityManager)}</span>${r.qualityManager==='장성진'?SJ_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+      <div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.tester)}</span>${r.testerSign?`<img src="${r.testerSign}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:''}</div></div>
+      <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span>${r.techSign?`<img src="${r.techSign}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:''}</div></div>
+      <div class="ss"><div class="ss-lbl">품질책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.qualityManager)}</span>${r.qualitySign?`<img src="${r.qualitySign}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:''}</div></div>
       <div class="stamp"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
     </div>
     <div class="cb">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
@@ -1909,7 +1921,7 @@ window.addEventListener('load',function(){
   $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
 }
 function newReport(){
-  currentId = null; sampleImageData='';
+  currentId = null; sampleImageData=''; testerSignData=''; techSignData=''; qualitySignData='';
   // 회사정보는 현재 입력값 유지
   const companyFields=['companyName','companyAddress','companyTel','companyFax','companyWeb'];
   const savedCompany={};
@@ -2047,7 +2059,7 @@ function collectReport(autoSaved){
   // ID 우선순위: currentId > receiptNo > 새 UUID
   const receiptNo = val('receiptNo');
   const id = currentId || (receiptNo ? receiptNo : crypto.randomUUID());
-  const data={id:id,savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,tests:collectTests(),detailData:getDetailData()};
+  const data={id:id,savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,testerSign:testerSignData,techSign:techSignData,qualitySign:qualitySignData,tests:collectTests(),detailData:getDetailData()};
   fields.forEach(function(fid){data[fid]=val(fid);});
   const me=document.getElementById('sampleMaterials');
   data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[];
@@ -2456,9 +2468,9 @@ function renderPreview(){
       </tr></tbody></table>
       <div class="page1-footer">
         <div class="p1f-sign-row">
-          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>&nbsp;<span style="color:#555">(서명)</span></div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span>${r.qualityManager==='장성진'?SJ_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>${testerSignData?`<img src="${testerSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tester\').click()\\">서명 이미지 클릭</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${techSignData?`<img src="${techSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tech\').click()\\">서명 이미지 클릭</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span>${qualitySignData?`<img src="${qualitySignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_quality\').click()\\">서명 이미지 클릭</span>'}</div></div>
           <div style="border-left:1px solid #bbb;padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
         <div class="p1f-contact-bar">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>
@@ -2475,9 +2487,9 @@ function renderPreview(){
       <div style="padding:16mm 10mm 0mm;min-height:40mm;box-sizing:border-box">
         <div class="sub-head" style="margin-bottom:6px"><span>접수번호 : ${esc(r.receiptNo)}</span><span>시료명 : ${esc(r.sampleName||"")}</span></div>
         <div class="p1f-sign-row" style="margin-bottom:0">
-          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>&nbsp;<span style="color:#555">(서명)</span></div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${r.techManager==='강지영'?JY_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
-          <div class="p1f-signer"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span>${r.qualityManager==='장성진'?SJ_SIGN_IMG:'<span style=\\"color:#555\\">(서명)</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">작 성 자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.tester)}</span>${testerSignData?`<img src="${testerSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tester\').click()\\">서명 이미지 클릭</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">기술책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.techManager)}</span>${techSignData?`<img src="${techSignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_tech\').click()\\">서명 이미지 클릭</span>'}</div></div>
+          <div class="p1f-signer"><div class="p1f-signer-label">품질책임자</div><div class="p1f-signer-name"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${esc(r.qualityManager)}</span>${qualitySignData?`<img src="${qualitySignData}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:'<span class=\\"sign-slot\\" onclick=\\"document.getElementById(\'signFile_quality\').click()\\">서명 이미지 클릭</span>'}</div></div>
           <div style="border-left:1px solid #bbb;padding:0 10px;background:#fff5f5;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border:2px solid #c00;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c00;font-size:7.5px;font-weight:900;text-align:center;line-height:1.3">품질<br>보증팀<br>직인</div></div>
         </div>
         <h3 class="section-line-title" style="margin:4mm 0 4px;line-height:1.25">세부 시험 결과 데이터</h3>
@@ -3731,6 +3743,7 @@ async function loadReport(r){
   currentId=r.id;
   fields.forEach(id=>setVal(id,r[id]||''));
   sampleImageData=r.image||'';
+  testerSignData=r.testerSign||''; techSignData=r.techSign||''; qualitySignData=r.qualitySign||'';
   // 재질 표시
   const matEl3=document.getElementById('sampleMaterials');
   if(matEl3){
