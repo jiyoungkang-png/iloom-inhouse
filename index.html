@@ -1796,6 +1796,9 @@ function bindInputs(){
         const csJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
         const csCrit = crit || '1종 ≤ 10\n2종 ≤ 13';
         blocks+=`<div class="rb">${th}${csCrit?`<div class="dc"><b>기준</b><br>${e2(csCrit)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과 (mm)</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}</td><td>-</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}</td><td>-</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}</td><td style="text-align:center">1종 ≤ 10<br>2종 ≤ 13</td></tr>${csJudge}</table></div>`;
+      } else if(nm.includes('롤링')){
+        const rJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td></td></tr>` : '';
+        blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th></tr>${rJudge}</table></div>`;
       } else if(nm.includes('내구성')){
         const dc=det['detail_crit_'+i]||crit||'';
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
