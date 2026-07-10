@@ -924,6 +924,11 @@ const DEFAULT_REQ_ITEMS = [
   {label:'수직하중시험', spec:'KS G 4300'}
 ];
 
+const PENDING_REQ_LABELS = new Set([
+  '염색견뢰도 (마찰)', '염색견뢰도 (땀)', '염색견뢰도 (물)',
+  '인장강도', '인열강도', '필링', 'pH', '포름알데히드'
+]);
+
 function getReqItemList(){
   try {
     const saved = localStorage.getItem(REQ_ITEM_LIST_KEY);
@@ -954,29 +959,34 @@ function resetReqItemList(){
 }
 
 function makeReqItemRow(item, isCustom){
+  const isPending = !isCustom && PENDING_REQ_LABELS.has(item.label);
+
   // div 컨테이너 (label 대신 사용 - button 클릭 충돌 방지)
   const row = document.createElement('div');
   row.className = 'req-item-row' + (isCustom ? ' req-item-custom' : '');
   row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;transition:background .15s;font-size:12px;color:#374151;cursor:default'
-    + (isCustom ? ';grid-column:1/-1;background:#fff9f9;border:1px dashed #fca5a5;margin-top:4px' : '');
+    + (isCustom ? ';grid-column:1/-1;background:#fff9f9;border:1px dashed #fca5a5;margin-top:4px' : '')
+    + (isPending ? ';opacity:0.55' : '');
 
   // 체크박스 클릭 영역 (label로 감싸기)
   const lbl = document.createElement('label');
-  lbl.style.cssText = 'display:flex;align-items:center;gap:8px;flex:1;cursor:pointer;min-width:0';
+  lbl.style.cssText = 'display:flex;align-items:center;gap:8px;flex:1;cursor:' + (isPending ? 'default' : 'pointer') + ';min-width:0';
 
   const chk = document.createElement('input');
   chk.type = 'checkbox';
   chk.className = 'req-item-chk';
   chk.checked = isCustom ? true : false;
+  chk.disabled = isPending;
   chk.dataset.label = item.label;
   chk.dataset.spec  = item.spec||'';
-  chk.style.cssText = 'width:16px;height:16px;accent-color:#e60012;cursor:pointer;flex-shrink:0';
+  chk.style.cssText = 'width:16px;height:16px;accent-color:#e60012;cursor:' + (isPending ? 'not-allowed' : 'pointer') + ';flex-shrink:0';
 
   const txt = document.createElement('span');
   txt.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap';
   txt.innerHTML = (isCustom ? '<span style="font-weight:700;color:#e60012;font-size:11px">+</span> ' : '')
     + '<span style="font-weight:700;color:#1f2937">'+item.label+'</span>'
-    + (item.spec ? '<span style="color:#9ca3af;font-size:10px;margin-left:2px">'+item.spec+'</span>' : '');
+    + (item.spec ? '<span style="color:#9ca3af;font-size:10px;margin-left:2px">'+item.spec+'</span>' : '')
+    + (isPending ? '<span style="background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;font-size:9px;font-weight:700;border-radius:4px;padding:1px 5px;margin-left:4px">준비중</span>' : '');
 
   lbl.appendChild(chk);
   lbl.appendChild(txt);
@@ -3371,7 +3381,7 @@ function renderReqPreviewHTML(data, iloomSrc, kolasSrc){
     +'<span style="font-size:8.5px;color:#222;font-weight:800">일룸수면과학연구소 &nbsp; <span style="font-weight:400;color:#444">경기도 안성시 공도읍 서동대로 4279</span></span>'
     +'<span style="font-size:8px;color:#444">T 02-1577-5670 &nbsp;|&nbsp; 기술책임자 010-9422-5518 &nbsp;|&nbsp; www.iloom.com</span>'
     +'</div>'
-    +'<div style="padding:3px 0 6mm;border-top:1px solid #e5e7eb">'
+    +'<div style="padding:3px 0 0;border-top:1px solid #e5e7eb">'
     +'<div style="font-size:7.5px;color:#555;line-height:1.9">'
     +'<div>※ 용도가 KOLAS용이 아닌 경우 KS Q ISO/IEC 17025 및 KOLAS 인정과 무관함을 알려드립니다.</div>'
     +'<div>※ 본 신청서의 기입 내용을 허위로 작성하여 발생한 문제에 대해서는 의뢰자에게 책임이 있음을 알려드립니다.</div>'
@@ -3688,9 +3698,9 @@ function printReqPreview(){
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
     @page{size:A4 portrait;margin:0}
     html{background:#e5e7eb}
-    body{width:210mm;min-height:275mm;margin:0 auto;padding:20mm 18mm 2mm;font-family:'Pretendard Variable',Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:11px;color:#111;background:#fff;display:flex;flex-direction:column;box-sizing:border-box}
+    body{width:210mm;min-height:297mm;margin:0 auto;padding:20mm 18mm 1mm;font-family:'Pretendard Variable',Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:11px;color:#111;background:#fff;display:flex;flex-direction:column;box-sizing:border-box}
     #reqSigSection{margin-top:auto!important}
-    @media print{html{background:#fff}body{margin:0;padding:20mm 18mm 2mm}}
+    @media print{html{background:#fff}body{margin:0;padding:20mm 18mm 1mm}}
     .p1f-contact-bar{background:#e60012!important;color:#fff!important;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     .red-title{color:#e60012!important;font-weight:900;font-size:13px;margin:16px 0 6px}
     .req-red-bar,[style*="background:#e60012"],[style*="background:var(--red)"]{background:#e60012!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
