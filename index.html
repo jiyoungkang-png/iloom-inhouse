@@ -3986,7 +3986,11 @@ async function loadReport(r){
   try {
     const rows = await supaFetch('reports', 'GET');
     const full = (rows||[]).find(function(x){ return x.id === r.id; });
-    if(full && full.data) r = full.data;
+    if(full && full.data){
+      const localImage = r.image; // Supabase에 이미지가 없을 때를 대비해 로컬 보존
+      r = full.data;
+      if(!r.image && localImage) r.image = localImage;
+    }
   } catch(e){ console.warn('Supabase 불러오기 실패, 로컬 사용:', e); }
   currentId=r.id;
   fields.forEach(id=>setVal(id,r[id]||''));
