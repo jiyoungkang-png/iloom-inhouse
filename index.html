@@ -354,6 +354,7 @@ button,input,select{font:inherit}
         <button class="nav-btn" data-tab="reqview" id="reqViewNavBtn" style="display:flex;align-items:center;gap:3px"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>의뢰 관리</span><span id="reqViewBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6">0</span></button>
         <button class="nav-btn" data-tab="write"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>성적서 작성</button>
         <button class="nav-btn" data-tab="list"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>성적서 조회</button>
+        <button class="nav-btn" data-tab="pdfstore" id="pdfstoreNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>PDF 보관함</button>
         <button class="nav-btn" data-tab="standard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>시험 규격 관리</button>
         <button class="nav-btn" data-tab="setting"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>회사/결재 설정</button>
         <button class="nav-btn" data-tab="admin" id="adminNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>관리자 등록</button>
@@ -733,6 +734,15 @@ button,input,select{font:inherit}
               onclick="document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=false;});document.getElementById('listSelectAll').checked=false;updateListActionBar();">선택 해제</button>
           </div>
           <div id="reportList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- PDF 보관함 탭 -->
+      <section class="tab-panel" id="tab-pdfstore">
+        <div class="card no-print">
+          <div class="section-title"><h2>📄 PDF 보관함</h2></div>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:16px">최종작성완료된 성적서 목록입니다. PDF 출력 버튼으로 바로 인쇄하세요.</p>
+          <div id="pdfStoreList"><p style="color:#9ca3af;text-align:center;padding:24px 0">발행완료된 성적서가 없습니다.</p></div>
         </div>
       </section>
 
@@ -1694,6 +1704,7 @@ function navInit(){
     if(btn.dataset.tab === 'reqview'){ renderReqMgmt(); updateReqBadge(); }
     if(btn.dataset.tab === 'list') renderListAsync();
     if(btn.dataset.tab === 'write') renderStandardSelect();
+    if(btn.dataset.tab === 'pdfstore') renderPdfStore();
     if(window.innerWidth <= 768) closeSidebar();
   }));
 }
@@ -1708,7 +1719,7 @@ function updateTopbar(tab){
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
   // 탭별 제목
-  const titles = {request:'의뢰서 작성', write:'', list:'성적서 조회', standard:'시험 규격 관리', setting:'회사/결재 설정', accounts:'계정 관리', admin:'관리자 등록'};
+  const titles = {request:'의뢰서 작성', write:'', list:'성적서 조회', pdfstore:'PDF 보관함', standard:'시험 규격 관리', setting:'회사/결재 설정', accounts:'계정 관리', admin:'관리자 등록'};
   if(titleEl) titleEl.textContent = titles[tab] || '';
 
   // 항상 actions 표시
@@ -1730,6 +1741,14 @@ function updateTopbar(tab){
     if(saveBtn) saveBtn.style.display = 'none';
     if(deleteBtn) deleteBtn.style.display = 'none';
     if(printBtn) printBtn.style.display = '';
+    if(autoSaveStatus) autoSaveStatus.style.display = 'none';
+    if(finalizeBtn) finalizeBtn.style.display = 'none';
+    if(requestUnlockBtn) requestUnlockBtn.style.display = 'none';
+  } else if(tab === 'pdfstore'){
+    if(newBtn) newBtn.style.display = 'none';
+    if(saveBtn) saveBtn.style.display = 'none';
+    if(deleteBtn) deleteBtn.style.display = 'none';
+    if(printBtn) printBtn.style.display = 'none';
     if(autoSaveStatus) autoSaveStatus.style.display = 'none';
     if(finalizeBtn) finalizeBtn.style.display = 'none';
     if(requestUnlockBtn) requestUnlockBtn.style.display = 'none';
@@ -1802,8 +1821,8 @@ function bindInputs(){
   $('newBtn').onclick=newReport; $('saveBtn').onclick=()=>saveReport(false); $('deleteBtn').onclick=deleteCurrent;
   $('printBtn').onclick=()=>{
     const r=collectReport();
-    // 저장 안 됐으면 출력 불가
-    if(_hasUnsaved || !currentId){
+    // 발행완료 성적서는 저장 없이 출력 가능, 그 외는 저장 필요
+    if(!_reportIsIssued && (_hasUnsaved || !currentId)){
       alert('저장을 해주세요.\n저장 버튼을 누른 후 PDF 출력이 가능합니다.');
       return;
     }
@@ -1863,7 +1882,8 @@ function bindInputs(){
         blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">결과</td><td class="rv">${e2(det['genResult_'+i]||'')}</td><td>${e2(crit||t.result||'')}</td></tr>${jr}</table></div>`;
       }
     });
-    blocks+=`<div class="rb photo-rb"><div class="rbt"><div class="rbtt"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="pb"><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="pc">${sampleImageData?`<img src="${sampleImageData}">`:`[ ${e2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="cap">${e2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${e2(r.sampleName)}</div></div></div></div>`;
+    const imgSrc = r.image || sampleImageData || '';
+    blocks+=`<div class="rb photo-rb"><div class="rbt"><div class="rbtt"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="pb"><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="pc">${imgSrc?`<img src="${imgSrc}">`:`[ ${e2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="cap">${e2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${e2(r.sampleName)}</div></div></div></div>`;
 
     const CSS=`
 :root{--red:#e60012}
@@ -2009,7 +2029,36 @@ window.addEventListener('load',function(){
 
     const pw=window.open('','_blank');
     if(pw){ pw.document.write(HTML); pw.document.close(); }
-  }; $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
+  };
+  window._buildPrintHTML = function(r){
+    const e2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const f2=s=>s?String(s).replace(/-/g,'.') :'';
+    const tests=r.tests||[];
+    const det=r.detailData||{};
+    const ksrc=document.getElementById('kolas-logo-src')?.src||'';
+    const showKolas=(r.purpose||'').trim()==='KOLAS용';
+    const ml={fabric:'원단',sponge:'스펀지',antibac:'항균',padding:'패딩',mattress:'매트리스'};
+    const mt=(r.materials&&r.materials.length)?' ['+r.materials.map(m=>ml[m]||m).join(', ')+']':'';
+    const imgSrc = r.image || '';
+    let blocks='';
+    tests.forEach(function(t,i){
+      const nm=(t.name||'').toLowerCase(),title=t.name||'항목 '+(i+1),spec=t.spec||'',crit=t.crit||'';
+      const jg=det['judge_'+i]||'';
+      const jr=jg?`<tr><td class="left" style="font-weight:800">판정</td><td class="rv" colspan="2" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${jg}</td></tr>`:'';
+      const th=`<div class="rbt"><div class="rbtt"><span>${e2(title)}</span>${spec?`<span style="font-weight:400;font-size:11px">(${e2(spec)})</span>`:''}</div></div>`;
+      if(nm.includes('치수의 측정')||nm.includes('치수의측정')){let rows='';for(let di=0;di<10;di++){const lv=det['dim_l_'+i+'_'+di]||'';const wv=det['dim_w_'+i+'_'+di]||'';const rv=det['dim_result_'+i+'_'+di]||'';if(!lv&&!wv&&!rv)continue;rows+=`<tr><td class="left">L=${e2(lv)} mm / W=${e2(wv)} mm</td><td class="rv" style="color:#2563eb">${e2(rv)}</td></tr>`;}if(!rows)rows='<tr><td colspan="2" style="color:#aaa">입력된 측정값 없음</td></tr>';blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt"><tr><th style="width:55%">측정값</th><th>시험 결과 (mm, class)</th></tr>${rows}</table></div>`;}
+      else if(nm.includes('압축줄음률')||nm.includes('영구압축')||nm.includes('줄음률')){const t0=det['t0_'+i]||'';const t1=det['t1_'+i]||'';const pct=det['cs_pct_'+i]||'';const csJudge=jg?`<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>`:'';const csCrit=crit||'1종 ≤ 10\n2종 ≤ 13';blocks+=`<div class="rb">${th}${csCrit?`<div class="dc"><b>기준</b><br>${e2(csCrit)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과 (mm)</th><th>기준</th></tr><tr><td class="left">시험 전 두께 (t₀)</td><td class="rv">${e2(t0)}</td><td>-</td></tr><tr><td class="left">시험 후 두께 (t₁)</td><td class="rv">${e2(t1)}</td><td>-</td></tr><tr><td class="left">영구압축 줄음률</td><td class="rv" style="color:#2563eb">${e2(pct)}</td><td style="text-align:center">1종 ≤ 10<br>2종 ≤ 13</td></tr>${csJudge}</table></div>`;}
+      else if(nm.includes('롤링')){const rJudge=jg?`<tr><td style="font-weight:800;text-align:center;padding:4px">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'};text-align:center">${e2(jg)}</td></tr>`:'';blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt" style="width:100%"><tr><th style="width:50%;text-align:center">구분</th><th style="width:50%;text-align:center">시험 결과</th></tr>${rJudge}</table></div>`;}
+      else if(nm.includes('내구성')){const dc=det['detail_crit_'+i]||crit||'';const dJudge=jg?`<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>`:'';blocks+=`<div class="rb">${th}${dc?`<div class="dc"><b>기준</b><br>${e2(dc)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr><tr><td class="left">d1 (mm)</td><td class="rv">${e2(det['d1_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d2 (mm)</td><td class="rv">${e2(det['d2_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d3 (mm)</td><td class="rv">${e2(det['d3_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d4 (mm)</td><td class="rv">${e2(det['d4_'+i]||'')}</td><td>-</td></tr>${dJudge}</table></div>`;}
+      else if(nm.includes('수직하중')||nm.includes('하중')){const dc2=det['detail_crit_'+i]||crit||'';let rows='';[['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['560000회','560000']].forEach(function(cv){rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td>D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;});const lJudge=jg?`<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>`:'';blocks+=`<div class="rb">${th}${dc2?`<div class="dc"><b>기준</b><br>${e2(dc2)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:35%">시험 결과</th><th>기준</th></tr>${rows}${lJudge}</table></div>`;}
+      else{blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">결과</td><td class="rv">${e2(det['genResult_'+i]||'')}</td><td>${e2(crit||t.result||'')}</td></tr>${jr}</table></div>`;}
+    });
+    blocks+=`<div class="rb photo-rb"><div class="rbt"><div class="rbtt"><span>첨부 이미지 (Test Sample Photo)</span></div></div><div class="pb"><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="pc">${imgSrc?`<img src="${imgSrc}">`:`[ ${e2(r.sampleName||'시료')} ]<br><br>시험 후 시료 촬영 이미지`}</div><div class="cap">${e2(r.receiptNo)}${r.receiptNo&&r.sampleName?'_':''}${e2(r.sampleName)}</div></div></div></div>`;
+    const CSS=`\n:root{--red:#e60012}\n*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}\nbody{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff;color:#111;font-size:11px}\n@page{size:A4;margin:0}\n.p1{width:210mm;height:297mm;padding:16mm 10mm 52mm;box-sizing:border-box;overflow:hidden;page-break-after:always;break-after:page;position:relative;background:#fff}\n.rh{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:8px;border-bottom:2px solid var(--red)}\n.rt-ttl{color:var(--red);font-size:24px;font-weight:900;letter-spacing:1px;text-transform:uppercase}\n.mt{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}\n.mt th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 11px;font-weight:700;font-size:11px;vertical-align:middle}\n.mt td{border:1px solid #e5e7eb;padding:6px 11px;font-weight:600;font-size:11px;vertical-align:middle;word-break:break-all}\n.red-title{color:var(--red);font-weight:900;font-size:15px;margin:12px 0 6px}\n.it{width:100%;border-collapse:collapse;font-size:11px}\n.it th{background:#f7f8fa;border:1px solid #ddd;padding:8px 10px;font-weight:700;text-align:center}\n.it td{border:1px solid #ddd;padding:7px 10px;text-align:center}\n.it td.left{text-align:left}\n.it .bold{font-weight:900}\n.ft{position:absolute;left:10mm;right:10mm;bottom:4mm;font-size:8.5px;color:#333}\n.sr{display:flex;border:1px solid #bbb;margin-bottom:6px}\n.ss{flex:1;padding:6px 10px;font-size:10px;display:flex;flex-direction:column;align-items:center;text-align:center}\n.ss:last-child{border-right:none}\n.ss-lbl{color:#555;font-size:8.5px;margin-bottom:3px}\n.ss-nm{font-weight:700;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}\n.stamp{padding:2px;background:#fff;display:flex;align-items:center;justify-content:center}\n.cb{background:var(--red);color:#fff;text-align:center;padding:5px 8px;font-size:9.5px;margin:3px 0}\n.ab{display:flex;justify-content:space-between;font-size:9.5px;color:#333;margin-bottom:3px}\n.nb{font-size:8.5px;color:#444;line-height:1.7;border-top:1px solid #ddd;padding-top:4px;margin-top:2px}\n.nb li{list-style:none;padding-left:12px;text-indent:-12px}\n.p2w{width:210mm;border-collapse:collapse;display:table}\n.p2ht{padding:0;border:none}\n.p2hd{padding:16mm 10mm 4mm;border-bottom:1px solid #ddd}\n.sh{display:flex;justify-content:space-between;font-weight:700;font-size:11px}\n.p2bt{padding:14mm 10mm 18mm;border:none;vertical-align:top;position:relative;min-height:245mm}\n.slt{border-left:3px solid var(--red);padding-left:10px;color:var(--red);font-size:18px;font-weight:900;line-height:1.25;margin:0 0 6mm 0;display:block;break-inside:avoid;page-break-inside:avoid}\n.rb{margin-bottom:24px;break-inside:auto;page-break-inside:auto}\n.photo-rb{margin-top:0mm}\n.rbt{display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;margin-bottom:6px}\n.rbt::before{content:"";display:inline-block;width:4px;height:28px;background:var(--red);border-radius:2px;flex-shrink:0}\n.rbtt{display:flex;flex-direction:row;align-items:center;gap:6px}\n.dc{font-size:10px;color:#333;white-space:pre-wrap;margin-bottom:6px;padding:4px 6px;background:#f9fafb;border-radius:4px}\n.rt{width:100%;border-collapse:collapse;font-size:12px}\n.rt th{background:#f4f5f7;border:1px solid #ddd;padding:6px 10px;text-align:center;font-weight:700}\n.rt td{border:1px solid #ddd;padding:6px 10px;text-align:center}\n.rt td.left{text-align:left}\n.rv{font-weight:900}\n.re{text-align:center;font-size:12px;font-weight:700;margin:30px 0 0;padding:6px 0;border-top:2px solid #ddd;border-bottom:2px solid #ddd}\n.pb{border:1px solid #dfe3e8;border-radius:4px;height:65mm;display:grid;place-items:center;margin-top:6mm;background:#fcfcfc}\n.pc{width:70mm;height:58mm;border:1px solid #ccc;display:grid;place-items:center;text-align:center;color:#6b7280;background:#fff;overflow:hidden;padding:6px}\n.pc img{width:100%;height:100%;object-fit:contain}\n.cap{text-align:center;font-weight:800;margin-top:20px;font-size:11px}\n.pn{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;margin-top:0;background:#fff;padding-top:2px}\n.p2page{width:210mm;height:297mm;padding:0 0 12mm 0;box-sizing:border-box;page-break-after:always;break-after:page;position:relative;background:#fff;overflow:hidden}\n.p2header{padding:16mm 10mm 4mm;border-bottom:2px solid var(--red);margin-bottom:4mm;box-sizing:border-box}\n.p2content{height:215mm;overflow:hidden;padding:0 10mm}\n.p2footer{position:absolute;right:10mm;bottom:5mm;text-align:right;font-size:7px;color:#999;background:#fff}\n`;
+    const HTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>\n<div class="p1">\n  <div class="rh"><div class="rt-ttl">${e2(r.reportTitle||'IN HOUSE TEST REPORT')}</div>${showKolas?`<img src="${ksrc}" style="height:48px;object-fit:contain">`:'<div></div>'}</div>\n  <table class="mt"><colgroup><col style="width:14%"><col style="width:41%"><col style="width:14%"><col style="width:31%"></colgroup>\n    <tr><th>접수번호</th><td>${e2(r.receiptNo)}</td><th>용도</th><td>${e2(r.purpose)}</td></tr>\n    <tr><th>접수일자</th><td>${f2(r.receivedDate)}</td><th>발급예정일</th><td>${f2(r.issuedDate)}</td></tr>\n    <tr><th>의뢰자</th><td>${e2(r.requestDept)}</td><th>색상</th><td>${e2(r.colorInfo)}</td></tr>\n    <tr><th>시료명</th><td>${e2(r.sampleName)}${mt}</td><th>브랜드</th><td>${e2(r.brand||'')}</td></tr>\n    ${(r.sampleReturn||r.sampleQty||r.sampleMaterial)?`<tr><th>시료반환여부</th><td>${e2(r.sampleReturn||'-')}</td><th>시료수량</th><td>${e2(r.sampleQty||'-')} 개</td></tr><tr><th>시료재질</th><td colspan="3">${e2(r.sampleMaterial||'-')}</td></tr>`:''}\n  </table>\n  <div class="red-title">■ 의뢰 시험 항목</div>\n  <table class="it">\n    <colgroup><col style="width:8%"><col style="width:37%"><col style="width:55%"></colgroup>\n    <thead><tr><th>No.</th><th>시험 항목 (Test Item)</th><th>시험 규격</th></tr></thead>\n    <tbody>${tests.length?tests.map((t,i)=>`<tr><td>${i+1}</td><td class="left bold">${e2(t.name||'')}</td><td class="left">${e2(t.spec||'')}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px">시험 항목 없음</td></tr>'}</tbody>\n  </table>\n  <table class="it" style="margin-top:6mm;border-top:none">\n    <tr><td style="width:80px;background:#f7f8fa;font-weight:700;text-align:center;border:1px solid #ddd">비고</td>\n    <td class="left" style="height:136px;border:1px solid #ddd;vertical-align:top;padding:6px 10px">${e2(r.remarkNote||'')}</td></tr>\n  </table>\n  <div class="ft">\n    <div class="sr">\n      <div class="ss"><div class="ss-lbl">작 성 자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.tester)}</span>${r.testerSign?`<img src="${r.testerSign}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">`:''}</div></div>\n      <div class="ss"><div class="ss-lbl">기술책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.techManager)}</span><img src="${JY_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>\n      <div class="ss" style="border-right:none"><div class="ss-lbl">품질책임자</div><div class="ss-nm"><span>성&nbsp;&nbsp;명&nbsp;:&nbsp;${e2(r.qualityManager)}</span><img src="${SJ_SIGN_DATA}" style="height:36px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)"></div></div>\n      <div class="stamp"><img src="${ILOOM_SIGN_DATA}" style="height:72px;width:72px;object-fit:contain;mix-blend-mode:multiply"></div>\n    </div>\n    <div class="cb">기술상담이나 의문사항은 담당자에게 문의하여 주시기 바랍니다.</div>\n    <div class="ab"><span><b>${e2(r.companyName)}</b> &nbsp; ${e2(r.companyAddress)}</span><span>T ${e2(r.companyTel)} &nbsp; 기술책임자 010-9422-5518 &nbsp; ${e2(r.companyWeb)}</span></div>\n    <div class="nb"><ul style="margin:0;padding:0">\n      <li>1. 본 성적서는 의뢰자가 제시한 시료 및 시료명으로 시험한 평가 결과로서, 전체 제품에 대한 품질 및 성능을 보증하지 않습니다.</li>\n      <li>2. 본 성적서는 당 연구원의 사전 서면 동의 없이 광고, 선전 등 홍보 목적 및 소송용으로 사용할 수 없으며, 용도 외 사용을 금합니다.</li>\n      <li>3. * 표시 항목은 KOLAS 인정 범위에 포함되지 않는 시험입니다.</li>\n    </ul></div>\n    <div style="text-align:right;font-size:7px;color:#333;font-weight:700;margin-top:2px" class="p1-pno">PAGE(S) : 1 / ?</div>\n  </div>\n</div>\n<div id="p2Source" style="display:none">\n  <div class="slt">세부 시험 결과 데이터</div>\n  ${blocks}\n  <div class="re">- 시험결과 기록 완료 -</div>\n</div>\n<div id="p2Pages"></div>\n<script>\nfunction _makeP2Page(){\n  var page=document.createElement('div');\n  page.className='p2page';\n  page.innerHTML='<div class="p2header"><div class="sh"><span>접수번호 : ${e2(r.receiptNo)}</span><span>시료명 : ${e2(r.sampleName||'')}</span></div></div><div class="p2content"></div><div class="p2footer"></div>';\n  return page;\n}\nfunction _paginateForPrint(){\n  var src=document.getElementById('p2Source');\n  var target=document.getElementById('p2Pages');\n  if(!src||!target) return;\n  target.innerHTML='';\n  var nodes=Array.from(src.children).map(function(n){return n.cloneNode(true);});\n  var page=_makeP2Page();\n  target.appendChild(page);\n  var body=page.querySelector('.p2content');\n  nodes.forEach(function(node){\n    body.appendChild(node);\n    if(body.scrollHeight > body.clientHeight && body.children.length>1){\n      body.removeChild(node);\n      page=_makeP2Page();\n      target.appendChild(page);\n      body=page.querySelector('.p2content');\n      body.appendChild(node);\n    }\n  });\n  var pages=Array.from(document.querySelectorAll('.p1,.p2page'));\n  var total=pages.length;\n  var p1=document.querySelector('.p1-pno');\n  if(p1) p1.textContent='PAGE(S) : 1 / '+total;\n  document.querySelectorAll('.p2page').forEach(function(pg,idx){\n    var foot=pg.querySelector('.p2footer');\n    if(foot) foot.textContent='PAGE(S) : '+(idx+2)+' / '+total;\n  });\n}\nwindow.addEventListener('load',function(){\n  _paginateForPrint();\n  setTimeout(function(){ _paginateForPrint(); window.print(); },600);\n});\n<\/script>\n<\/body><\/html>`;
+    return HTML;
+  };
+  $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
   $('searchReport').addEventListener('input',renderList);
   $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
 }
@@ -2894,7 +2943,7 @@ async function finalizeReport(){
   reports[idx].unlockRequest = null;
   setReports(reports);
   await supaFetch('reports','POST',{id:currentId, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
-  renderList(); renderUnlockRequests(); updateUnlockBadge();
+  renderList(); renderUnlockRequests(); updateUnlockBadge(); renderPdfStore();
   setIssuedLockUI(true, null);
   showToast('✔ 최종작성완료 처리되었습니다.');
 }
@@ -2923,7 +2972,7 @@ async function approveUnlock(id){
   reports[idx].unlockRequest = null;
   setReports(reports);
   await supaFetch('reports','POST',{id, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
-  renderList(); renderUnlockRequests(); updateUnlockBadge();
+  renderList(); renderUnlockRequests(); updateUnlockBadge(); renderPdfStore();
   showToast('수정 잠금이 해제되었습니다.');
 }
 
@@ -2942,6 +2991,43 @@ function updateUnlockBadge(){
   const pending = getReports().filter(r=>r.unlockRequest && r.unlockRequest.status==='pending').length;
   const badge = document.getElementById('unlockReqBadge');
   if(badge){ badge.textContent = pending; badge.style.display = pending>0 ? '' : 'none'; }
+}
+
+function renderPdfStore(){
+  const box = document.getElementById('pdfStoreList');
+  if(!box) return;
+  const issued = getReports().filter(r=>r.issued);
+  if(!issued.length){
+    box.innerHTML='<p style="color:#9ca3af;text-align:center;padding:24px 0">발행완료된 성적서가 없습니다.</p>';
+    return;
+  }
+  box.innerHTML='';
+  function fmtD(s){ if(!s) return '-'; const d=new Date(s); if(isNaN(d)) return s; const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+  issued.forEach(r=>{
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:10px;padding:12px 16px;border:1.5px solid #bbf7d0;border-radius:12px;margin-bottom:10px;background:#f0fdf4';
+    d.innerHTML='<div style="flex:1;min-width:0">'
+      +'<div style="font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px">'+esc(r.receiptNo||'접수번호 없음')
+      +'<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:5px;padding:2px 7px;font-weight:700">✔ 발행완료</span></div>'
+      +'<div style="font-size:12px;color:#374151;margin-top:3px">'+esc(r.sampleName||'')+(r.sampleName&&r.issuedDate?' · ':'')+esc(r.issuedDate?r.issuedDate.replace(/-/g,'.'):'')+'</div>'
+      +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">🕐 발행완료: '+fmtD(r.savedAt||r.updated_at||'')+'</div>'
+      +'</div>';
+    const btn=document.createElement('button');
+    btn.textContent='🖨 PDF 출력';
+    btn.style.cssText='background:#e60012;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer;flex-shrink:0;white-space:nowrap';
+    btn.onclick=()=>printStoredReport(r.id);
+    d.appendChild(btn);
+    box.appendChild(d);
+  });
+}
+
+function printStoredReport(id){
+  const r = getReports().find(x=>x.id===id);
+  if(!r){ alert('성적서를 찾을 수 없습니다.'); return; }
+  if(!window._buildPrintHTML){ alert('출력 모듈이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.'); return; }
+  const HTML = window._buildPrintHTML(r);
+  const pw = window.open('','_blank');
+  if(pw){ pw.document.write(HTML); pw.document.close(); }
 }
 
 function renderUnlockRequests(){
