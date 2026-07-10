@@ -357,6 +357,7 @@ button,input,select{font:inherit}
         <button class="nav-btn" data-tab="standard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>시험 규격 관리</button>
         <button class="nav-btn" data-tab="setting"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>회사/결재 설정</button>
         <button class="nav-btn" data-tab="admin" id="adminNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>관리자 등록</button>
+        <button class="nav-btn" data-tab="unlockReq" id="unlockReqNavBtn" style="display:none;align-items:center;gap:4px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>성적서 수정요청<span id="unlockReqBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6;margin-left:4px">0</span></button>
       </nav>
 
       <div class="side-card">
@@ -388,6 +389,8 @@ button,input,select{font:inherit}
           <span id="autoSaveStatus" style="font-size:11px;color:#e60012;font-weight:700;align-self:center;margin-left:4px;display:none">● 미저장 변경사항 있음</span>
           <button class="btn danger" id="deleteBtn">삭제</button>
           <button class="btn primary" id="printBtn" style="background:var(--red);border-color:var(--red);font-size:14px;padding:10px 20px">PDF 출력</button>
+          <button id="finalizeBtn" style="display:none;background:#16a34a;border:none;color:#fff;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer" onclick="finalizeReport()">✔ 최종작성완료</button>
+          <button id="requestUnlockBtn" style="display:none;background:#f59e0b;border:none;color:#fff;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer" onclick="requestUnlock()">✏ 수정 작성 요청하기</button>
         </div>
       </section>
 
@@ -573,6 +576,15 @@ button,input,select{font:inherit}
       </section>
 
       <section class="tab-panel" id="tab-write">
+        <!-- 발행완료 잠금 배너 -->
+        <div id="issuedLockBanner" style="display:none;background:#dcfce7;border:1.5px solid #16a34a;border-radius:12px;padding:14px 20px;margin-bottom:12px;align-items:center;gap:12px">
+          <span style="font-size:22px">🔒</span>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:14px;color:#15803d">발행완료된 성적서입니다</div>
+            <div style="font-size:12px;color:#166534;margin-top:2px">수정이 잠겨 있습니다. 수정이 필요한 경우 <b>수정 작성 요청하기</b> 버튼을 눌러주세요.</div>
+          </div>
+          <span id="unlockPendingLabel" style="display:none;font-size:12px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:8px;padding:4px 10px;font-weight:700">요청 검토 중...</span>
+        </div>
         <div class="grid-layout no-print">
           <div class="card form-card">
             <h2>기본 정보</h2>
@@ -721,6 +733,15 @@ button,input,select{font:inherit}
               onclick="document.querySelectorAll('#reportList .list-chk').forEach(function(x){x.checked=false;});document.getElementById('listSelectAll').checked=false;updateListActionBar();">선택 해제</button>
           </div>
           <div id="reportList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- 성적서 수정요청 탭 (관리자 강지영 전용) -->
+      <section class="tab-panel" id="tab-unlockReq">
+        <div class="card no-print">
+          <div class="section-title"><h2>🔓 성적서 수정요청 관리</h2></div>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:16px">발행완료된 성적서에 대해 수정 요청이 들어온 목록입니다.</p>
+          <div id="unlockReqList"><p style="color:#9ca3af;text-align:center;padding:24px 0">수정 요청이 없습니다.</p></div>
         </div>
       </section>
 
@@ -1638,6 +1659,15 @@ async function init(){
     if(adminNavBtn && (u.role==='관리자' || u.id===ADMIN_ID)){
       adminNavBtn.style.display='';
     }
+    // 강지영에게만 수정요청 탭 표시
+    const unlockReqNavBtn = document.getElementById('unlockReqNavBtn');
+    if(unlockReqNavBtn && u.id===ADMIN_ID){
+      unlockReqNavBtn.style.display='flex';
+      updateUnlockBadge();
+    }
+    // 저장 버튼에 최종작성완료 버튼 표시 조건 연동
+    const finalizeBtn = document.getElementById('finalizeBtn');
+    if(finalizeBtn) finalizeBtn.style.display = 'none';
   }catch(e){}
 }
 function toggleSidebar(){
@@ -1997,6 +2027,9 @@ function newReport(){
   const dCard = document.getElementById('detailDataCard'); if(dCard) dCard.style.display='none';
   // 시험 항목은 의뢰서에서 불러오거나 직접 추가
   renderDetailSection(); renderImage(); renderPreview();
+  setIssuedLockUI(false, null);
+  const finalizeBtn = document.getElementById('finalizeBtn');
+  if(finalizeBtn) finalizeBtn.style.display = 'none';
 }
 function addTest(item){
   const tbody=$('testTable').querySelector('tbody'); const tr=document.createElement('tr');
@@ -2806,9 +2839,125 @@ function toggleReportIssued(id, issued){
   const idx = reports.findIndex(r=>r.id===id);
   if(idx===-1) return;
   reports[idx].issued = issued;
+  if(!issued) reports[idx].unlockRequest = null;
   setReports(reports);
   supaFetch('reports','POST',{id, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
   renderList();
+  renderUnlockRequests();
+  updateUnlockBadge();
+}
+
+// ── 최종작성완료 / 잠금 UI ──
+function setIssuedLockUI(issued, unlockRequest){
+  const banner = document.getElementById('issuedLockBanner');
+  const finalizeBtn = document.getElementById('finalizeBtn');
+  const requestUnlockBtn = document.getElementById('requestUnlockBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const pendingLabel = document.getElementById('unlockPendingLabel');
+  if(!banner) return;
+  if(issued){
+    banner.style.display = 'flex';
+    finalizeBtn.style.display = 'none';
+    requestUnlockBtn.style.display = '';
+    saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.style.cursor = 'not-allowed';
+    deleteBtn.disabled = true; deleteBtn.style.opacity = '0.4'; deleteBtn.style.cursor = 'not-allowed';
+    if(pendingLabel) pendingLabel.style.display = unlockRequest && unlockRequest.status==='pending' ? '' : 'none';
+    // 폼 필드 비활성화
+    document.querySelectorAll('#tab-write input, #tab-write textarea, #tab-write select').forEach(el=>{
+      el.disabled = true; el.style.background='#f9fafb'; el.style.cursor='not-allowed';
+    });
+  } else {
+    banner.style.display = 'none';
+    finalizeBtn.style.display = currentId ? '' : 'none';
+    requestUnlockBtn.style.display = 'none';
+    saveBtn.disabled = false; saveBtn.style.opacity = ''; saveBtn.style.cursor = '';
+    deleteBtn.disabled = false; deleteBtn.style.opacity = ''; deleteBtn.style.cursor = '';
+    document.querySelectorAll('#tab-write input, #tab-write textarea, #tab-write select').forEach(el=>{
+      el.disabled = false; el.style.background = ''; el.style.cursor = '';
+    });
+  }
+}
+
+async function finalizeReport(){
+  if(!currentId){ alert('저장된 성적서가 없습니다. 먼저 저장해주세요.'); return; }
+  if(!confirm('최종작성완료 처리하면 더 이상 수정할 수 없습니다.\n계속하시겠습니까?')) return;
+  const reports = getReports();
+  const idx = reports.findIndex(r=>r.id===currentId);
+  if(idx===-1){ alert('성적서를 찾을 수 없습니다.'); return; }
+  reports[idx].issued = true;
+  reports[idx].unlockRequest = null;
+  setReports(reports);
+  await supaFetch('reports','POST',{id:currentId, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
+  renderList(); renderUnlockRequests(); updateUnlockBadge();
+  setIssuedLockUI(true, null);
+  showToast('✔ 최종작성완료 처리되었습니다.');
+}
+
+async function requestUnlock(){
+  if(!currentId) return;
+  const u = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+  const note = prompt('수정 요청 사유를 입력해주세요:','');
+  if(note === null) return;
+  const reports = getReports();
+  const idx = reports.findIndex(r=>r.id===currentId);
+  if(idx===-1) return;
+  reports[idx].unlockRequest = { by: u.name||u.id||'', at: new Date().toISOString(), note: note.trim(), status:'pending' };
+  setReports(reports);
+  await supaFetch('reports','POST',{id:currentId, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
+  renderUnlockRequests(); updateUnlockBadge();
+  document.getElementById('unlockPendingLabel').style.display = '';
+  showToast('수정 요청이 전송되었습니다. 강지영님의 승인을 기다려주세요.');
+}
+
+async function approveUnlock(id){
+  const reports = getReports();
+  const idx = reports.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  reports[idx].issued = false;
+  reports[idx].unlockRequest = null;
+  setReports(reports);
+  await supaFetch('reports','POST',{id, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
+  renderList(); renderUnlockRequests(); updateUnlockBadge();
+  showToast('수정 잠금이 해제되었습니다.');
+}
+
+async function rejectUnlock(id){
+  const reports = getReports();
+  const idx = reports.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  if(reports[idx].unlockRequest) reports[idx].unlockRequest.status = 'rejected';
+  setReports(reports);
+  await supaFetch('reports','POST',{id, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
+  renderUnlockRequests(); updateUnlockBadge();
+  showToast('수정 요청을 거부했습니다.');
+}
+
+function updateUnlockBadge(){
+  const pending = getReports().filter(r=>r.unlockRequest && r.unlockRequest.status==='pending').length;
+  const badge = document.getElementById('unlockReqBadge');
+  if(badge){ badge.textContent = pending; badge.style.display = pending>0 ? '' : 'none'; }
+}
+
+function renderUnlockRequests(){
+  const box = document.getElementById('unlockReqList');
+  if(!box) return;
+  const pending = getReports().filter(r=>r.unlockRequest && r.unlockRequest.status==='pending');
+  if(!pending.length){ box.innerHTML='<p style="color:#9ca3af;text-align:center;padding:24px 0">수정 요청이 없습니다.</p>'; return; }
+  box.innerHTML='';
+  pending.forEach(r=>{
+    const req = r.unlockRequest;
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;background:#fff';
+    d.innerHTML='<div style="flex:1">'
+      +'<div style="font-weight:800;font-size:14px">'+esc(r.receiptNo||'접수번호 없음')+'&nbsp;<span style="font-size:12px;color:#6b7280">'+esc(r.sampleName||'')+'</span></div>'
+      +'<div style="font-size:12px;color:#374151;margin-top:4px">요청자: <b>'+esc(req.by)+'</b> &nbsp; 사유: '+esc(req.note||'(없음)')+'</div>'
+      +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">'+new Date(req.at).toLocaleString('ko-KR')+'</div>'
+      +'</div>'
+      +'<button onclick="approveUnlock(\''+r.id+'\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:800;cursor:pointer">승인</button>'
+      +'<button onclick="rejectUnlock(\''+r.id+'\')" style="background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:800;cursor:pointer">거부</button>';
+    box.appendChild(d);
+  });
 }
 
 function renderList(page){
@@ -3880,9 +4029,16 @@ async function loadReport(r){
       renderPreview();
     }, 100);
   }, 50);
+  // 잠금 상태 UI 적용
+  setTimeout(()=>setIssuedLockUI(!!r.issued, r.unlockRequest||null), 150);
   document.querySelector('[data-tab="write"]').click();
 }
 async function saveReport(silent=false){
+  // 발행완료 잠금 체크
+  if(currentId){
+    const existing = getReports().find(r=>r.id===currentId);
+    if(existing && existing.issued){ if(!silent) alert('발행완료된 성적서는 수정할 수 없습니다.'); return; }
+  }
   const receiptNo = val('receiptNo');
 
   // 의뢰번호 없으면 저장 불가
@@ -3936,6 +4092,7 @@ async function saveReport(silent=false){
     setReports(list);
     await renderListAsync();
     clearUnsaved();
+    setIssuedLockUI(false, null);
     if(!silent){ showSaveToast(); }
   } catch(e) {
     console.error('saveReport error:', e);
