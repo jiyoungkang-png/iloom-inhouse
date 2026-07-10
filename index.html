@@ -2801,6 +2801,16 @@ async function renderListAsync(page){
   renderList(page);
 }
 
+function toggleReportIssued(id, issued){
+  const reports = getReports();
+  const idx = reports.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  reports[idx].issued = issued;
+  setReports(reports);
+  supaFetch('reports','POST',{id, data:reports[idx], updated_at:new Date().toISOString()}).catch(e=>{});
+  renderList();
+}
+
 function renderList(page){
   if(page) _listPage = page;
   const q=($('searchReport')?.value||'').toLowerCase();
@@ -2811,14 +2821,17 @@ function renderList(page){
   const list = all.slice((_listPage-1)*LIST_PAGE_SIZE, _listPage*LIST_PAGE_SIZE);
 
   box.innerHTML = all.length ? '' : '<p class="note">저장된 성적서가 없습니다.</p>';
+  const _listUser = JSON.parse(sessionStorage.getItem('iloom_user')||'{}');
+  const _listIsAdmin = _listUser.role==='관리자' || _listUser.id===ADMIN_ID;
   list.forEach(r=>{
+    const isIssued = !!r.issued;
     const d=document.createElement('div'); d.className='list-item';
-    d.style.cssText='display:flex;align-items:center;gap:3px;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer';
+    d.style.cssText='display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer'
+      +(isIssued?';background:#f0fdf4':'');
     const chk=document.createElement('input'); chk.type='checkbox'; chk.className='list-chk'; chk.dataset.id=r.id;
     chk.style.cssText='width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0';
     chk.onclick = updateListActionBar;
     const info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
-    // 저장 시각 포맷
     function fmtSaved(s){
       if(!s) return '저장시각 없음';
       const d = new Date(s);
@@ -2829,14 +2842,35 @@ function renderList(page){
     const savedAt = r.savedAt || r.updated_at || '';
     const savedStr = fmtSaved(savedAt);
     const isAutoSave = r.autoSaved ? ' <span style="font-size:10px;background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 5px;font-weight:700">자동</span>' : '';
-    info.innerHTML='<div style="font-weight:800;font-size:14px">'+esc(r.receiptNo||'접수번호 없음')+'</div>'
+    const statusBadge = isIssued
+      ? '<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">✔ 발행완료</span>'
+      : '<span style="font-size:10px;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">작성중</span>';
+    info.innerHTML='<div style="font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px">'+esc(r.receiptNo||'접수번호 없음')+'&nbsp;'+statusBadge+'</div>'
       +'<div style="font-size:12px;color:#6b7280;margin-top:2px">'+esc(r.sampleName||'')+' · '+fmt(r.issuedDate)+'</div>'
       +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">🕐 '+savedStr+isAutoSave+'</div>';
-    const btn=document.createElement('button'); btn.className='btn ghost'; btn.textContent='불러오기';
-    btn.style.cssText='font-size:12px;padding:6px 14px;flex-shrink:0';
-    btn.onclick=(e)=>{e.stopPropagation();loadReport(r);document.querySelector('.nav-btn[data-tab="write"]').click();};
-    d.onclick=(e)=>{if(e.target.tagName!=='BUTTON'&&e.target.tagName!=='INPUT'){chk.checked=!chk.checked;updateListActionBar();}};
-    d.appendChild(chk); d.appendChild(info); d.appendChild(btn); box.appendChild(d);
+    const btn=document.createElement('button');
+    if(isIssued){
+      btn.textContent='🔒 발행완료';
+      btn.style.cssText='font-size:12px;padding:6px 14px;flex-shrink:0;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:10px;cursor:not-allowed;font-weight:700';
+      btn.title='발행완료된 성적서는 수정할 수 없습니다';
+    } else {
+      btn.className='btn ghost'; btn.textContent='불러오기';
+      btn.style.cssText='font-size:12px;padding:6px 14px;flex-shrink:0';
+      btn.onclick=(e)=>{e.stopPropagation();loadReport(r);document.querySelector('.nav-btn[data-tab="write"]').click();};
+    }
+    // 관리자 잠금/해제 버튼
+    if(_listIsAdmin){
+      const lockBtn=document.createElement('button');
+      lockBtn.textContent=isIssued?'잠금해제':'발행완료';
+      lockBtn.style.cssText='font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;cursor:pointer;font-weight:700;border:1px solid '
+        +(isIssued?'#fca5a5;background:#fee2e2;color:#dc2626':'#6ee7b7;background:#d1fae5;color:#059669');
+      lockBtn.onclick=(e)=>{e.stopPropagation();toggleReportIssued(r.id,!isIssued);};
+      d.onclick=(e)=>{if(e.target.tagName!=='BUTTON'&&e.target.tagName!=='INPUT'){chk.checked=!chk.checked;updateListActionBar();}};
+      d.appendChild(chk); d.appendChild(info); d.appendChild(lockBtn); d.appendChild(btn); box.appendChild(d);
+    } else {
+      d.onclick=(e)=>{if(e.target.tagName!=='BUTTON'&&e.target.tagName!=='INPUT'){chk.checked=!chk.checked;updateListActionBar();}};
+      d.appendChild(chk); d.appendChild(info); d.appendChild(btn); box.appendChild(d);
+    }
   });
 
   // 페이지네이션 렌더
