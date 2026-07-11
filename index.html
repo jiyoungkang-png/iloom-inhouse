@@ -937,6 +937,26 @@ function setStandards(v){
 function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
 // generateReceiptNo → generateReqNo로 통합
 function setReports(v){localStorage.setItem(storeKey, JSON.stringify(v));}
+// 이미지 전용 별도 저장 (setReports는 이미지 제외 저장이므로)
+const IMG_STORE_KEY = 'iloom_img_v1';
+function saveImageLocally(id, imgData){
+  if(!id || !imgData) return;
+  try {
+    const store = JSON.parse(localStorage.getItem(IMG_STORE_KEY)||'{}');
+    store[id] = imgData;
+    // 최대 20개만 보관 (오래된 것 제거)
+    const keys = Object.keys(store);
+    if(keys.length > 20){ delete store[keys[0]]; }
+    localStorage.setItem(IMG_STORE_KEY, JSON.stringify(store));
+  } catch(e){ console.warn('이미지 로컬 저장 실패:', e); }
+}
+function getImageLocally(id){
+  if(!id) return '';
+  try {
+    const store = JSON.parse(localStorage.getItem(IMG_STORE_KEY)||'{}');
+    return store[id] || '';
+  } catch(e){ return ''; }
+}
 function val(id){const el=$(id); return el ? el.value.trim() : '';}
 function setVal(id,v){const el=$(id); if(el) el.value = v || '';}
 
@@ -4039,15 +4059,20 @@ function clearAll(){
 
 async function loadReport(r){
   // Supabase에서 이미지 포함 전체 데이터 가져오기
+  const fallbackImage = r.image || getImageLocally(r.id);
   try {
     const rows = await supaFetch('reports', 'GET');
     const full = (rows||[]).find(function(x){ return x.id === r.id; });
     if(full && full.data){
-      const localImage = r.image; // Supabase에 이미지가 없을 때를 대비해 로컬 보존
       r = full.data;
-      if(!r.image && localImage) r.image = localImage;
+      if(!r.image && fallbackImage) r.image = fallbackImage;
+    } else if(!r.image && fallbackImage){
+      r = Object.assign({}, r, {image: fallbackImage});
     }
-  } catch(e){ console.warn('Supabase 불러오기 실패, 로컬 사용:', e); }
+  } catch(e){
+    console.warn('Supabase 불러오기 실패, 로컬 사용:', e);
+    if(!r.image && fallbackImage) r = Object.assign({}, r, {image: fallbackImage});
+  }
   currentId=r.id;
   fields.forEach(id=>setVal(id,r[id]||''));
   setVal('companyName','일룸수면과학연구소');
@@ -4148,6 +4173,8 @@ async function saveReport(silent=false){
   try {
     const r = collectReport(silent);
     currentId = r.id;
+    // 이미지 별도 localStorage 저장 (Supabase 실패 시 fallback용)
+    if(r.image) saveImageLocally(r.id, r.image);
     // Supabase에 저장 (같은 id면 항상 UPDATE)
     await setReportAsync(r);
     // 로컬 캐시 업데이트
