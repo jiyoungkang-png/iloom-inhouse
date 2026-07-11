@@ -1852,6 +1852,10 @@ function bindInputs(){
       alert('의뢰서 번호가 없습니다.\n의뢰서를 먼저 불러온 후 출력해주세요.');
       return;
     }
+    const pw=window.open('','_blank');
+    if(pw){ pw.document.write(buildPrintHTML(r)); pw.document.close(); }
+  };
+  window.buildPrintHTML = function(r){
     const e2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const f2=s=>s?String(s).replace(/-/g,'.') :'';
     const tests=r.tests||[];
@@ -2048,8 +2052,7 @@ window.addEventListener('load',function(){
 <\/script>
 </body></html>`;
 
-    const pw=window.open('','_blank');
-    if(pw){ pw.document.write(HTML); pw.document.close(); }
+    return HTML;
   };
   $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
   $('searchReport').addEventListener('input',renderList);
@@ -3015,10 +3018,24 @@ function renderPdfStore(){
 }
 
 async function printStoredReport(id){
-  const r = getReports().find(x=>x.id===id);
+  let r = getReports().find(x=>x.id===id);
   if(!r){ alert('성적서를 찾을 수 없습니다.'); return; }
-  await loadReport(r);
-  setTimeout(function(){ document.getElementById('printBtn').click(); }, 500);
+  const fallbackImage = r.image || getImageLocally(r.id);
+  try {
+    const rows = await supaFetch('reports', 'GET');
+    const full = (rows||[]).find(x=>x.id===id);
+    if(full && full.data){
+      r = full.data;
+      if(!r.image && fallbackImage) r.image = fallbackImage;
+    } else if(!r.image && fallbackImage){
+      r = Object.assign({}, r, {image: fallbackImage});
+    }
+  } catch(e){
+    if(!r.image && fallbackImage) r = Object.assign({}, r, {image: fallbackImage});
+  }
+  if(!window.buildPrintHTML){ alert('출력 모듈이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.'); return; }
+  const pw = window.open('', '_blank');
+  if(pw){ pw.document.write(window.buildPrintHTML(r)); pw.document.close(); }
 }
 
 function renderUnlockRequests(){
