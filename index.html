@@ -1,4 +1,4 @@
-﻿
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -1853,7 +1853,13 @@ function bindInputs(){
     const pw=window.open('','_blank');
     if(pw){ pw.document.write(buildPrintHTML(r)); pw.document.close(); }
   };
-  window.buildPrintHTML = function(r){
+  window.buildPrintHTML = buildPrintHTML;
+  $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
+  $('searchReport').addEventListener('input',renderList);
+  $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
+}
+
+function buildPrintHTML(r){
     const e2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const f2=s=>s?String(s).replace(/-/g,'.') :'';
     const tests=r.tests||[];
@@ -2051,10 +2057,6 @@ window.addEventListener('load',function(){
 </body></html>`;
 
     return HTML;
-  };
-  $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
-  $('searchReport').addEventListener('input',renderList);
-  $('exportBtn').onclick=exportData; $('importFile').addEventListener('change',importData); $('clearAllBtn').onclick=clearAll;
 }
 function newReport(){
   currentId = null; _reportIsIssued = false; sampleImageData=''; testerSignData='';
