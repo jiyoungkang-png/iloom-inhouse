@@ -1789,7 +1789,7 @@ function markUnsaved(){
   const btn = document.getElementById('saveBtn');
   const status = document.getElementById('autoSaveStatus');
   if(btn){ btn.style.background='#e60012'; btn.style.color='#fff'; btn.style.borderColor='#e60012'; }
-  if(status){ status.style.display=''; status.textContent='● 저장 안됨 — 저장 버튼을 눌러주세요'; }
+  if(status){ status.style.display=_reportIsIssued?'none':''; status.textContent='● 저장 안됨 — 저장 버튼을 눌러주세요'; }
 }
 function clearUnsaved(){
   _hasUnsaved = false;
@@ -2914,6 +2914,8 @@ function setIssuedLockUI(issued, unlockRequest){
     saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.style.cursor = 'not-allowed';
     deleteBtn.disabled = true; deleteBtn.style.opacity = '0.4'; deleteBtn.style.cursor = 'not-allowed';
     if(pendingLabel) pendingLabel.style.display = unlockRequest && unlockRequest.status==='pending' ? '' : 'none';
+    const status = document.getElementById('autoSaveStatus');
+    if(status) status.style.display = 'none';
     document.querySelectorAll('#tab-write input, #tab-write textarea, #tab-write select').forEach(el=>{
       el.disabled = true; el.style.background='#f9fafb'; el.style.cursor='not-allowed';
     });
@@ -3020,6 +3022,11 @@ function renderPdfStore(){
 async function printStoredReport(id){
   let r = getReports().find(x=>x.id===id);
   if(!r){ alert('성적서를 찾을 수 없습니다.'); return; }
+  if(!window.buildPrintHTML){ alert('출력 모듈이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.'); return; }
+  // await 전에 팝업을 열어야 브라우저 팝업 차단을 피할 수 있음
+  const pw = window.open('', '_blank');
+  if(!pw){ alert('팝업이 차단되었습니다.\n브라우저 주소창 우측의 팝업 차단 아이콘을 눌러 허용해주세요.'); return; }
+  pw.document.write('<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#666"><p>성적서를 불러오는 중...</p></body></html>');
   const fallbackImage = r.image || getImageLocally(r.id);
   try {
     const rows = await supaFetch('reports', 'GET');
@@ -3033,9 +3040,9 @@ async function printStoredReport(id){
   } catch(e){
     if(!r.image && fallbackImage) r = Object.assign({}, r, {image: fallbackImage});
   }
-  if(!window.buildPrintHTML){ alert('출력 모듈이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.'); return; }
-  const pw = window.open('', '_blank');
-  if(pw){ pw.document.write(window.buildPrintHTML(r)); pw.document.close(); }
+  pw.document.open();
+  pw.document.write(window.buildPrintHTML(r));
+  pw.document.close();
 }
 
 function renderUnlockRequests(){
