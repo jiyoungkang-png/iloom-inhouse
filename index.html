@@ -1901,10 +1901,14 @@ function buildPrintHTML(r){
         blocks+=`<div class="rb">${th}${dc?`<div class="dc"><b>기준</b><br>${e2(dc)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">시험 결과</th><th>기준</th></tr><tr><td class="left">d1 (mm)</td><td class="rv">${e2(det['d1_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d2 (mm)</td><td class="rv">${e2(det['d2_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d3 (mm)</td><td class="rv">${e2(det['d3_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">d4 (mm)</td><td class="rv">${e2(det['d4_'+i]||'')}</td><td>-</td></tr>${dJudge}</table></div>`;
       } else if(nm.includes('수직하중')||nm.includes('하중')){
         const dc2=det['detail_crit_'+i]||crit||'';
+        const show560=!!det['load_show560_'+i];
         let rows='';
-        [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['560000회','560000']].forEach(function(cv){
+        [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000']].forEach(function(cv){
           rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td>D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;
         });
+        if(show560){
+          rows+=`<tr><td class="left">560000회</td><td class="rv">D1: ${e2(det['load_560000_d1_'+i]||'')} / D2: ${e2(det['load_560000_d2_'+i]||'')}</td><td>-</td></tr>`;
+        }
         const lJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
         blocks+=`<div class="rb">${th}${dc2?`<div class="dc"><b>기준</b><br>${e2(dc2)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:35%">시험 결과</th><th>기준</th></tr>${rows}${lJudge}</table></div>`;
       } else {
@@ -2221,7 +2225,7 @@ function renderDetailSection(externalData){
   if(!tests || tests.length === 0){ box.innerHTML = ''; return; }
 
   const saved = {};
-  box.querySelectorAll('[data-key]').forEach(function(el){ saved[el.dataset.key] = el.value; });
+  box.querySelectorAll('[data-key]').forEach(function(el){ saved[el.dataset.key] = el.type==='checkbox' ? el.checked : el.value; });
   const testTableRows = document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)');
   testTableRows.forEach(function(tr, idx){
     if(!saved['name_edit_'+idx]){ const ni=tr.querySelector('.t-name'); if(ni) saved['name_edit_'+idx]=ni.value; }
@@ -2438,10 +2442,11 @@ function renderDetailSection(externalData){
         fieldsWrap.appendChild(jWrap);
 
       } else if(name.includes('수직하중')||name.includes('하중')){
-        var tbl3=document.createElement('table'); tbl3.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px';
+        var tbl3=document.createElement('table'); tbl3.style.cssText='width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px';
         tbl3.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D1 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D2 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
         var tbody3=document.createElement('tbody');
-        [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['560000회','560000']].forEach(function(cv){
+        // 기본 4개 행 (0회~8만회)
+        [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000']].forEach(function(cv){
           var tr3=document.createElement('tr');
           var ta3=document.createElement('td'); ta3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; ta3.textContent=cv[0];
           var tbD1=document.createElement('td'); tbD1.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
@@ -2451,7 +2456,24 @@ function renderDetailSection(externalData){
           var tc3=document.createElement('td'); tc3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc3.textContent='D1 ≤ 45mm / D2 ≥ 5mm';
           tr3.appendChild(ta3); tr3.appendChild(tbD1); tr3.appendChild(tbD2); tr3.appendChild(tc3); tbody3.appendChild(tr3);
         });
+        // 56만회 행 (토글)
+        var tr560=document.createElement('tr');
+        var show560=!!saved['load_show560_'+i];
+        tr560.style.display=show560?'':'none';
+        var ta560=document.createElement('td'); ta560.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; ta560.textContent='560000회';
+        var tbD1_560=document.createElement('td'); tbD1_560.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+        var d1i560=document.createElement('input'); d1i560.type='number'; d1i560.step='0.1'; d1i560.dataset.key='load_560000_d1_'+i; d1i560.placeholder='0.0'; d1i560.value=saved['load_560000_d1_'+i]||''; d1i560.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d1i560.addEventListener('input',renderPreview); tbD1_560.appendChild(d1i560);
+        var tbD2_560=document.createElement('td'); tbD2_560.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+        var d2i560=document.createElement('input'); d2i560.type='number'; d2i560.step='0.1'; d2i560.dataset.key='load_560000_d2_'+i; d2i560.placeholder='0.0'; d2i560.value=saved['load_560000_d2_'+i]||''; d2i560.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d2i560.addEventListener('input',renderPreview); tbD2_560.appendChild(d2i560);
+        var tc560=document.createElement('td'); tc560.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc560.textContent='-';
+        tr560.appendChild(ta560); tr560.appendChild(tbD1_560); tr560.appendChild(tbD2_560); tr560.appendChild(tc560); tbody3.appendChild(tr560);
         tbl3.appendChild(tbody3); fieldsWrap.appendChild(tbl3);
+        // 56만회 토글 체크박스
+        var chk560Wrap=document.createElement('label');
+        chk560Wrap.style.cssText='display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#374151;font-weight:600;cursor:pointer;margin-bottom:10px;padding:4px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px';
+        var chk560=document.createElement('input'); chk560.type='checkbox'; chk560.dataset.key='load_show560_'+i; chk560.checked=show560; chk560.style.cssText='width:15px;height:15px;accent-color:var(--red);cursor:pointer';
+        chk560.addEventListener('change',function(){ tr560.style.display=chk560.checked?'':'none'; renderPreview(); markUnsaved(); });
+        chk560Wrap.appendChild(chk560); chk560Wrap.appendChild(document.createTextNode('560,000회 포함')); fieldsWrap.appendChild(chk560Wrap);
         var jRow3=document.createElement('div'); jRow3.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
         jRow3.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
         fieldsWrap.appendChild(jRow3);
@@ -2570,7 +2592,9 @@ function renderDetailSection(externalData){
 function getDetailData(){
   const result = {};
   const box = document.getElementById('detailDataSection');
-  if(box) box.querySelectorAll('[data-key]').forEach(el=>{ result[el.dataset.key] = el.value; });
+  if(box) box.querySelectorAll('[data-key]').forEach(el=>{
+    result[el.dataset.key] = el.type==='checkbox' ? el.checked : el.value;
+  });
   return result;
 }
 
@@ -2580,7 +2604,13 @@ function restoreDetailData(data){
   if(!box) return;
   Object.keys(data).forEach(function(key){
     const el = box.querySelector('[data-key="'+key+'"]');
-    if(el) el.value = data[key]||'';
+    if(!el) return;
+    if(el.type==='checkbox'){
+      el.checked = !!data[key];
+      el.dispatchEvent(new Event('change'));
+    } else {
+      el.value = data[key]||'';
+    }
   });
 }
 
@@ -2705,14 +2735,19 @@ function renderPreview(){
 
           // 수직하중시험
           } else if(name.includes('수직하중')||name.includes('하중')){
-            const cycles = [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000'],['560000회','560000']];
             const critBox2 = crit ? '<div style="font-size:10px;color:#374151;white-space:pre-wrap;margin-bottom:6px;padding:6px 8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;line-height:1.7"><span style="font-weight:800;font-size:10px;color:#6b7280">기준</span><br>'+esc(crit)+'</div>' : '';
+            const show560p=!!detail['load_show560_'+i];
             let rows = '';
-            cycles.forEach(function(c){
+            [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000']].forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
               const d2=detail['load_'+c[1]+'_d2_'+i]||'';
               rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td>D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>';
             });
+            if(show560p){
+              const d1=detail['load_560000_d1_'+i]||'';
+              const d2=detail['load_560000_d2_'+i]||'';
+              rows += '<tr><td class="left">560000회</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td>-</td></tr>';
+            }
             const lJudge = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>KS G 4300 기준 만족</td></tr>' : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +critBox2
