@@ -3217,7 +3217,6 @@ function updateListActionBar(){
   var all = document.querySelectorAll('#reportList .list-chk').length;
 
   var delBtn = document.getElementById('listDeleteBtn');
-  var pdfBtn = document.getElementById('listPdfBtn');
   var cancelBtn = document.getElementById('listCancelBtn');
   var countEl = document.getElementById('listSelectedCount');
   var sa = document.getElementById('listSelectAll');
@@ -3228,16 +3227,13 @@ function updateListActionBar(){
     if(delBtn) delBtn.style.display = (u.id === ADMIN_ID) ? '' : 'none';
   } catch(e){}
 
-  // 삭제/PDF 버튼 활성·비활성 스타일
   if(checked > 0){
     if(delBtn) { delBtn.style.opacity='1'; delBtn.style.cursor='pointer'; }
-    pdfBtn.style.opacity='1'; pdfBtn.style.cursor='pointer';
-    cancelBtn.style.display='';
+    if(cancelBtn) cancelBtn.style.display='';
     if(countEl){ countEl.style.display=''; countEl.textContent=checked+'개 선택됨'; }
   } else {
     if(delBtn) { delBtn.style.opacity='0.4'; delBtn.style.cursor='not-allowed'; }
-    pdfBtn.style.opacity='0.4'; pdfBtn.style.cursor='not-allowed';
-    cancelBtn.style.display='none';
+    if(cancelBtn) cancelBtn.style.display='none';
     if(countEl) countEl.style.display='none';
   }
 
