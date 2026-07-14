@@ -2153,7 +2153,7 @@ function addTest(item){
     var deletedName = (tr.querySelector('.t-name')||{}).value||'';
     tr.remove(); detailTr.remove(); renumber(); renderDetailSection(); renderPreview(); markUnsaved();
     // 삭제 후 자동 저장 — 성적서 보기와 일치시킴
-    if(val('receiptNo') && val('receiptNo').trim()) saveReport(true);
+    if(currentId) saveReport(true);
     if(deletedName && window._currentReqData){
       var d = window._currentReqData;
       d.items = (d.items||[]).filter(function(it){
@@ -4095,11 +4095,13 @@ function importData(e){
 function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
 
 
-function deleteCurrent(){
+async function deleteCurrent(){
   if(!requireOwner()) return;
   if(!currentId){alert('삭제할 저장 성적서가 없습니다.');return;}
   if(!confirm('현재 성적서를 삭제할까요?'))return;
-  setReports(getReports().filter(r=>r.id!==currentId));
+  const idToDelete = currentId;
+  await deleteReportsAsync([idToDelete]);
+  setReports(getReports().filter(r=>r.id!==idToDelete));
   currentId=null; newReport(); renderList();
 }
 
@@ -4204,10 +4206,13 @@ async function saveReport(silent=false){
   }
   const receiptNo = val('receiptNo');
 
-  // 의뢰번호 없으면 저장 불가
+  // 의뢰번호 없으면 저장 불가 (currentId 있는 자동저장은 통과)
   if(!receiptNo || !receiptNo.trim()){
-    if(!silent) alert('의뢰번호가 없습니다.\n의뢰서를 먼저 불러온 후 저장해주세요.');
-    return;
+    if(!currentId){
+      if(!silent) alert('의뢰번호가 없습니다.\n의뢰서를 먼저 불러온 후 저장해주세요.');
+      return;
+    }
+    // currentId로 이미 저장된 성적서면 receiptNo 없어도 저장 가능
   }
 
   // ── 의뢰번호 기준으로 항상 같은 ID 고정 ──
