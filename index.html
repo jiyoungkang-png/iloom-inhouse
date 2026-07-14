@@ -932,9 +932,15 @@ function setStandards(v){
   supaFetch('settings','POST',{id:'standards',data:v,updated_at:new Date().toISOString()})
     .catch(function(e){ console.warn('규격 Supabase 저장 실패:', e); });
 }
-function getReports(){return JSON.parse(localStorage.getItem(storeKey) || '[]');}
+function getReports(){
+  if(window._reportsMemCache) return window._reportsMemCache;
+  return JSON.parse(localStorage.getItem(storeKey) || '[]');
+}
 // generateReceiptNo → generateReqNo로 통합
-function setReports(v){localStorage.setItem(storeKey, JSON.stringify(v));}
+function setReports(v){
+  window._reportsMemCache = v;
+  try { localStorage.setItem(storeKey, JSON.stringify(v)); } catch(e){}
+}
 // 이미지 전용 별도 저장 (setReports는 이미지 제외 저장이므로)
 const IMG_STORE_KEY = 'iloom_img_v1';
 function saveImageLocally(id, imgData){
@@ -2906,10 +2912,12 @@ async function renderListAsync(page){
   try {
     const rows = await getReportsAsync();
     if(rows && rows.length >= 0){
-      // localStorage를 Supabase 데이터로 완전 덮어쓰기 (오래된 캐시 제거)
-      localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){
-        const c = Object.assign({}, r); delete c.image; return c;
-      })));
+      window._reportsMemCache = rows; // 메모리 캐시 우선 저장
+      try {
+        localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){
+          const c = Object.assign({}, r); delete c.image; return c;
+        })));
+      } catch(qe){ console.warn('reports localStorage 용량 초과, 메모리 캐시 사용'); }
     }
     if(box) box.dataset.loaded = '1';
   } catch(e){
@@ -4990,29 +4998,44 @@ async function syncAllFromServer(force){
   if(!force && now - _lastSyncTime < 10000) return;
   _lastSyncTime = now;
 
+  let anyOk = false;
+  let allFail = true;
+
+  // 1. 성적서
   try {
-    // 1. 성적서 — 작성 중인 경우(미저장) localStorage만 갱신, 화면은 건드리지 않음
     const rows = await getReportsAsync();
-    if(rows && rows.length >= 0){
-      localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
+    if(Array.isArray(rows)){
+      window._reportsMemCache = rows; // 메모리 캐시 우선 저장
+      try {
+        localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
+      } catch(qe){ console.warn('reports localStorage 용량 초과, 메모리 캐시 사용'); }
       if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
+      anyOk = true; allFail = false;
     }
+  } catch(e){ console.warn('성적서 동기화 실패:', e); }
 
-    // 2. 의뢰서
+  // 2. 의뢰서
+  try {
     const reqs = await getRequestsAsync();
-    if(reqs && reqs.length >= 0){
+    if(Array.isArray(reqs)){
       localStorage.setItem('iloom_requests_v1', JSON.stringify(reqs));
+      anyOk = true; allFail = false;
     }
+  } catch(e){ console.warn('의뢰서 동기화 실패:', e); }
 
-    // 3. 계정
+  // 3. 계정
+  try {
     const accRows = await supaFetch('accounts', 'GET');
-    if(accRows && accRows.length > 0){
+    if(Array.isArray(accRows) && accRows.length > 0){
       localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accRows.map(function(r){ return r.data; })));
+      anyOk = true; allFail = false;
     }
+  } catch(e){ console.warn('계정 동기화 실패:', e); }
 
-    // 4. 규격 + 의뢰항목
+  // 4. 규격 + 의뢰항목
+  try {
     const settingRows = await supaFetch('settings', 'GET');
-    if(settingRows && settingRows.length){
+    if(Array.isArray(settingRows) && settingRows.length){
       const stdRow = settingRows.find(function(r){ return r.id==='standards'; });
       if(stdRow && Array.isArray(stdRow.data) && stdRow.data.length > 0){
         localStorage.setItem(standardsKey, JSON.stringify(stdRow.data));
@@ -5022,22 +5045,22 @@ async function syncAllFromServer(force){
       if(reqRow && Array.isArray(reqRow.data) && reqRow.data.length > 0){
         localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(reqRow.data));
       }
+      anyOk = true; allFail = false;
     }
+  } catch(e){ console.warn('규격/설정 동기화 실패:', e); }
 
-    // 동기화 성공
+  // 상태 표시
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  if(anyOk){
     _syncFailCount = 0;
-    const dot = document.getElementById('syncDot');
-    const lbl = document.getElementById('syncLabel');
     if(dot) dot.style.background='#22c55e';
     if(lbl) lbl.textContent='동기화 완료 '+new Date().toLocaleTimeString();
     console.log('✅ 전체 동기화 완료', new Date().toLocaleTimeString());
-  } catch(e){
+  } else {
     _syncFailCount++;
-    console.warn('동기화 실패 ('+_syncFailCount+'회):', e);
-    // 2회 연속 실패부터만 UI에 표시 (일시적 네트워크 끊김에는 반응 안 함)
+    console.warn('전체 동기화 실패 ('+_syncFailCount+'회)');
     if(_syncFailCount >= 2){
-      const dot = document.getElementById('syncDot');
-      const lbl = document.getElementById('syncLabel');
       if(dot) dot.style.background='#f59e0b';
       if(lbl) lbl.textContent='서버 연결 불가 (로컬 데이터 사용 중)';
     }
@@ -5062,9 +5085,12 @@ document.addEventListener('visibilitychange', function(){
   }
 });
 
-function getReports() { return JSON.parse(localStorage.getItem(storeKey)||'[]'); }
+function getReports() {
+  if(window._reportsMemCache) return window._reportsMemCache;
+  return JSON.parse(localStorage.getItem(storeKey)||'[]');
+}
 function setReports(list) {
-  // localStorage에는 이미지 제외하고 저장 (용량 초과 방지)
+  window._reportsMemCache = list; // 메모리 캐시 항상 갱신
   const slim = list.map(function(r){
     const copy = Object.assign({}, r);
     delete copy.image;
@@ -5073,10 +5099,7 @@ function setReports(list) {
   try {
     localStorage.setItem(storeKey, JSON.stringify(slim));
   } catch(e) {
-    // 그래도 초과하면 오래된 것부터 제거
-    console.warn('localStorage 용량 부족, 오래된 성적서 제거:', e);
-    const trimmed = slim.slice(0, Math.floor(slim.length / 2));
-    try { localStorage.setItem(storeKey, JSON.stringify(trimmed)); } catch(e2) {}
+    console.warn('reports localStorage 용량 초과, 메모리 캐시만 사용:', e.name);
   }
 }
 
