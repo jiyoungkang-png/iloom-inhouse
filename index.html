@@ -4811,9 +4811,11 @@ async function supaFetch(table, method, body, id) {
     headers,
     body: body ? JSON.stringify(body) : undefined
   });
-  if(!res.ok && method !== 'GET'){
+  if(!res.ok){
     const errText = await res.text().catch(()=>'');
     console.error('Supabase 오류:', res.status, errText);
+    if(method === 'GET') throw new Error('Supabase GET 실패: '+res.status);
+    return false;
   }
   if(method === 'GET') return res.json();
   return res.ok;
@@ -4978,9 +4980,10 @@ async function forceUploadAll(){
   add('완료! 다른 컴퓨터에서 새로고침 후 확인해보세요.');
 }
 
-// ── 전체 실시간 동기화 (10초마다 + 포커스 시) ──
+// ── 전체 실시간 동기화 (30초마다 + 포커스 시) ──
 let _lastSyncTime = 0;
 let _syncTimer = null;
+let _syncFailCount = 0;
 
 async function syncAllFromServer(force){
   const now = Date.now();
@@ -4992,7 +4995,6 @@ async function syncAllFromServer(force){
     const rows = await getReportsAsync();
     if(rows && rows.length >= 0){
       localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
-      // 작성 탭이 열려있고 미저장 데이터 있으면 목록만 갱신, 현재 작성 화면은 건드리지 않음
       if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
     }
 
@@ -5000,7 +5002,6 @@ async function syncAllFromServer(force){
     const reqs = await getRequestsAsync();
     if(reqs && reqs.length >= 0){
       localStorage.setItem('iloom_requests_v1', JSON.stringify(reqs));
-      // 의뢰서 탭 작성 중일 수 있으므로 자동 렌더링 안 함
     }
 
     // 3. 계정
@@ -5020,22 +5021,26 @@ async function syncAllFromServer(force){
       const reqRow = settingRows.find(function(r){ return r.id==='req_items'; });
       if(reqRow && Array.isArray(reqRow.data) && reqRow.data.length > 0){
         localStorage.setItem(REQ_ITEM_LIST_KEY, JSON.stringify(reqRow.data));
-        // 의뢰서 탭에서 작성 중일 수 있으므로 체크박스 재렌더링 안 함 (체크 날림 방지)
       }
     }
 
-    // 동기화 상태 표시
+    // 동기화 성공
+    _syncFailCount = 0;
     const dot = document.getElementById('syncDot');
     const lbl = document.getElementById('syncLabel');
     if(dot) dot.style.background='#22c55e';
     if(lbl) lbl.textContent='동기화 완료 '+new Date().toLocaleTimeString();
     console.log('✅ 전체 동기화 완료', new Date().toLocaleTimeString());
   } catch(e){
-    const dot = document.getElementById('syncDot');
-    const lbl = document.getElementById('syncLabel');
-    if(dot) dot.style.background='#ef4444';
-    if(lbl) lbl.textContent='동기화 실패';
-    console.warn('동기화 실패:', e);
+    _syncFailCount++;
+    console.warn('동기화 실패 ('+_syncFailCount+'회):', e);
+    // 2회 연속 실패부터만 UI에 표시 (일시적 네트워크 끊김에는 반응 안 함)
+    if(_syncFailCount >= 2){
+      const dot = document.getElementById('syncDot');
+      const lbl = document.getElementById('syncLabel');
+      if(dot) dot.style.background='#f59e0b';
+      if(lbl) lbl.textContent='서버 연결 불가 (로컬 데이터 사용 중)';
+    }
   }
 }
 
