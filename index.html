@@ -1867,7 +1867,16 @@ function bindInputs(){
       return;
     }
     const pw=window.open('','_blank');
-    if(pw){ pw.document.write(buildPrintHTML(r)); pw.document.close(); }
+    if(!pw){ alert('팝업이 차단되었습니다.\n브라우저 주소창 우측의 팝업 허용 버튼을 클릭한 후 다시 시도해주세요.'); return; }
+    try {
+      const html = buildPrintHTML(r);
+      pw.document.write(html);
+      pw.document.close();
+    } catch(err) {
+      pw.close();
+      alert('출력 오류가 발생했습니다:\n' + err.message);
+      console.error('buildPrintHTML error:', err);
+    }
   };
   window.buildPrintHTML = buildPrintHTML;
   $('saveStandardBtn').onclick=saveStandard; $('resetStandardsBtn').onclick=()=>{if(confirm('모든 규격을 삭제할까요?')){setStandards([]);renderStandardSelect();renderStandards();}};
@@ -2080,8 +2089,11 @@ function _paginateForPrint(){
   });
 }
 window.addEventListener('load',function(){
-  _paginateForPrint();
-  setTimeout(function(){ _paginateForPrint(); window.print(); },600);
+  try{ _paginateForPrint(); }catch(e){ console.error('p1 paginate err',e); }
+  setTimeout(function(){
+    try{ _paginateForPrint(); }catch(e){ console.error('p2 paginate err',e); }
+    window.print();
+  },600);
 });
 <\/script>
 </body></html>`;
@@ -2191,8 +2203,8 @@ function addTest(item){
       renderDetailSection();
       window._detailRenderTimer = null;
     }, 50);
+    markUnsaved();
   }
-  markUnsaved();
 }
 function updateJudgeColors(){
   document.querySelectorAll('[data-key^="judge_"]').forEach(function(sel){
@@ -3262,25 +3274,25 @@ async function listDeleteSelected(){
   updateListActionBar();
 }
 
-function listPrintSelected(){
+async function listPrintSelected(){
   var ids = [...document.querySelectorAll('#reportList .list-chk:checked')].map(function(c){ return c.dataset.id; });
   if(!ids.length){ return; }
   var reports = getReports().filter(function(r){ return ids.includes(r.id); });
   // 선택한 성적서들을 순서대로 미리보기 탭에서 출력
   if(reports.length === 1){
-    loadReport(reports[0]);
-    setTimeout(function(){ document.getElementById('printBtn').click(); }, 400);
+    await loadReport(reports[0]);
+    setTimeout(function(){ document.getElementById('printBtn').click(); }, 300);
   } else {
     alert(reports.length+'개 성적서를 순서대로 출력합니다.');
     var idx = 0;
-    function printNext(){
+    async function printNext(){
       if(idx >= reports.length) return;
-      loadReport(reports[idx]);
+      await loadReport(reports[idx]);
       idx++;
       setTimeout(function(){
         document.getElementById('printBtn').click();
         setTimeout(printNext, 800);
-      }, 400);
+      }, 300);
     }
     printNext();
   }
@@ -4221,6 +4233,7 @@ async function loadReport(r){
   }, 50);
   // 잠금 상태 UI 적용
   setTimeout(()=>setIssuedLockUI(!!r.issued, r.unlockRequest||null), 150);
+  clearUnsaved();
   document.querySelector('[data-tab="write"]').click();
 }
 async function saveReport(silent=false){
