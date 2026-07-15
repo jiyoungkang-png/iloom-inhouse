@@ -1947,7 +1947,7 @@ function buildPrintHTML(r){
         const dc2=det['detail_crit_'+i]||crit||'';
         const show560=!!det['load_show560_'+i];
         let rows='';
-        [['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(cv){
+        [['0회','0'],['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(cv){
           rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;
         });
         if(show560){
@@ -2562,7 +2562,7 @@ function renderDetailSection(externalData){
         tbl3.innerHTML='<thead><tr style="background:#f4f5f7"><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">구분</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D1 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">D2 (mm)</th><th style="border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700">기준</th></tr></thead>';
         var tbody3=document.createElement('tbody');
         // 기본 4개 행 (0회~8만회)
-        [['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(cv){
+        [['0회','0'],['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(cv){
           var tr3=document.createElement('tr');
           var ta3=document.createElement('td'); ta3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; ta3.textContent=cv[0];
           var tbD1=document.createElement('td'); tbD1.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
@@ -2861,7 +2861,7 @@ function renderPreview(){
             const critBox2 = crit ? '<div style="font-size:10px;color:#374151;white-space:pre-wrap;margin-bottom:6px;padding:6px 8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;line-height:1.7"><span style="font-weight:800;font-size:10px;color:#6b7280">기준</span><br>'+esc(crit)+'</div>' : '';
             const show560p=!!detail['load_show560_'+i];
             let rows = '';
-            [['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(c){
+            [['0회','0'],['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
               const d2=detail['load_'+c[1]+'_d2_'+i]||'';
               rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>';
