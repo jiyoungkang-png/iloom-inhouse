@@ -1925,16 +1925,16 @@ function buildPrintHTML(r){
         const rJudge = jg ? `<tr><td style="font-weight:800;text-align:center;padding:4px">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'};text-align:center">${e2(jg)}</td></tr>` : '';
         blocks+=`<div class="rb">${th}${crit?`<div class="dc"><b>기준</b><br>${e2(crit)}</div>`:''}<table class="rt" style="width:100%"><tr><th style="width:50%;text-align:center">구분</th><th style="width:50%;text-align:center">시험 결과</th></tr>${rJudge}</table></div>`;
       } else if(nm.includes('내구성')){
-        const dc=det['detail_crit_'+i]||crit||'';
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
         const d4Row_p=det['d4_'+i]?`<tr><td class="left">D4 (560,000회)</td><td class="rv">${e2(det['d4_'+i])}</td><td>-</td></tr>`:'';
-        blocks+=`<div class="rb">${th}${dc?`<div class="dc"><b>기준</b><br>${e2(dc)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">측정값 (mm)</th><th>기준</th></tr><tr><td class="left">D1 (200회)</td><td class="rv">${e2(det['d1_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">D2 (10,000회)</td><td class="rv">${e2(det['d2_'+i]||'')}</td><td>≤ 40 mm</td></tr><tr><td class="left">D3 (80,000회)</td><td class="rv">${e2(det['d3_'+i]||'')}</td><td>≤ 40 mm</td></tr>${d4Row_p}${dJudge}</table></div>`;
+        const appJudge_p=det['appearance_'+i]?`<tr><td class="left">외관</td><td class="rv" style="color:${det['appearance_'+i]==='합격'?'#008a3d':'#e60012'}">${e2(det['appearance_'+i])}</td><td>겉감·내용물·용수철·구조체 이상 없을 것</td></tr>`:'';
+        blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">측정값 (mm)</th><th>기준</th></tr><tr><td class="left">D1 (200회)</td><td class="rv">${e2(det['d1_'+i]||'')}</td><td>-</td></tr><tr><td class="left">D2 (10,000회)</td><td class="rv">${e2(det['d2_'+i]||'')}</td><td>-</td></tr><tr><td class="left">D3 (80,000회)</td><td class="rv">${e2(det['d3_'+i]||'')}</td><td>-</td></tr>${d4Row_p}${appJudge_p}${dJudge}</table></div>`;
       } else if(nm.includes('수직하중')||nm.includes('하중')){
         const dc2=det['detail_crit_'+i]||crit||'';
         const show560=!!det['load_show560_'+i];
         let rows='';
         [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000']].forEach(function(cv){
-          rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td>D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;
+          rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td>-</td></tr>`;
         });
         if(show560){
           rows+=`<tr><td class="left">560000회</td><td class="rv">D1: ${e2(det['load_560000_d1_'+i]||'')} / D2: ${e2(det['load_560000_d2_'+i]||'')}</td><td>-</td></tr>`;
@@ -2502,13 +2502,9 @@ function renderDetailSection(externalData){
         d4Lbl.style.cssText='font-size:12px;font-weight:600;color:#374151;cursor:pointer'; d4Lbl.textContent='D4 포함';
         d4Chk.addEventListener('change',function(){ trD4.style.display=this.checked?'':'none'; if(!this.checked){inpD4.value='';inpD4.dispatchEvent(new Event('input'));} });
         d4ToggleWrap.appendChild(d4Chk); d4ToggleWrap.appendChild(d4Lbl); fieldsWrap.appendChild(d4ToggleWrap);
-        var dcWrap=document.createElement('div'); dcWrap.style.cssText='margin-bottom:10px';
-        var dcLbl=document.createElement('label'); dcLbl.style.cssText='display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12px;color:#374151';
-        dcLbl.textContent='상세 기준';
-        var dcInp=document.createElement('textarea'); dcInp.dataset.key='detail_crit_'+i; dcInp.rows=2; dcInp.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px;resize:vertical;width:100%'; dcInp.value=saved['detail_crit_'+i]||t.crit||'';
-        dcInp.addEventListener('input',renderPreview); dcLbl.appendChild(dcInp); dcWrap.appendChild(dcLbl); fieldsWrap.appendChild(dcWrap);
         var jWrap=document.createElement('div'); jWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
         jWrap.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
+        jWrap.appendChild(_makeSelect({label:'외관 합격 여부',key:'appearance_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
         fieldsWrap.appendChild(jWrap);
 
       } else if(name.includes('수직하중')||name.includes('하중')){
@@ -2523,7 +2519,7 @@ function renderDetailSection(externalData){
           var d1i=document.createElement('input'); d1i.type='number'; d1i.step='0.1'; d1i.dataset.key='load_'+cv[1]+'_d1_'+i; d1i.placeholder='0.0'; d1i.value=saved['load_'+cv[1]+'_d1_'+i]||''; d1i.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d1i.addEventListener('input',renderPreview); tbD1.appendChild(d1i);
           var tbD2=document.createElement('td'); tbD2.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
           var d2i=document.createElement('input'); d2i.type='number'; d2i.step='0.1'; d2i.dataset.key='load_'+cv[1]+'_d2_'+i; d2i.placeholder='0.0'; d2i.value=saved['load_'+cv[1]+'_d2_'+i]||''; d2i.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; d2i.addEventListener('input',renderPreview); tbD2.appendChild(d2i);
-          var tc3=document.createElement('td'); tc3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc3.textContent='D1 ≤ 45mm / D2 ≥ 5mm';
+          var tc3=document.createElement('td'); tc3.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tc3.textContent='-';
           tr3.appendChild(ta3); tr3.appendChild(tbD1); tr3.appendChild(tbD2); tr3.appendChild(tc3); tbody3.appendChild(tr3);
         });
         // 56만회 행 (토글)
@@ -2795,15 +2791,14 @@ function renderPreview(){
           } else if(name.includes('내구성')){
             const d1=detail['d1_'+i]||''; const d2=detail['d2_'+i]||'';
             const d3=detail['d3_'+i]||''; const d4=detail['d4_'+i]||'';
-            const critBox1 = crit ? '<div style="font-size:10px;color:#374151;white-space:pre-wrap;margin-bottom:6px;padding:6px 8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;line-height:1.7"><span style="font-weight:800;font-size:10px;color:#6b7280">기준</span><br>'+esc(crit)+'</div>' : '';
             const dJudge = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>KS G 4300 기준 만족</td></tr>' : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
-              +critBox1
               +'<table class="result-table"><tr><th style="width:30%">구분</th><th style="width:30%">측정값 (mm)</th><th>기준</th></tr>'
-              +'<tr><td class="left">D1 (200회)</td><td class="result-val">'+esc(d1)+'</td><td>≤ 40 mm</td></tr>'
-              +'<tr><td class="left">D2 (10,000회)</td><td class="result-val">'+esc(d2)+'</td><td>≤ 40 mm</td></tr>'
-              +'<tr><td class="left">D3 (80,000회)</td><td class="result-val">'+esc(d3)+'</td><td>≤ 40 mm</td></tr>'
+              +'<tr><td class="left">D1 (200회)</td><td class="result-val">'+esc(d1)+'</td><td>-</td></tr>'
+              +'<tr><td class="left">D2 (10,000회)</td><td class="result-val">'+esc(d2)+'</td><td>-</td></tr>'
+              +'<tr><td class="left">D3 (80,000회)</td><td class="result-val">'+esc(d3)+'</td><td>-</td></tr>'
               +(d4?'<tr><td class="left">D4 (560,000회)</td><td class="result-val">'+esc(d4)+'</td><td>-</td></tr>':'')
+              +(detail['appearance_'+i]?'<tr><td class="left">외관</td><td class="result-val" style="font-weight:900;color:'+(detail['appearance_'+i]==='합격'?'#008a3d':'#e60012')+'">'+esc(detail['appearance_'+i])+'</td><td>겉감·내용물·용수철·구조체 이상 없을 것</td></tr>':'')
               +dJudge
               +'</table></div>';
 
@@ -2815,7 +2810,7 @@ function renderPreview(){
             [['0회','0'],['200회','200'],['10000회','10000'],['80000회','80000']].forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
               const d2=detail['load_'+c[1]+'_d2_'+i]||'';
-              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td>D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>';
+              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td>-</td></tr>';
             });
             if(show560p){
               const d1=detail['load_560000_d1_'+i]||'';
