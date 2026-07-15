@@ -1735,6 +1735,7 @@ function navInit(){
     if(btn.dataset.tab === 'list') renderListAsync();
     if(btn.dataset.tab === 'write') renderStandardSelect();
     if(btn.dataset.tab === 'pdfstore') renderPdfStore();
+    if(btn.dataset.tab === 'unlockReq') renderUnlockRequests();
     if(window.innerWidth <= 768) closeSidebar();
   }));
 }
@@ -5061,6 +5062,8 @@ async function syncAllFromServer(force){
         localStorage.setItem(storeKey, JSON.stringify(rows.map(function(r){ const c=Object.assign({},r); delete c.image; return c; })));
       } catch(qe){ console.warn('reports localStorage 용량 초과, 메모리 캐시 사용'); }
       if(document.getElementById('tab-list')?.classList.contains('active')) renderList();
+      updateUnlockBadge();
+      if(document.getElementById('tab-unlockReq')?.classList.contains('active')) renderUnlockRequests();
       anyOk = true; allFail = false;
     }
   } catch(e){ console.warn('성적서 동기화 실패:', e); }
