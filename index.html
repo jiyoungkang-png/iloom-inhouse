@@ -1927,7 +1927,7 @@ function buildPrintHTML(r){
       } else if(nm.includes('내구성')){
         const dJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
         const d4Row_p=det['d4_'+i]?`<tr><td class="left">D4 (560,000회)</td><td class="rv">${e2(det['d4_'+i])}</td><td>-</td></tr>`:'';
-        const appJudge_p=det['appearance_'+i]?`<tr><td class="left">외관</td><td class="rv" style="color:${det['appearance_'+i]==='합격'?'#008a3d':'#e60012'}">${e2(det['appearance_'+i])}</td><td>겉감·내용물·용수철·구조체 이상 없을 것</td></tr>`:'';
+        const appJudge_p=det['appearance_'+i]?`<tr><td class="left">외관</td><td class="rv" style="color:${det['appearance_'+i]==='합격'?'#008a3d':'#e60012'}">${e2(det['appearance_'+i])}</td><td style="font-size:9px;line-height:1.7;text-align:left">2. 겉감의 닳음, 풀림, 찢어짐 등이 없을 것.<br>3. 내용물의 이동, 뭉침 빠짐등이 없을 것.<br>4. 용수철의 끊어짐, 빠짐 등이 없을 것.<br>5. 구조체에 파손, 흔들거림, 이상음의 발생 등이 없을 것.</td></tr>`:'';
         blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:30%">측정값 (mm)</th><th>기준</th></tr><tr><td class="left">D1 (200회)</td><td class="rv">${e2(det['d1_'+i]||'')}</td><td>-</td></tr><tr><td class="left">D2 (10,000회)</td><td class="rv">${e2(det['d2_'+i]||'')}</td><td>-</td></tr><tr><td class="left">D3 (80,000회)</td><td class="rv">${e2(det['d3_'+i]||'')}</td><td>-</td></tr>${d4Row_p}${appJudge_p}${dJudge}</table></div>`;
       } else if(nm.includes('수직하중')||nm.includes('하중')){
         const dc2=det['detail_crit_'+i]||crit||'';
@@ -2493,6 +2493,15 @@ function renderDetailSection(externalData){
         var inpD4=document.createElement('input'); inpD4.type='number'; inpD4.step='0.01'; inpD4.dataset.key='d4_'+i; inpD4.placeholder='0.00'; inpD4.value=saved['d4_'+i]||''; inpD4.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center'; inpD4.addEventListener('input',renderPreview); tbD4.appendChild(inpD4);
         var tcD4=document.createElement('td'); tcD4.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:11px'; tcD4.textContent='-';
         trD4.appendChild(taD4); trD4.appendChild(tbD4); trD4.appendChild(tcD4); tbodyD.appendChild(trD4);
+        // 외관 행 (D4 다음, 항상 표시)
+        var trApp=document.createElement('tr');
+        var taApp=document.createElement('td'); taApp.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;font-weight:700'; taApp.textContent='외관';
+        var tbApp=document.createElement('td'); tbApp.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center';
+        var selApp=document.createElement('select'); selApp.dataset.key='appearance_'+i; selApp.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%';
+        ['','합격','불합격'].forEach(function(o){ var opt=document.createElement('option'); opt.value=o; opt.textContent=o||'선택'; if((saved['appearance_'+i]||'')===o) opt.selected=true; selApp.appendChild(opt); });
+        selApp.addEventListener('change',renderPreview); tbApp.appendChild(selApp);
+        var tcApp=document.createElement('td'); tcApp.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:left;color:#555;font-size:10px;line-height:1.7'; tcApp.innerHTML='2. 겉감의 닳음, 풀림, 찢어짐 등이 없을 것.<br>3. 내용물의 이동, 뭉침 빠짐등이 없을 것.<br>4. 용수철의 끊어짐, 빠짐 등이 없을 것.<br>5. 구조체에 파손, 흔들거림, 이상음의 발생 등이 없을 것.';
+        trApp.appendChild(taApp); trApp.appendChild(tbApp); trApp.appendChild(tcApp); tbodyD.appendChild(trApp);
         tblD.appendChild(tbodyD); fieldsWrap.appendChild(tblD);
         // D4 토글 체크박스
         var d4ToggleWrap=document.createElement('div'); d4ToggleWrap.style.cssText='margin-bottom:10px;display:flex;align-items:center;gap:6px';
@@ -2504,7 +2513,6 @@ function renderDetailSection(externalData){
         d4ToggleWrap.appendChild(d4Chk); d4ToggleWrap.appendChild(d4Lbl); fieldsWrap.appendChild(d4ToggleWrap);
         var jWrap=document.createElement('div'); jWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
         jWrap.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
-        jWrap.appendChild(_makeSelect({label:'외관 합격 여부',key:'appearance_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
         fieldsWrap.appendChild(jWrap);
 
       } else if(name.includes('수직하중')||name.includes('하중')){
@@ -2798,7 +2806,7 @@ function renderPreview(){
               +'<tr><td class="left">D2 (10,000회)</td><td class="result-val">'+esc(d2)+'</td><td>-</td></tr>'
               +'<tr><td class="left">D3 (80,000회)</td><td class="result-val">'+esc(d3)+'</td><td>-</td></tr>'
               +(d4?'<tr><td class="left">D4 (560,000회)</td><td class="result-val">'+esc(d4)+'</td><td>-</td></tr>':'')
-              +(detail['appearance_'+i]?'<tr><td class="left">외관</td><td class="result-val" style="font-weight:900;color:'+(detail['appearance_'+i]==='합격'?'#008a3d':'#e60012')+'">'+esc(detail['appearance_'+i])+'</td><td>겉감·내용물·용수철·구조체 이상 없을 것</td></tr>':'')
+              +(detail['appearance_'+i]?'<tr><td class="left">외관</td><td class="result-val" style="font-weight:900;color:'+(detail['appearance_'+i]==='합격'?'#008a3d':'#e60012')+'">'+esc(detail['appearance_'+i])+'</td><td style="font-size:9px;line-height:1.7;text-align:left">2. 겉감의 닳음, 풀림, 찢어짐 등이 없을 것.<br>3. 내용물의 이동, 뭉침 빠짐등이 없을 것.<br>4. 용수철의 끊어짐, 빠짐 등이 없을 것.<br>5. 구조체에 파손, 흔들거림, 이상음의 발생 등이 없을 것.</td></tr>':'')
               +dJudge
               +'</table></div>';
 
