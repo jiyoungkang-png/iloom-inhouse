@@ -1892,6 +1892,9 @@ function buildPrintHTML(r){
     const f2=s=>s?String(s).replace(/-/g,'.') :'';
     const tests=r.tests||[];
     const det=r.detailData||{};
+    // 현재 규격에서 최신 crit/spec 병합
+    const _pStds = typeof getStandards === 'function' ? getStandards() : [];
+    tests.forEach(function(t){ const s=_pStds.find(function(x){return x.name===t.name;}); if(s){ if(s.spec) t.spec=s.spec; if(s.crit!==undefined) t.crit=s.crit; } });
     const ksrc=document.getElementById('kolas-logo-src')?.src||'';
     const iloomsrc=document.getElementById('iloom-logo-src')?.src||'';
     const showKolas=(r.purpose||'').includes('KOLAS용');
@@ -2130,7 +2133,7 @@ function newReport(){
 function addTest(item){
   const tbody=$('testTable').querySelector('tbody'); const tr=document.createElement('tr');
   const detail = item.detail || {};
-  tr.innerHTML=`<td class="rowno"></td><td><input class="t-name" value="${esc(item.name)}"></td><td><input class="t-spec" value="${esc(item.spec)}"></td><td><textarea class="t-crit" rows="3" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;padding:4px 6px;font:inherit;font-size:12px;resize:vertical;min-height:32px">${esc(item.crit||item.result||'')}</textarea></td><td><select class="t-cat"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></td><td><button class="btn ghost t-detail-btn" style="font-size:11px;padding:4px 8px;white-space:nowrap">세부 입력</button></td><td><button class="icon-btn">삭제</button></td>`;
+  tr.innerHTML=`<td class="rowno"></td><td><input class="t-name" value="${esc(item.name)}" readonly style="background:#f9fafb;cursor:default"></td><td><input class="t-spec" value="${esc(item.spec)}" readonly style="background:#f9fafb;cursor:default"></td><td><textarea class="t-crit" rows="3" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;padding:4px 6px;font:inherit;font-size:12px;resize:vertical;min-height:32px;background:#f9fafb;cursor:default" readonly>${esc(item.crit||item.result||'')}</textarea></td><td><select class="t-cat"><option>내구성시험</option><option>치수/외관</option><option>성능시험</option><option>물성시험</option><option>견뢰도</option><option>유해물질</option></select></td><td><button class="btn ghost t-detail-btn" style="font-size:11px;padding:4px 8px;white-space:nowrap">세부 입력</button></td><td><button class="icon-btn">삭제</button></td>`;
   tbody.appendChild(tr);
   tr.querySelector('.t-cat').value=item.category||'기타';
 
@@ -2277,6 +2280,17 @@ function renderDetailSection(externalData){
     if(!saved['crit_edit_'+idx]){ const ci=tr.querySelector('.t-crit'); if(ci) saved['crit_edit_'+idx]=ci.value; }
   });
   if(externalData) Object.assign(saved, externalData);
+
+  // 현재 규격에서 최신 crit/spec 병합 (규격 수정 시 반영)
+  const _currStds = typeof getStandards === 'function' ? getStandards() : [];
+  tests.forEach(function(t, idx){
+    const std = _currStds.find(function(s){ return s.name === t.name; });
+    if(std){
+      t.spec = std.spec || t.spec;
+      if(!saved['crit_edit_'+idx]) t.crit = std.crit !== undefined ? std.crit : t.crit;
+    }
+  });
+
   box.innerHTML = '';
 
   // ── 헬퍼 함수 (루프 밖 선언) ──
@@ -2341,8 +2355,7 @@ function renderDetailSection(externalData){
       secBtnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
       const secEditBtn = document.createElement('button');
       secEditBtn.type='button'; secEditBtn.textContent='수정';
-      try{ if(JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id!==ADMIN_ID) secEditBtn.style.display='none'; }catch(e){}
-      secEditBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer';
+      secEditBtn.style.cssText='background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
       const secSaveBtn = document.createElement('button');
       secSaveBtn.type='button'; secSaveBtn.textContent='저장';
       secSaveBtn.style.cssText='background:#e60012;border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;display:none';
@@ -2703,6 +2716,9 @@ function renderPreview(){
     const r=collectReport();
 
     const tests=r.tests;
+    // 현재 규격에서 최신 crit/spec 병합
+    const _rStds = typeof getStandards === 'function' ? getStandards() : [];
+    (tests||[]).forEach(function(t){ const s=_rStds.find(function(x){return x.name===t.name;}); if(s){ if(s.spec) t.spec=s.spec; if(s.crit!==undefined) t.crit=s.crit; } });
     const lenPct=pct(num(r.lengthBefore),num(r.lengthAfter));
     const widPct=pct(num(r.widthBefore),num(r.widthAfter));
     const lpEl=$('lengthPctDisplay'); if(lpEl) lpEl.textContent=lenPct||'—';
@@ -3542,12 +3558,46 @@ function renderStandards(){
       document.getElementById('edit_cancel_'+i).onclick=function(){ editDiv.remove(); viewDiv.style.display=''; };
       document.getElementById('edit_save_'+i).onclick=function(){
         const l=getStandards();
+        const oldName = l[i].name;
         l[i].name = document.getElementById('edit_name_'+i).value.trim();
         l[i].spec = document.getElementById('edit_spec_'+i).value.trim();
         l[i].crit = document.getElementById('edit_crit_'+i).value.trim();
         l[i].defaultJudge = document.getElementById('edit_judge_'+i).value;
         l[i].category = document.getElementById('edit_cat_'+i).value;
-        setStandards(l); renderStandards(); renderStandardSelect();
+        setStandards(l);
+        // 모든 성적서에 전파
+        const newStd = l[i];
+        const allReports = getReports();
+        let repChanged = false;
+        allReports.forEach(function(r){
+          if(!r.tests) return;
+          r.tests.forEach(function(t){
+            if(t.name===oldName || t.name===newStd.name){
+              t.name=newStd.name; t.spec=newStd.spec; t.crit=newStd.crit; repChanged=true;
+            }
+          });
+          // detailData의 crit_edit도 초기화 (수동 편집값 덮어쓰기)
+          if(r.detailData) Object.keys(r.detailData).forEach(function(k){ if(k.startsWith('crit_edit_')) delete r.detailData[k]; });
+        });
+        if(repChanged){
+          setReports(allReports);
+          allReports.forEach(function(r){ supaFetch('reports','POST',{id:r.id,data:r,updated_at:new Date().toISOString()}).catch(function(){}); });
+        }
+        // 의뢰서에도 전파
+        try{
+          var reqs=JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+          reqs.forEach(function(req){
+            if(!req.items) return;
+            req.items.forEach(function(item){
+              if(typeof item==='object' && (item.name===oldName || item.name===newStd.name)){
+                item.name=newStd.name; item.spec=newStd.spec; item.crit=newStd.crit;
+              }
+            });
+          });
+          localStorage.setItem('iloom_requests_v1',JSON.stringify(reqs));
+        }catch(e){}
+        renderStandards(); renderStandardSelect();
+        showToast('규격이 저장되었습니다. 모든 성적서/의뢰서에 반영되었습니다.');
       };
     };
 
