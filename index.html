@@ -2004,12 +2004,11 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
 `;
 
     const showLogo = !!r.showLogo;
-    const iloomLineEl = '';
-    const iloomLogoEl = showLogo ? (iloomsrc ? `<img src="${iloomsrc}" class="iloom-brand-img">` : '<div style="font-size:14px;font-weight:800;color:#D8755B;margin-bottom:3mm">iloom</div>') : '';
+    const iloomLineEl = showLogo ? '<div class="iloom-wm">iloom</div>' : '';
+    const iloomLogoEl = '';
     const HTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
-<div class="p1${showLogo?' p1-logo':''}">
+<div class="p1">
   ${iloomLineEl}
-  ${iloomLogoEl}
   <div class="rh"><div class="rt-ttl">${e2(r.reportTitle||'IN HOUSE TEST REPORT')}</div>${showKolas?`<img src="${ksrc}" style="height:48px;object-fit:contain">`:'<div></div>'}</div>
   <table class="mt"><colgroup><col style="width:14%"><col style="width:41%"><col style="width:14%"><col style="width:31%"></colgroup>
     <tr><th>접수번호</th><td>${e2(r.receiptNo)}</td><th>용도</th><td>${(r.purpose||'').includes('KOLAS용')?'KOLAS ACC.NO KT1333':e2(r.purpose)}</td></tr>
@@ -2669,12 +2668,10 @@ function renderPreview(){
     const kolasSrc = document.getElementById('kolas-logo-src') ? document.getElementById('kolas-logo-src').src : '';
     const _prevShowLogo = !!r.showLogo;
     const _iloomLogoSrc = document.getElementById('iloom-logo-src')?.src||'';
-    const _prevLogoEl = '';
-    const _prevLogoImg = _prevShowLogo ? (_iloomLogoSrc ? `<img src="${_iloomLogoSrc}" style="display:block;height:18px;object-fit:contain;margin-bottom:3mm">` : '<div style="font-size:14px;font-weight:800;color:#D8755B;margin-bottom:3mm">iloom</div>') : '';
+    const _prevLogoEl = _prevShowLogo ? '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(216,117,91,0.11);font-size:128px;font-weight:900;pointer-events:none;user-select:none;white-space:nowrap;z-index:0;letter-spacing:-3px">iloom</div>' : '';
     $('reportPreview').innerHTML=`
-    <section class="page page-1" style="${_prevShowLogo?'padding-top:8mm':''}">
+    <section class="page page-1" style="">
       ${_prevLogoEl}
-      ${_prevLogoImg}
       <div class="report-head"><div class="report-head-row"><div class="report-title">${esc(r.reportTitle)}</div><div class="logo-block"><img src="${kolasSrc}" alt="KOLAS ILAC" style="height:52px;object-fit:contain"></div></div></div>
       <table class="meta-table"><colgroup><col style="width:14%"><col style="width:41%"><col style="width:14%"><col style="width:31%"></colgroup><tr><th>접수번호</th><td>${esc(r.receiptNo)}</td><th>용도</th><td>${(r.purpose||'').includes('KOLAS용')?'KOLAS ACC.NO KT1333':esc(r.purpose)}</td></tr><tr><th>접수일자</th><td>${fmt(r.receivedDate)}</td><th>발급예정일</th><td>${fmt(r.issuedDate)}</td></tr><tr><th>의뢰자</th><td>${esc(r.requestDept)}</td><th>색상</th><td>${esc(r.colorInfo)}</td></tr><tr><th>시료명</th><td>${esc(r.sampleName)}${(r.materials&&r.materials.length)?" ["+r.materials.map(function(m){return {fabric:"원단",sponge:"스펀지",antibac:"항균",padding:"패딩",mattress:"매트리스"}[m]||m;}).join(", ")+"]":""}</td><th>브랜드</th><td>${esc(r.brand||"")}</td></tr>${(r.sampleReturn||r.sampleQty||r.sampleMaterial)?`<tr><th>시료반환여부</th><td>${esc(r.sampleReturn||'-')}</td><th>시료수량</th><td>${esc(r.sampleQty||'-')} 개</td></tr><tr><th>시료재질</th><td colspan="3">${esc(r.sampleMaterial||'-')}</td></tr>`:''}</table>
       <div class="red-title">■ 의뢰 시험 항목</div>
