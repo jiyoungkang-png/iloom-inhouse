@@ -2004,7 +2004,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
 `;
 
     const showLogo = !!r.showLogo;
-    const iloomLineEl = showLogo ? '<div class="iloom-paper-line"></div><div class="iloom-wm">iloom</div>' : '';
+    const iloomLineEl = '';
     const iloomLogoEl = showLogo ? (iloomsrc ? `<img src="${iloomsrc}" class="iloom-brand-img">` : '<div style="font-size:14px;font-weight:800;color:#D8755B;margin-bottom:3mm">iloom</div>') : '';
     const HTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
 <div class="p1${showLogo?' p1-logo':''}">
@@ -2100,6 +2100,7 @@ window.addEventListener('load',function(){
 }
 function newReport(){
   currentId = null; _reportIsIssued = false; sampleImageData=''; testerSignData='';
+  const _logoChk=document.getElementById('showLogoChk'); if(_logoChk) _logoChk.checked=false;
   techSignData=JY_SIGN_DATA; qualitySignData=SJ_SIGN_DATA;
   (function(){[{k:'tech',d:JY_SIGN_DATA},{k:'quality',d:SJ_SIGN_DATA}].forEach(function(s){const prev=document.getElementById('signPreview_'+s.k);if(prev)prev.innerHTML='<img src="'+s.d+'" style="max-height:32px;max-width:80px;mix-blend-mode:multiply;filter:grayscale(1) contrast(10) brightness(0.4)">';const box=document.getElementById('signUpload'+s.k.charAt(0).toUpperCase()+s.k.slice(1));if(box){box.style.borderColor='#6b7280';box.style.background='#fff';}});})();
   // 회사정보는 현재 입력값 유지
@@ -2668,9 +2669,7 @@ function renderPreview(){
     const kolasSrc = document.getElementById('kolas-logo-src') ? document.getElementById('kolas-logo-src').src : '';
     const _prevShowLogo = !!r.showLogo;
     const _iloomLogoSrc = document.getElementById('iloom-logo-src')?.src||'';
-    const _prevLogoEl = _prevShowLogo ? `
-      <div style="position:absolute;top:0;left:0;right:0;height:3.5px;background:#D8755B;z-index:20"></div>
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(216,117,91,0.11);font-size:128px;font-weight:900;pointer-events:none;user-select:none;white-space:nowrap;z-index:0;letter-spacing:-3px">iloom</div>` : '';
+    const _prevLogoEl = '';
     const _prevLogoImg = _prevShowLogo ? (_iloomLogoSrc ? `<img src="${_iloomLogoSrc}" style="display:block;height:18px;object-fit:contain;margin-bottom:3mm">` : '<div style="font-size:14px;font-weight:800;color:#D8755B;margin-bottom:3mm">iloom</div>') : '';
     $('reportPreview').innerHTML=`
     <section class="page page-1" style="${_prevShowLogo?'padding-top:8mm':''}">
