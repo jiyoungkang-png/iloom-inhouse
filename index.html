@@ -354,8 +354,8 @@ button,input,select{font:inherit}
         <button class="nav-btn" data-tab="pdfstore" id="pdfstoreNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>PDF 보관함</button>
         <button class="nav-btn" data-tab="standard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>시험 규격 관리</button>
         <button class="nav-btn" data-tab="setting"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>회사/결재 설정</button>
-        <button class="nav-btn" data-tab="admin" id="adminNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>관리자 등록</button>
         <button class="nav-btn" data-tab="unlockReq" id="unlockReqNavBtn" style="display:none;align-items:center;gap:4px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>성적서 수정요청<span id="unlockReqBadge" style="display:none;background:#ef4444;color:#fff;border-radius:9999px;padding:1px 7px;font-size:10px;font-weight:900;line-height:1.6;margin-left:4px">0</span></button>
+        <button class="nav-btn" data-tab="admin" id="adminNavBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:8px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>관리자 등록</button>
       </nav>
 
       <div class="side-card">
@@ -564,9 +564,9 @@ button,input,select{font:inherit}
             <div style="display:flex;gap:8px;align-items:center">
               <select id="reqviewFilter" onchange="renderReqMgmt()" style="border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;font-size:13px;color:#374151;outline:none">
                 <option value="">전체</option>
-                <option value="submitted">제출됨</option>
-                <option value="processing">처리중</option>
-                <option value="completed">완료</option>
+                <option value="pending">처리중</option>
+                <option value="writing">작성중</option>
+                <option value="issued">발행완료</option>
               </select>
               <button onclick="renderReqMgmt()" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#374151">새로고침</button>
             </div>
@@ -4063,9 +4063,24 @@ function renderReqMgmt(){
   var container = document.getElementById('reqMgmtList');
   if(!container) return;
   var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+  var reports = getReports();
+
+  // 의뢰 번호로 연결된 성적서를 찾아 자동으로 상태 결정
+  function getReqComputedStatus(r){
+    var linked = reports.find(function(rep){ return (rep.receiptNo||'') === (r.no||''); });
+    if(linked) return linked.issued ? 'issued' : 'writing';
+    return 'pending';
+  }
+
+  var ST = {
+    pending: {label:'처리중',  color:'#d97706', bg:'#fffbeb', border:'#fde68a'},
+    writing: {label:'작성중',  color:'#2563eb', bg:'#eff6ff', border:'#bfdbfe'},
+    issued:  {label:'발행완료', color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0'}
+  };
+
   var filterEl = document.getElementById('reqviewFilter');
   var filter = filterEl ? filterEl.value : '';
-  var items = filter ? list.filter(function(r){ return r.status === filter; }) : list;
+  var items = filter ? list.filter(function(r){ return getReqComputedStatus(r) === filter; }) : list;
   items = items.slice().sort(function(a,b){ return (b.savedAt||'').localeCompare(a.savedAt||''); });
 
   if(!items.length){
@@ -4073,18 +4088,16 @@ function renderReqMgmt(){
     return;
   }
 
-  var ST = {
-    submitted:  {label:'제출됨',  color:'#dc2626', bg:'#fef2f2', border:'#fecaca'},
-    processing: {label:'처리중',  color:'#d97706', bg:'#fffbeb', border:'#fde68a'},
-    completed:  {label:'완료',    color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0'}
-  };
-
   container.innerHTML = items.map(function(r){
-    var st = ST[r.status] || ST['submitted'];
+    var cs = getReqComputedStatus(r);
+    var st = ST[cs];
+    var isIssued = cs === 'issued';
     var reqItems = (r.items||[]).map(function(i){ return typeof i==='object'?(i.label||''):String(i).split(' - ')[0].trim(); });
     var itemText = reqItems.slice(0,4).join(' · ') + (reqItems.length > 4 ? ' 외 '+(reqItems.length-4)+'건' : '');
     var dateStr = r.savedAt ? r.savedAt.slice(0,10)+' '+r.savedAt.slice(11,16) : '';
-    return '<div style="border:1px solid #e5e7eb;border-radius:14px;padding:18px 20px;background:#fff;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">'
+    var cardBg = isIssued ? '#f0fdf4' : '#fff';
+    var cardBorder = isIssued ? '#bbf7d0' : '#e5e7eb';
+    return '<div style="border:1px solid '+cardBorder+';border-radius:14px;padding:18px 20px;background:'+cardBg+';display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">'
       +'<div style="flex:1;min-width:220px">'
       +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
       +'<span style="background:'+st.bg+';color:'+st.color+';border:1px solid '+st.border+';border-radius:9999px;padding:2px 10px;font-size:11px;font-weight:800">'+st.label+'</span>'
@@ -4096,17 +4109,9 @@ function renderReqMgmt(){
       +(itemText?'<div style="font-size:12px;color:#6b7280;line-height:1.7"><b style="color:#374151">시험항목:</b> '+escHtml(itemText)+'</div>':'')
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
-      +(r.status==='submitted'
-        ? '<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" style="background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">제출 확인 · 저장</button>'
-        : '')
+      +(cs==='pending' ? '<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" style="background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">제출 확인 · 저장</button>' : '')
       +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
       +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
-      +'<select onchange="reqMgmtSetStatus(\''+escAttr(r.no)+'\',this.value);this.value=\'\'" style="border:1px solid #d1d5db;border-radius:9px;padding:7px 6px;font-size:11px;color:#374151;cursor:pointer;outline:none;width:128px;background:#fff">'
-      +'<option value="">상태 변경 ▾</option>'
-      +'<option value="submitted">제출됨으로</option>'
-      +'<option value="processing">처리중으로</option>'
-      +'<option value="completed">완료로</option>'
-      +'</select>'
       +'</div>'
       +'</div>';
   }).join('');
