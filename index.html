@@ -2474,7 +2474,7 @@ function renderDetailSection(externalData){
         var tbodyR=document.createElement('tbody');
         var trR=document.createElement('tr');
         var tbR=document.createElement('td'); tbR.style.cssText='border:1px solid #ddd;padding:6px 8px;text-align:center;vertical-align:middle';
-        var selR=document.createElement('select'); selR.dataset.key='judge_'+i; selR.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%';
+        var selR=document.createElement('select'); selR.dataset.key='judge_'+i; selR.style.cssText='border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;width:100%;text-align:center;text-align-last:center';
         ['','합격','불합격'].forEach(function(o){ var opt=document.createElement('option'); opt.value=o; opt.textContent=o||'선택'; if((saved['judge_'+i]||'')===o) opt.selected=true; selR.appendChild(opt); });
         selR.addEventListener('change',renderPreview); tbR.appendChild(selR);
         var tcR=document.createElement('td'); tcR.style.cssText='border:1px solid #ddd;padding:8px 10px;text-align:center;color:#555;font-size:10px;line-height:1.7;vertical-align:middle'; tcR.innerHTML='· 겉감의 닳음, 풀림, 찢어짐 등이 없을 것.<br>· 내용물의 이동, 뭉침 빠짐등이 없을 것.<br>· 용수철의 끊어짐, 빠짐 등이 없을 것.<br>· 구조체에 파손, 흔들거림, 이상음의 발생 등이 없을 것.';
@@ -2519,7 +2519,7 @@ function renderDetailSection(externalData){
         d4Lbl.style.cssText='font-size:12px;font-weight:600;color:#374151;cursor:pointer'; d4Lbl.textContent='D4 포함';
         d4Chk.addEventListener('change',function(){ trD4.style.display=this.checked?'':'none'; if(!this.checked){inpD4.value='';inpD4.dispatchEvent(new Event('input'));} });
         d4ToggleWrap.appendChild(d4Chk); d4ToggleWrap.appendChild(d4Lbl); fieldsWrap.appendChild(d4ToggleWrap);
-        var jWrap=document.createElement('div'); jWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap';
+        var jWrap=document.createElement('div'); jWrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center';
         jWrap.appendChild(_makeSelect({label:'판정',key:'judge_'+i,options:['','합격','불합격'],placeholder:'선택'},saved));
         fieldsWrap.appendChild(jWrap);
 
