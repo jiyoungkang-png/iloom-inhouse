@@ -1667,6 +1667,17 @@ async function init(){
     localStorage.setItem(storeKey, JSON.stringify(cleaned));
   } catch(e) { localStorage.removeItem(storeKey); }
   if(!localStorage.getItem(standardsKey)) setStandards([]); // 기본 고정 규격 없음
+  // 수직하중시험 기준 텍스트 마이그레이션
+  (function(){
+    const _sl = getStandards(); let _sc = false;
+    _sl.forEach(function(s){
+      if(s.name && (s.name.includes('수직하중') || s.name.includes('하중'))){
+        const _nc = 'D1 (시험 후 구조물의 영구 처짐이 과도하지 않을 것)\nD2 (하중 제거 후 최소한의 탄성 및 복원 성능을 유지할 것)';
+        if(s.crit !== _nc){ s.crit = _nc; _sc = true; }
+      }
+    });
+    if(_sc) setStandards(_sl);
+  })();
   navInit(); bindInputs(); renderStandardSelect(); renderStandards(); newReport();
   initAccounts(); initListActions();
   // Supabase에서 최신 데이터 가져온 뒤 렌더링 (await로 완료 보장)
@@ -2281,13 +2292,15 @@ function renderDetailSection(externalData){
   });
   if(externalData) Object.assign(saved, externalData);
 
-  // 현재 규격에서 최신 crit/spec 병합 (규격 수정 시 반영)
+  // 현재 규격에서 최신 crit/spec 항상 반영 (수동 수정 불가이므로 무조건 덮어씀)
   const _currStds = typeof getStandards === 'function' ? getStandards() : [];
   tests.forEach(function(t, idx){
     const std = _currStds.find(function(s){ return s.name === t.name; });
     if(std){
       t.spec = std.spec || t.spec;
-      if(!saved['crit_edit_'+idx]) t.crit = std.crit !== undefined ? std.crit : t.crit;
+      t.crit = std.crit !== undefined ? std.crit : t.crit;
+      // saved crit_edit도 덮어써서 표시에 반영
+      saved['crit_edit_'+idx] = t.crit;
     }
   });
 
@@ -3596,6 +3609,17 @@ function renderStandards(){
           });
           localStorage.setItem('iloom_requests_v1',JSON.stringify(reqs));
         }catch(e){}
+        // 현재 열려있는 성적서 테이블 행도 즉시 업데이트
+        document.querySelectorAll('#testTable tbody tr:not(.t-detail-row)').forEach(function(tr){
+          const ni=tr.querySelector('.t-name'); if(!ni) return;
+          if(ni.value===oldName || ni.value===newStd.name){
+            ni.value=newStd.name;
+            const si=tr.querySelector('.t-spec'); if(si) si.value=newStd.spec||'';
+            const ci=tr.querySelector('.t-crit'); if(ci) ci.value=newStd.crit||'';
+          }
+        });
+        if(typeof renderDetailSection==='function') renderDetailSection();
+        if(typeof renderPreview==='function') renderPreview();
         renderStandards(); renderStandardSelect();
         showToast('규격이 저장되었습니다. 모든 성적서/의뢰서에 반영되었습니다.');
       };
