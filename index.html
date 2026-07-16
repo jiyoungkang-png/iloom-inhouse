@@ -1948,12 +1948,17 @@ function buildPrintHTML(r){
         const show560=!!det['load_show560_'+i];
         let rows='';
         [['0회','0'],['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(cv){
-          rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${e2(det['load_'+cv[1]+'_d1_'+i]||'')} / D2: ${e2(det['load_'+cv[1]+'_d2_'+i]||'')}</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;
+          var _d1v=det['load_'+cv[1]+'_d1_'+i]||''; var _d2v=det['load_'+cv[1]+'_d2_'+i]||'';
+          var _d1n=parseFloat(_d1v); var _d2n=parseFloat(_d2v);
+          var _d1f=_d1v!==''&&!isNaN(_d1n)&&_d1n>45; var _d2f=_d2v!==''&&!isNaN(_d2n)&&_d2n<5;
+          var _d1s=_d1v?(_d1f?`<span style="color:#e60012;font-weight:700">${e2(_d1v)}</span>`:e2(_d1v)):'';
+          var _d2s=_d2v?(_d2f?`<span style="color:#e60012;font-weight:700">${e2(_d2v)}</span>`:e2(_d2v)):'';
+          rows+=`<tr><td class="left">${cv[0]}</td><td class="rv">D1: ${_d1s} / D2: ${_d2s}</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>`;
         });
         if(show560){
           rows+=`<tr><td class="left">560000회</td><td class="rv">D1: ${e2(det['load_560000_d1_'+i]||'')} / D2: ${e2(det['load_560000_d2_'+i]||'')}</td><td>-</td></tr>`;
         }
-        const lJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>KS G 4300 기준 만족</td></tr>` : '';
+        const lJudge = jg ? `<tr><td class="left" style="font-weight:800">판정</td><td class="rv" style="color:${jg==='합격'||jg==='PASS'?'#008a3d':'#e60012'}">${e2(jg)}</td><td>${jg==='합격'||jg==='PASS'?'KS G 4300 기준 만족':'KS G 4300 기준 미달'}</td></tr>` : '';
         blocks+=`<div class="rb">${th}${dc2?`<div class="dc"><b>기준</b><br>${e2(dc2)}</div>`:''}<table class="rt"><tr><th style="width:30%">구분</th><th style="width:35%">시험 결과</th><th>기준</th></tr>${rows}${lJudge}</table></div>`;
       } else {
         blocks+=`<div class="rb">${th}<table class="rt"><tr><th style="width:35%">구분</th><th>시험 결과</th><th style="width:20%">기준</th></tr><tr><td class="left">결과</td><td class="rv">${e2(det['genResult_'+i]||'')}</td><td>${e2(crit||t.result||'')}</td></tr>${jr}</table></div>`;
@@ -2870,14 +2875,18 @@ function renderPreview(){
             [['0회','0'],['200회','200'],['10,000회','10000'],['80,000회','80000']].forEach(function(c){
               const d1=detail['load_'+c[1]+'_d1_'+i]||'';
               const d2=detail['load_'+c[1]+'_d2_'+i]||'';
-              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>';
+              const d1n=parseFloat(d1); const d2n=parseFloat(d2);
+              const d1f=d1!==''&&!isNaN(d1n)&&d1n>45; const d2f=d2!==''&&!isNaN(d2n)&&d2n<5;
+              const d1s=d1?(d1f?'<span style="color:#e60012;font-weight:700">'+esc(d1)+'</span>':esc(d1)):'';
+              const d2s=d2?(d2f?'<span style="color:#e60012;font-weight:700">'+esc(d2)+'</span>':esc(d2)):'';
+              rows += '<tr><td class="left">'+c[0]+'</td><td class="result-val">D1: '+d1s+' / D2: '+d2s+'</td><td style="font-size:10px;line-height:1.7">D1 ≤ 45 mm<br>D2 ≥ 5 mm</td></tr>';
             });
             if(show560p){
               const d1=detail['load_560000_d1_'+i]||'';
               const d2=detail['load_560000_d2_'+i]||'';
               rows += '<tr><td class="left">560000회</td><td class="result-val">D1: '+esc(d1)+' / D2: '+esc(d2)+'</td><td>-</td></tr>';
             }
-            const lJudge = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>KS G 4300 기준 만족</td></tr>' : '';
+            const lJudge = judge ? '<tr><td class="left" style="font-weight:800">판정</td><td class="result-val" style="font-weight:900;color:'+(judge==='합격'||judge==='PASS'?'#008a3d':'#e60012')+'">'+esc(judge)+'</td><td>'+(judge==='합격'||judge==='PASS'?'KS G 4300 기준 만족':'KS G 4300 기준 미달')+'</td></tr>' : '';
             blocks += '<div class="result-block"><div class="result-block-title"><div class="result-block-title-text"><span>'+title+'</span>'+(spec?'<span style="font-weight:400;font-size:10px">('+spec+')</span>':'')+'</div></div>'
               +critBox2
               +'<table class="result-table"><tr><th style="width:30%">구분</th><th style="width:35%">시험 결과</th><th>기준</th></tr>'
