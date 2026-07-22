@@ -929,6 +929,9 @@ const defaultStandards = [
 const fields = ['receiptNo','purpose','receivedDate','issuedDate','requestDept','sampleName','colorInfo','brand','sampleReturn','sampleQty','sampleMaterial','tester','techManager','qualityManager','companyName','companyAddress','companyTel','companyFax','companyWeb','reportTitle','colorChange','staining','lengthBefore','lengthAfter','widthBefore','widthAfter','pillingResult','appearanceResult','remarkNote'];
 const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const fmt = (d) => d ? d.replaceAll('-','.') : '';
+// KST(UTC+9) 시간 포맷터 - toISOString()이 UTC로 저장하므로 +9h 보정
+const fmtKST = function(s,showSec){ if(!s) return ''; var d=new Date(s); if(isNaN(d)) return ''; var kst=new Date(d.getTime()+9*60*60*1000); var p=function(n){return String(n).padStart(2,'0');}; var base=kst.getUTCFullYear()+'-'+p(kst.getUTCMonth()+1)+'-'+p(kst.getUTCDate())+' '+p(kst.getUTCHours())+':'+p(kst.getUTCMinutes()); return showSec ? base+':'+p(kst.getUTCSeconds()) : base; };
+const getCurUser = function(){ try{ return JSON.parse(sessionStorage.getItem('iloom_user')||'{}'); }catch(e){return {};} };
 const num = (v) => Number.parseFloat(v || 0);
 const pct = (before, after) => before ? (((after-before)/before)*100).toFixed(1) + ' %' : '-';
 
@@ -2279,7 +2282,7 @@ function collectReport(autoSaved){
   // ID 우선순위: currentId > receiptNo > 새 UUID
   const receiptNo = val('receiptNo');
   const id = currentId || (receiptNo ? receiptNo : crypto.randomUUID());
-  const data={id:id,savedAt:new Date().toISOString(),autoSaved:!!autoSaved,image:sampleImageData,testerSign:testerSignData,techSign:techSignData,qualitySign:qualitySignData,tests:collectTests(),detailData:getDetailData()};
+  const _u=getCurUser(); const data={id:id,savedAt:new Date().toISOString(),autoSaved:!!autoSaved,lastSavedBy:_u.name||_u.id||'',lastSavedById:_u.id||'',image:sampleImageData,testerSign:testerSignData,techSign:techSignData,qualitySign:qualitySignData,tests:collectTests(),detailData:getDetailData()};
   fields.forEach(function(fid){data[fid]=val(fid);});
   const me=document.getElementById('sampleMaterials');
   data.materials=me&&me.dataset.materials?JSON.parse(me.dataset.materials):[];
@@ -3210,7 +3213,7 @@ function renderPdfStore(){
     return;
   }
   box.innerHTML='';
-  function fmtD(s){ if(!s) return '-'; const d=new Date(s); if(isNaN(d)) return s; const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+  function fmtD(s){ if(!s) return '-'; return fmtKST(s).replace(/-/g,'.'); }
   issued.forEach(r=>{
     const d=document.createElement('div');
     d.style.cssText='display:flex;align-items:center;gap:10px;padding:12px 16px;border:1.5px solid #bbf7d0;border-radius:12px;margin-bottom:10px;background:#f0fdf4';
@@ -3366,22 +3369,16 @@ function renderList(page){
     chk.style.cssText='width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0';
     chk.onclick = updateListActionBar;
     const info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
-    function fmtSaved(s){
-      if(!s) return '저장시각 없음';
-      const d = new Date(s);
-      if(isNaN(d)) return s;
-      const pad = n => String(n).padStart(2,'0');
-      return d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-    }
     const savedAt = r.savedAt || r.updated_at || '';
-    const savedStr = fmtSaved(savedAt);
+    const savedStr = savedAt ? fmtKST(savedAt,true) : '저장시각 없음';
+    const savedByStr = r.lastSavedBy ? ' · <span style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 5px">✏ '+esc(r.lastSavedBy)+'</span>' : '';
     const isAutoSave = r.autoSaved ? ' <span style="font-size:10px;background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 5px;font-weight:700">자동</span>' : '';
     let statusBadge;
     if(!isIssued){ statusBadge='<span style="font-size:10px;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">작성중</span>'; }
     else { const _rs=r.reportStatus||'issued'; if(_rs==='submitted') statusBadge='<span style="font-size:10px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">📤 제출중</span>'; else if(_rs==='completed') statusBadge='<span style="font-size:10px;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">✔ 발행완료</span>'; else statusBadge='<span style="font-size:10px;background:#fef9c3;color:#854d0e;border:1px solid #fde68a;border-radius:5px;padding:2px 7px;font-weight:700;vertical-align:middle">발행됨</span>'; }
     info.innerHTML='<div style="font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px">'+esc(r.receiptNo||'접수번호 없음')+'&nbsp;'+statusBadge+'</div>'
       +'<div style="font-size:12px;color:#6b7280;margin-top:2px">'+esc(r.sampleName||'')+' · '+fmt(r.issuedDate)+'</div>'
-      +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">🕐 '+savedStr+isAutoSave+'</div>';
+      +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">🕐 '+savedStr+isAutoSave+savedByStr+'</div>';
     const btn=document.createElement('button');
     if(isIssued){
       btn.textContent='📄 열어보기';
@@ -4150,7 +4147,8 @@ async function saveRequest(){
     status: 'draft',
     chk_kolas: document.getElementById('req_chk_kolas')?.checked||false,
     chk_internal: document.getElementById('req_chk_internal')?.checked||false,
-    savedBy: (function(){ try{ return JSON.parse(sessionStorage.getItem('iloom_user')||'{}').id||''; }catch(e){return '';} })()
+    savedBy: (function(){ var u=getCurUser(); return u.name||u.id||''; })(),
+    savedById: (function(){ return getCurUser().id||''; })()
   };
   // Supabase에 저장
   try { await setRequestAsync(data); } catch(e){ console.warn('의뢰서 Supabase 저장 실패:', e); }
@@ -4179,6 +4177,7 @@ async function submitFinal(){
   d.signature = sig;
   d.status = 'submitted';
   d.savedAt = new Date().toISOString();
+  var _su=getCurUser(); d.savedBy=_su.name||_su.id||''; d.savedById=_su.id||'';
   try { await setRequestAsync(d); } catch(e){ console.warn('Supabase 저장 실패:', e); }
   var list = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
   var fi = list.findIndex(function(r){ return r.no === d.no; });
@@ -4239,25 +4238,40 @@ function renderReqMgmt(){
     var isIssued = cs === 'issued';
     var reqItems = (r.items||[]).map(function(i){ return typeof i==='object'?(i.label||''):String(i).split(' - ')[0].trim(); });
     var itemText = reqItems.slice(0,4).join(' · ') + (reqItems.length > 4 ? ' 외 '+(reqItems.length-4)+'건' : '');
-    var dateStr = r.savedAt ? r.savedAt.slice(0,10)+' '+r.savedAt.slice(11,16) : '';
+    var dateStr = fmtKST(r.savedAt);
+    var savedByStr = r.savedBy ? ' · <b>저장: '+escHtml(r.savedBy)+'</b>' : '';
     var cardBg = isIssued ? '#f0fdf4' : '#fff';
     var cardBorder = isIssued ? '#bbf7d0' : '#e5e7eb';
+    var actionArea;
+    if(isIssued){
+      actionArea = '<div style="display:flex;flex-direction:column;gap:7px;min-width:128px;position:relative">'
+        +'<div style="position:absolute;inset:0;background:rgba(240,253,244,0.7);backdrop-filter:blur(3px);border-radius:9px;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">'
+        +'<span style="font-size:18px">🔒</span>'
+        +'<span style="font-size:10px;font-weight:700;color:#16a34a">발행완료 · 수정불가</span>'
+        +'</div>'
+        +'<button style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;color:#374151;width:128px;cursor:default" disabled>미리보기</button>'
+        +'<button style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;color:#fff;width:128px;cursor:default" disabled>성적서 작성</button>'
+        +'</div>';
+    } else {
+      actionArea = '<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
+        +(cs==='pending' ? '<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" style="background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">제출 확인 · 저장</button>' : '')
+        +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
+        +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
+        +'</div>';
+    }
     return '<div style="border:1px solid '+cardBorder+';border-radius:14px;padding:18px 20px;background:'+cardBg+';display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">'
       +'<div style="flex:1;min-width:220px">'
       +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
       +'<span style="background:'+st.bg+';color:'+st.color+';border:1px solid '+st.border+';border-radius:9999px;padding:2px 10px;font-size:11px;font-weight:800">'+st.label+'</span>'
       +'<span style="font-size:12px;color:#9ca3af">'+r.no+'</span>'
       +'<span style="font-size:11px;color:#9ca3af">'+dateStr+'</span>'
+      +(r.savedBy?'<span style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 6px">✏ '+escHtml(r.savedBy)+'</span>':'')
       +'</div>'
       +'<div style="font-size:17px;font-weight:900;color:#1f2937;margin-bottom:4px">'+escHtml(r.company||'-')+' <span style="font-size:14px;font-weight:600;color:#4b5563">/ '+escHtml(r.person||'-')+'</span></div>'
       +'<div style="font-size:13px;color:#374151;margin-bottom:4px"><b>시료명:</b> '+escHtml(r.product||'-')+(r.color?' &nbsp;<span style="color:#6b7280">'+escHtml(r.color)+'</span>':'')+'</div>'
       +(itemText?'<div style="font-size:12px;color:#6b7280;line-height:1.7"><b style="color:#374151">시험항목:</b> '+escHtml(itemText)+'</div>':'')
       +'</div>'
-      +'<div style="display:flex;flex-direction:column;gap:7px;min-width:128px">'
-      +(cs==='pending' ? '<button onclick="reqMgmtSetStatus(\''+escAttr(r.no)+'\',\'processing\')" style="background:#16a34a;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">제출 확인 · 저장</button>' : '')
-      +'<button onclick="reqMgmtPreview(\''+escAttr(r.no)+'\')" style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#374151;width:128px">미리보기</button>'
-      +'<button onclick="reqMgmtToReport(\''+escAttr(r.no)+'\')" style="background:#e60012;border:none;border-radius:9px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;color:#fff;width:128px">성적서 작성</button>'
-      +'</div>'
+      +actionArea
       +'</div>';
   }).join('');
 }
