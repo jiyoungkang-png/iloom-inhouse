@@ -3147,6 +3147,17 @@ async function finalizeReport(){
   reports[idx].verifyToken = await generateVerifyToken({...reports[idx], issuedAt});
   setReports(reports);
   await supaFetch('reports','POST',{id:currentId, data:reports[idx], updated_at:issuedAt}).catch(e=>{});
+  // 연결된 의뢰서가 submitted 상태이면 processing으로 자동 전환 (뱃지 오작동 방지)
+  const _rno = reports[idx].receiptNo||'';
+  if(_rno){
+    var _reql = JSON.parse(localStorage.getItem('iloom_requests_v1')||'[]');
+    var _ri = _reql.findIndex(function(x){ return x.no===_rno; });
+    if(_ri>=0 && _reql[_ri].status==='submitted'){
+      _reql[_ri].status='processing';
+      localStorage.setItem('iloom_requests_v1', JSON.stringify(_reql));
+      setRequestAsync(_reql[_ri]).catch(function(){});
+    }
+  }
   renderList(); renderUnlockRequests(); updateUnlockBadge(); renderPdfStore();
   setIssuedLockUI(true, null);
   showToast('✔ 최종작성완료 처리되었습니다.');
@@ -3743,7 +3754,18 @@ async function renderReqListAsync(){
           if(!merged[idx].savedBy && localSavedBy) merged[idx].savedBy = localSavedBy;
         }
       });
+      // submitted 상태이지만 연결된 성적서가 발행됐으면 processing으로 자동 교정
+      var _reps = getReports();
+      var _changed = false;
+      merged.forEach(function(req){
+        if(req.status==='submitted'){
+          var linked=_reps.find(function(rep){return (rep.receiptNo||'')===(req.no||'');});
+          if(linked&&linked.issued){ req.status='processing'; _changed=true; }
+        }
+      });
       localStorage.setItem('iloom_requests_v1', JSON.stringify(merged));
+      // 변경된 항목 Supabase에도 반영
+      if(_changed) merged.filter(function(r){return r.status==='processing';}).forEach(function(r){ setRequestAsync(r).catch(function(){}); });
     }
   } catch(e){ console.warn('의뢰서 Supabase 로드 실패:', e); }
   renderReqList(); // renderReqListAsync 아닌 renderReqList 호출!
