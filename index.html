@@ -2055,7 +2055,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
     const _ovPass = _ovJudged.length>0 && _ovJudged.every(x=>x.judge==='합격'||x.judge==='PASS');
     const _ovJudge = _ovJudged.length===0?'':(_ovPass?'합격':'불합격');
     const _ovColor = _ovJudge==='합격'?'#008a3d':'#e60012';
-    const HTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style>${_vUrl?'<scr'+'ipt src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\\/script>':''}</head><body>
+    const HTML=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
 <div class="p1">
   ${iloomLineEl}
   <div class="rh"><div class="rt-ttl">${e2(r.reportTitle||'IN HOUSE TEST REPORT')}</div>${showKolas?`<img src="${ksrc}" style="height:48px;object-fit:contain">`:'<div></div>'}</div>
@@ -2093,7 +2093,7 @@ body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR','Malgun Gothic'
         <li>3. * 표시 항목은 KOLAS 인정 범위에 포함되지 않는 시험입니다.</li>
         <li>4. 발행된 성적서는 우측 QR 코드를 스캔하시면 위변조 여부를 확인할 수 있습니다.</li>
       </ul>
-      ${_vUrl?`<div style="text-align:center;flex-shrink:0"><canvas id="qrCanvas" width="72" height="72" style="display:block;margin:0 auto 2px;border:0.5px solid #e5e7eb"></canvas><div style="font-size:6px;color:#e60012;font-weight:800;letter-spacing:0.2px">위변조방지 QR</div></div>`:''}
+      ${_vUrl?`<div style="text-align:center;flex-shrink:0"><img src="https://api.qrserver.com/v1/create-qr-code/?size=72x72&margin=2&data=${encodeURIComponent(_vUrl)}" width="72" height="72" style="display:block;margin:0 auto 2px;border:0.5px solid #e5e7eb"><div style="font-size:6px;color:#e60012;font-weight:800;letter-spacing:0.2px">위변조방지 QR</div></div>`:''}
     </div>
     <div style="text-align:right;font-size:7px;color:#333;font-weight:700;margin-top:2px" class="p1-pno">PAGE(S) : 1 / ?</div>
   </div>
@@ -2140,15 +2140,11 @@ function _paginateForPrint(){
   });
 }
 window.addEventListener('load',function(){
-  var _doprint=function(){
-    try{ _paginateForPrint(); }catch(e){}
-    setTimeout(function(){ try{ _paginateForPrint(); }catch(e){} window.print(); },500);
-  };
-  var qc=document.getElementById('qrCanvas');
-  if(qc&&typeof QRCode!=='undefined'){
-    try{ QRCode.toCanvas(qc,'${_vUrl}',{width:72,margin:1,color:{dark:'#000000',light:'#ffffff'}},function(){ _doprint(); }); }
-    catch(e){ _doprint(); }
-  } else { setTimeout(_doprint, qc?200:0); }
+  try{ _paginateForPrint(); }catch(e){ console.error('p1 paginate err',e); }
+  setTimeout(function(){
+    try{ _paginateForPrint(); }catch(e){ console.error('p2 paginate err',e); }
+    window.print();
+  },600);
 });
 <\/script>
 </body></html>`;
@@ -3116,10 +3112,12 @@ function setIssuedLockUI(issued, unlockRequest){
   const deleteBtn = document.getElementById('deleteBtn');
   const pendingLabel = document.getElementById('unlockPendingLabel');
   if(!banner) return;
+  const printBtn2 = document.getElementById('printBtn');
   if(issued){
     banner.style.display = 'flex';
     if(finalizeBtn) finalizeBtn.style.display = 'none';
     if(requestUnlockBtn) requestUnlockBtn.style.display = '';
+    if(printBtn2){ printBtn2.style.display = 'none'; }
     saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.style.cursor = 'not-allowed';
     deleteBtn.disabled = true; deleteBtn.style.opacity = '0.4'; deleteBtn.style.cursor = 'not-allowed';
     if(pendingLabel) pendingLabel.style.display = unlockRequest && unlockRequest.status==='pending' ? '' : 'none';
@@ -3132,6 +3130,7 @@ function setIssuedLockUI(issued, unlockRequest){
     banner.style.display = 'none';
     if(finalizeBtn) finalizeBtn.style.display = '';
     if(requestUnlockBtn) requestUnlockBtn.style.display = 'none';
+    if(printBtn2){ printBtn2.style.display = ''; }
     saveBtn.disabled = false; saveBtn.style.opacity = ''; saveBtn.style.cursor = '';
     deleteBtn.disabled = false; deleteBtn.style.opacity = ''; deleteBtn.style.cursor = '';
     document.querySelectorAll('#tab-write input, #tab-write textarea, #tab-write select').forEach(el=>{
@@ -3294,6 +3293,14 @@ async function printStoredReport(id){
     }
   } catch(e){
     if(!r.image && fallbackImage) r = Object.assign({}, r, {image: fallbackImage});
+  }
+  // verifyToken 없으면 자동 생성 후 저장
+  if(r.issued && !r.verifyToken && r.receiptNo){
+    r = Object.assign({}, r);
+    r.issuedAt = r.issuedAt || r.savedAt || new Date().toISOString();
+    r.verifyToken = await generateVerifyToken(r);
+    const _reps=getReports(); const _ri=_reps.findIndex(function(x){return x.id===r.id;});
+    if(_ri>=0){ _reps[_ri].verifyToken=r.verifyToken; _reps[_ri].issuedAt=r.issuedAt; setReports(_reps); supaFetch('reports','POST',{id:r.id,data:_reps[_ri],updated_at:new Date().toISOString()}).catch(function(){}); }
   }
   pw.document.open();
   pw.document.write(window.buildPrintHTML(r));
